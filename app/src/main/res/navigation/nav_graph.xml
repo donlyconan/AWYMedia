@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/splashScreenFragment"
-        android:name="com.utc.donlyconan.media.SplashScreenFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.SplashScreenFragment"
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen" />
 
