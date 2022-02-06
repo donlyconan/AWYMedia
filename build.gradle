@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     ext {
-        kotlin_version = "1.5.10"
+        kotlin_version = "1.5.30"
         nav_version = "2.3.5"
     }
     dependencies {
@@ -22,6 +22,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         jcenter() // Warning: this repository is going to shut down soon
     }
 }
