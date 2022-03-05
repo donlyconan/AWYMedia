@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
 
 
 android {
@@ -9,7 +10,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.donly.funny"
+        applicationId "com.utc.donlyconan.media"
         minSdkVersion 24
         targetSdkVersion 31
         versionCode 1
@@ -37,7 +38,7 @@ android {
 
 buildscript {
     ext {
-        kotlin_version = "1.5.10"
+        kotlin_version = "1.6.10"
         fragment_version = "1.2.5"
         retrofit = "2.9.0"
         converter_gson = "2.9.0"
@@ -51,6 +52,7 @@ buildscript {
         kotlincore_version = "1.7.0"
         play_services_version = "20.1.0"
         support_version = "27.1.1"
+        firebase_version = "29.0.1"
     }
 }
 
@@ -64,8 +66,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
+    implementation 'com.google.android.material:material:1.4.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -103,4 +106,11 @@ dependencies {
     implementation "com.google.android.gms:play-services-auth:20.1.0"
     implementation "com.google.android.gms:play-services-drive:17.0.0"
     implementation 'com.squareup.okio:okio:1.14.0'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:29.1.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 }

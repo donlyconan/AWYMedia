@@ -7,18 +7,18 @@ import javax.inject.Singleton
 
 @Singleton
 class Settings @Inject constructor(context: Context) {
+
     companion object {
         const val SETTINGS_NAME = "sra-datn"
-
         // const of default language
         const val DEFAULT_LANGUAGE = "en"
-
         // const of key
-        const val KEY_LANGUAGE = "keys.language"
+        const val KEY_LANGUAGE = "language"
+        const val KEY_LOGGED = "logged"
     }
 
     var preferences: SharedPreferences =
         context.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE)
     val language by StringPreferenceDelegate(preferences, KEY_LANGUAGE, DEFAULT_LANGUAGE)
-
+    val isLogged by BooleanPreferenceDelegate(preferences, KEY_LOGGED, false)
 }

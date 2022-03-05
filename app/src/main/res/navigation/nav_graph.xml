@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/splashScreenFragment">
-
+    app:startDestination="@id/mainDisplayFragment">
 
     <fragment
         android:id="@+id/splashScreenFragment"
@@ -12,4 +11,9 @@
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen" />
 
+    <fragment
+        android:id="@+id/mainDisplayFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.MainDisplayFragment"
+        android:label="fragment_main_display"
+        tools:layout="@layout/fragment_main_display" />
 </navigation>

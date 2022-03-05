@@ -8,10 +8,6 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 
-fun File.test() {
-
-}
-
 class StringPreferenceDelegate(
   private val sharedPreferences: SharedPreferences,
   private val key: String,

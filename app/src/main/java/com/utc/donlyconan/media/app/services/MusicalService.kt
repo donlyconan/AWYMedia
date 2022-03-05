@@ -4,10 +4,10 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 
-class VideoMediaService: Service() {
+class MusicalService: Service() {
 
     companion object {
-        val TAG = VideoMediaService.javaClass.simpleName
+        val TAG = MusicalService.javaClass.simpleName
     }
 
     override fun onBind(intent: Intent?): IBinder? {
