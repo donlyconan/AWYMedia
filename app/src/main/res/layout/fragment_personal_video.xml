@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_content_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#2f3338"
+            android:baselineAligned="false"
+            android:gravity="start|center"
+            android:theme="@style/MenuStylle"
+            app:layout_scrollFlags="snap|scroll|enterAlways"
+            app:menu="@menu/menu_bar"
+            app:titleTextColor="#fff">
+
+            <LinearLayout
+                android:id="@+id/box_header"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/img_open_drawer"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_avatar" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/graduate"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="5dp"
+                    android:text="@string/app_name"
+                    android:textColor="#fff"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/recycler_color"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/fab_margin"
+            android:backgroundTint="?colorPrimary"
+            android:src="@drawable/ic_baseline_add_24"
+            android:tint="#FFFFFF"
+            app:fabSize="normal"
+            app:maxImageSize="25dp"
+            app:useCompatPadding="false" />
+
+    </LinearLayout>
+
+
+    <!--        <LinearLayout-->
+    <!--            android:id="@+id/layout_info"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_gravity="center"-->
+    <!--            android:gravity="center"-->
+    <!--            android:orientation="horizontal"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toBottomOf="@+id/search_bar"-->
+    <!--            app:layout_constraintVertical_bias="0.45">-->
+
+    <!--            <ImageView-->
+    <!--                android:layout_width="60dp"-->
+    <!--                android:layout_height="60dp"-->
+    <!--                android:src="@drawable/ic_baseline_menu_book" />-->
+
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginLeft="5dp"-->
+    <!--                android:layout_marginTop="5dp"-->
+    <!--                android:text="@string/no_item_inrecycle"-->
+    <!--                android:textColor="@color/text_color_light"-->
+    <!--                android:textSize="16sp" />-->
+    <!--        </LinearLayout>-->
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

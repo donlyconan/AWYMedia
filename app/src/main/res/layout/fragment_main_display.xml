@@ -1,39 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".views.fragments.MainDisplayFragment">
-
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:queryHint="Find in Drive"
-        app:iconifiedByDefault="false"
-        app:searchIcon="@drawable/ic_outline_dehaze_24"
-        android:background="@drawable/background_search_bar"
-        android:layout_margin="10dp"/>
-
+    android:fitsSystemWindows="true">
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
+        android:id="@+id/viewPager2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/navigation_bar"
-        android:layout_below="@id/search_bar"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp" />
+        android:layout_above="@id/nav_bar"
+        android:layout_alignParentStart="true"/>
 
+<!--    <com.google.android.material.navigation.NavigationView-->
+<!--        android:id="@+id/activity_main_navigation_view"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_gravity="start"-->
+<!--        android:maxWidth="@dimen/navigation_drawer_max_width"-->
+<!--        app:elevation="@dimen/elevation_nav_drawer"-->
+<!--        app:headerLayout="@layout/nav_header_main"-->
+<!--        app:menu="@menu/menu_main_drawer" />-->
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/navigation_bar"
+        android:id="@+id/nav_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/nav_bar_height"
         android:layout_alignParentBottom="true"
+        android:background="@color/gray"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
+        app:itemBackground="@drawable/bg_nav_bar_item"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/list_naviation_bar"
-        android:background="@android:color/white" />
+        android:layout_gravity="bottom"
+        app:menu="@menu/menu_naviation_bar" />
+
 
 </RelativeLayout>

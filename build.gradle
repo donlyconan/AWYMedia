@@ -3,10 +3,14 @@ buildscript {
         google()
         mavenCentral()
     }
+
     ext {
         kotlin_version = "1.5.30"
         nav_version = "2.3.5"
     }
+
+
+
     dependencies {
         classpath "com.android.tools.build:gradle:4.2.2"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -17,6 +21,25 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
+    ext {
+        kotlin_version = "1.6.10"
+        fragment_version = "1.2.5"
+        retrofit = "2.9.0"
+        converter_gson = "2.9.0"
+        exoplayer_version = "2.13.0"
+        nav_version = "2.4.0"
+        room_version = "2.4.1"
+        dagger_version = "2.28.3"
+        nav_compose = "2.4.0"
+        imageslider_version = "1.4.0-appcompat"
+        viewpager_version = "1.0.0"
+        kotlincore_version = "1.7.0"
+        play_services_version = "20.1.0"
+        support_version = "27.1.1"
+        firebase_version = "29.0.1"
+    }
+
 }
 
 allprojects {

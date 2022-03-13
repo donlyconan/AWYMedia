@@ -16,4 +16,27 @@
     <color name="selected_text">#0b57cf</color>
     <color name="icon_color">#1f1f1f</color>
     <color name="text_navigation_bottom">#454746</color>
+    <color name="primary">@color/blue_500</color>
+    <color name="primaryDark">@color/blue_700</color>
+    <color name="textPrimary">@color/text_black_primary</color>
+    <color name="colorToolBarIcon">#FFDF8A</color>
+    <color name="blue_300">#3E5B9A</color>
+
+    <!-- Text -->
+    <color name="text_black_primary">@color/black_87</color>
+
+    <color name="text_white_primary">@color/white</color>
+
+    <!-- Blue -->
+    <color name="blue_500">#2196f3</color>
+    <color name="blue_700">#1976D2</color>
+
+    <!-- Black and White -->
+    <color name="black_alpha_40">#66000000</color>
+    <color name="black_alpha_60">#99000000</color>
+
+    <color name="black_87">#DE000000</color>
+    <color name="white_gray">#44474C</color>
+    <color name="recycler_color">#1f2123</color>
+    <color name="gray">#383C40</color>
 </resources>

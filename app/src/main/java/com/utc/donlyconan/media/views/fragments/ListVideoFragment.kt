@@ -7,11 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.utc.donlyconan.media.R
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ListVideoFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ListVideoFragment : Fragment() {
 
 
