@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:title="Sort by" />
 
     <item
-        android:icon="@drawable/ic_cast_screen"
-        android:title="Cast screen"
-        app:showAsAction="always" />
-
-    <item
+        android:id="@+id/it_search"
         android:icon="@drawable/ic_search_icon"
         android:title="Search"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/it_sort_by"
+        android:icon="@drawable/ic_baseline_sort_24"
+        android:title="Sort by"
+        app:showAsAction="always"/>
+
 
     <item
-        android:id="@+id/nav_backups"
-        android:icon="@drawable/ic_explore_white_24dp"
-        android:title="Backups" />
-
-    <item
-        android:id="@+id/nav_trash"
-        android:icon="@drawable/ic_explore_white_24dp"
-        android:title="Trash" />
-
-    <item
-        android:id="@+id/nav_settings"
+        android:id="@+id/it_settings"
         android:icon="@drawable/ic_help_white_24dp"
         android:title="Settings" />
 
 
     <item
-        android:id="@+id/nav_view_item_help"
+        android:id="@+id/it_backups"
+        android:icon="@drawable/ic_explore_white_24dp"
+        android:title="Backups" />
+
+    <item
+        android:id="@+id/it_trash"
+        android:icon="@drawable/ic_explore_white_24dp"
+        android:title="Trash" />
+
+    <item
+        android:id="@+id/it_view_item_help"
         android:icon="@drawable/ic_help_white_24dp"
         android:title="@string/nav_drawer_help_and_feedback" />
 
     <item
-        android:id="@+id/nav_view_item_about"
+        android:id="@+id/it_view_item_about"
         android:icon="@drawable/ic_info_white_24dp"
         android:title="@string/nav_drawer_about" />
 

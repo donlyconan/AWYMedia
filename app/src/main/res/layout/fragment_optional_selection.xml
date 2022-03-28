@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="15dp"
+    android:paddingBottom="10dp"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet_fragment">
+
+    <TextView
+        android:id="@+id/btn_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_play_circle_24"
+        android:text="Xem"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/btn_play_music"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_audiotrack_24"
+        android:text="Phát âm thanh"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/btn_favorite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_favorite"
+        android:text="Yêu thích"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_delete_24"
+        android:text="Xóa"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/btn_share"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_share_24"
+        android:text="Chia sẻ"
+        style="@style/BottomMenuItem"
+        />
+
+
+    <TextView
+        android:id="@+id/btn_make_copy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_content_copy_24"
+        android:text="Tạo bản sao"
+        style="@style/BottomMenuItem"
+        />
+
+</LinearLayout>

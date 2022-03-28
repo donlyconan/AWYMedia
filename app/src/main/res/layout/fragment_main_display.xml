@@ -7,22 +7,52 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <include android:id="@+id/appbar"
+        layout="@layout/app_bar_layout"/>
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/nav_bar"
-        android:layout_alignParentStart="true"/>
+        android:layout_below="@id/appbar"
+        android:background="@color/recycler_color"
+        android:layout_alignParentStart="true" />
 
-<!--    <com.google.android.material.navigation.NavigationView-->
-<!--        android:id="@+id/activity_main_navigation_view"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_gravity="start"-->
-<!--        android:maxWidth="@dimen/navigation_drawer_max_width"-->
-<!--        app:elevation="@dimen/elevation_nav_drawer"-->
-<!--        app:headerLayout="@layout/nav_header_main"-->
-<!--        app:menu="@menu/menu_main_drawer" />-->
+    <LinearLayout
+        android:id="@+id/ll_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:visibility="invisible">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:indeterminate="true"/>
+
+        <TextView
+            android:layout_marginStart="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đang tải..."
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_no_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"
+        android:text="Không có dữ liệu"
+        android:fontFamily="sans-serif"
+        android:drawablePadding="@dimen/spacing_8"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/outline_movie_24"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_bar"

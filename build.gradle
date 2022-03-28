@@ -29,7 +29,7 @@ buildscript {
         converter_gson = "2.9.0"
         exoplayer_version = "2.13.0"
         nav_version = "2.4.0"
-        room_version = "2.4.1"
+        room_version = "2.4.2"
         dagger_version = "2.28.3"
         nav_compose = "2.4.0"
         imageslider_version = "1.4.0-appcompat"

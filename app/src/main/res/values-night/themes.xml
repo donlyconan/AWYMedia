@@ -2,9 +2,9 @@
     <!-- Base application theme. -->
     <style name="Theme.AWYMedia" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_300</item>
+        <item name="colorPrimary">@color/gray</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/white_gray</item>
         <!-- Status bar color. -->
         <!-- Customize your theme here. -->
     </style>

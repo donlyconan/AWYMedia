@@ -1,26 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrim_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:layoutDirection="ltr"
-    android:background="#CC000000"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:background="#99000000">
 
     <LinearLayout
+        android:id="@+id/layout_scrim"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:gravity="center"
-        android:paddingTop="4dp"
-        android:orientation="horizontal">
+        android:visibility="invisible"
+        android:layout_gravity="bottom">
 
-        <ImageButton android:id="@id/exo_play"
-            style="@style/ExoMediaButton.Play"/>
+        <ImageButton
+            android:id="@+id/exo_unlock"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_button_unlock"
+            android:src="@drawable/outline_lock_open_24" />
 
-        <ImageButton android:id="@id/exo_pause"
-            style="@style/ExoMediaButton.Pause"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:text="Màn hình đã khóa"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Nhấn để mở khóa"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
-</LinearLayout>
+
+    <include
+        android:id="@+id/layout_custom_player_control_view"
+        layout="@layout/custom_option_player_control_view"/>
+
+</FrameLayout>

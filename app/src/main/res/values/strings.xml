@@ -22,5 +22,8 @@
     <string name="recent">Recent</string>
     <string name="shared">Shared</string>
     <string name="favorite">Favorite</string>
-
+    <string name="share">Share</string>
+    <string name="upload">Upload</string>
+    <string name="copy">Copy</string>
+    <string name="print">Print</string>
 </resources>

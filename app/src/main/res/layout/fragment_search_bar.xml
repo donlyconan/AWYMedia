@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?colorSecondary"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".views.fragments.SearchBarFragment">
 
@@ -10,9 +11,13 @@
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        app:queryHint="Find in Drive"
+        app:queryHint="Tìm kiếm..."
         app:iconifiedByDefault="false"
         app:searchIcon="@drawable/ic_baseline_arrow_back_24"
-        android:background="#D5D5D5" />
+        app:closeIcon="@drawable/ic_baseline_close"
+        android:background="?colorPrimary"
+        style="@style/SearchViewLight"/>
 
-</FrameLayout>
+
+
+</LinearLayout>

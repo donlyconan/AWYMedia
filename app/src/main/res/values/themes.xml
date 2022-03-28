@@ -4,11 +4,14 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/gray</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/white_gray</item>
+        <item name="colorControlNormal">@color/white</item>
         <!-- Status bar color. -->
         <!-- Customize your theme here. -->
         <item name="android:statusBarColor">?colorPrimary</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:itemBackground">@color/gray_20</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 </resources>

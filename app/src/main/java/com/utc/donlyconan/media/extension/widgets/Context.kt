@@ -1,4 +1,4 @@
-package com.utc.donlyconan.media.widget.viewextension
+package com.utc.donlyconan.media.extension.widgets
 
 import android.content.Context
 import android.widget.Toast

@@ -11,4 +11,6 @@
 
     <dimen name="elevation_app_bar">4dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="action_bar_size">55dp</dimen>
+    <dimen name="list_video_item_margin_bottom">5dp</dimen>
 </resources>

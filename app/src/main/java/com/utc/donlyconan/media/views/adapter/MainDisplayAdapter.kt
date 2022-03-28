@@ -1,4 +1,4 @@
-package com.utc.donlyconan.media.views.fragments.adapter
+package com.utc.donlyconan.media.views.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
