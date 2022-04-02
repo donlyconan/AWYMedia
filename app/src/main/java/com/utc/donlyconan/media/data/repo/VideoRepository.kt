@@ -22,4 +22,7 @@ interface VideoRepository {
     fun getAllNextVideos(startId: Long): LiveData<List<Video>>
 
     fun hasUrl(url: String): Boolean
+
+    fun findAllVideos(keyword: String): LiveData<List<Video>>
+
 }

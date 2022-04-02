@@ -107,40 +107,26 @@ class MainDisplayFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onStart() {
-        super.onStart()
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(broadcastReceiver,
-            IntentFilter(ACTION_SHOW_LOADING).apply {
-                addAction(ACTION_HIDE_LOADING)
-                addAction(ACTION_SHOW_NO_DATA_VIEW)
-                addAction(ACTION_HIDE_NO_DATA_VIEW)
-            })
-    }
 
-    override fun onStop() {
-        super.onStop()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(broadcastReceiver)
-    }
-
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            Log.d(TAG, "onReceive() called with: context = $context, intent = $intent")
-            when (intent.action) {
-                ACTION_SHOW_NO_DATA_VIEW -> {
-                    binding.tvNoData.visibility = View.VISIBLE
-                }
-                ACTION_HIDE_NO_DATA_VIEW -> {
-                    binding.tvNoData.visibility = View.INVISIBLE
-                }
-                ACTION_SHOW_LOADING -> {
-                    binding.llLoading.visibility = View.VISIBLE
-                }
-                ACTION_HIDE_LOADING -> {
-                    binding.llLoading.visibility = View.INVISIBLE
-                }
-            }
-        }
-    }
+//    private val broadcastReceiver = object : BroadcastReceiver() {
+//        override fun onReceive(context: Context?, intent: Intent) {
+//            Log.d(TAG, "onReceive() called with: context = $context, intent = $intent")
+//            when (intent.action) {
+//                ACTION_SHOW_NO_DATA_VIEW -> {
+//                    binding.tvNoData.visibility = View.VISIBLE
+//                }
+//                ACTION_HIDE_NO_DATA_VIEW -> {
+//                    binding.tvNoData.visibility = View.INVISIBLE
+//                }
+//                ACTION_SHOW_LOADING -> {
+//                    binding.llLoading.visibility = View.VISIBLE
+//                }
+//                ACTION_HIDE_LOADING -> {
+//                    binding.llLoading.visibility = View.INVISIBLE
+//                }
+//            }
+//        }
+//    }
 
 
     companion object {

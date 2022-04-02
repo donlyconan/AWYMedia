@@ -110,6 +110,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-drive:17.0.0"
     implementation 'com.squareup.okio:okio:1.17.2'
 
+
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:29.1.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
@@ -134,7 +135,8 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.17.1'
 
     // Implement androidx.fragment
-    implementation 'androidx.fragment:fragment-ktx:1.5.0-alpha03'
+    implementation 'androidx.fragment:fragment-ktx:1.5.0-alpha04'
     api 'androidx.navigation:navigation-fragment-ktx:2.5.0-alpha03'
     api 'androidx.navigation:navigation-ui-ktx:2.5.0-alpha03'
+
 }

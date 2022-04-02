@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.app.services
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 
 class MusicMediaService: Service() {
     companion object {
@@ -18,7 +19,9 @@ class MusicMediaService: Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
+        Log.d(TAG, "onBind() called with: intent = $intent")
+        // TODO implemented
+        return null
     }
 
     override fun onDestroy() {

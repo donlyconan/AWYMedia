@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:background="?colorSecondary"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".views.fragments.SearchBarFragment">
+    tools:context=".views.fragments.SearchBarFragment"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_bar"
@@ -18,6 +19,22 @@
         android:background="?colorPrimary"
         style="@style/SearchViewLight"/>
 
+    <TextView
+        android:id="@+id/tv_search_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đang tìm kiếm trong thư mục Yêu thích"
+        android:textSize="16sp"
+        android:padding="8dp"/>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        tools:itemCount="10"
+        tools:listitem="@layout/item_video_single_mode" />
 
 </LinearLayout>

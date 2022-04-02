@@ -10,11 +10,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
+import com.utc.donlyconan.media.databinding.IncludeLoadingDataBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.VideoDisplayActivity
@@ -29,17 +29,12 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
+    private val bindLoadingData by lazy { IncludeLoadingDataBinding.bind(view!!.findViewById(R.id.ll_loading)) }
     private lateinit var adapter: VideoAdapter
     private val videoDao by lazy {
         (requireContext().applicationContext as AwyMediaApplication).listVideoDao
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
-        super.onCreate(savedInstanceState)
-        LocalBroadcastManager.getInstance(requireContext())
-            .sendBroadcast(Intent(MainDisplayFragment.ACTION_SHOW_LOADING))
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,6 +49,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
         Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                     "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
+        bindLoadingData.llLoading1.visibility = View.VISIBLE
         adapter = VideoAdapter(context!!, ArrayList())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
@@ -62,17 +58,8 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
             adapter.submit(it)
             if (it.isEmpty()) {
                 viewModel.insertVideosIntoDbIfNeed()
-            }
-            if(viewModel.isLoaded) {
-                LocalBroadcastManager.getInstance(requireContext())
-                    .sendBroadcast(Intent(MainDisplayFragment.ACTION_HIDE_LOADING))
-                if(it.isEmpty()) {
-                    LocalBroadcastManager.getInstance(requireContext())
-                        .sendBroadcast(Intent(MainDisplayFragment.ACTION_SHOW_NO_DATA_VIEW))
-                } else {
-                    LocalBroadcastManager.getInstance(requireContext())
-                        .sendBroadcast(Intent(MainDisplayFragment.ACTION_HIDE_NO_DATA_VIEW))
-                }
+            } else {
+                bindLoadingData.llLoading1.visibility = View.INVISIBLE
             }
         }
         binding.fab.setOnClickListener(this)
@@ -119,28 +106,27 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                 R.id.btn_share -> {
 
                 }
-                R.id.btn_make_copy -> {
 
-                }
                 else -> {}
             }
         }
     }
 
-    val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            Log.d(TAG, "onActivityResult() called with: result = $result")
+    private val activityResultLauncher = registerForActivityResult(ActivityResultContracts
+        .StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val intent = result.data
                 intent?.data?.let { data ->
+                    Log.d(TAG, "activityResultLauncher() called with: data = $data")
+                    val videoId = data.toString().let {
+                        it.substring(it.lastIndexOf('A') + 1).toInt()
+                    }
                     if (!viewModel.repository.hasUrl(data.toString())) {
                         viewModel.viewModelScope.launch {
-                            val video = context?.contentResolver?.getAllVideos(data)?.first()
-                            if(video != null) {
+                            context?.contentResolver?.getAllVideos(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                "${MediaStore.Video.Media._ID}=$videoId")?.first()?.let { video ->
+                                Log.d(TAG, "activityResultLauncher() called video=$video")
                                 viewModel.repository.insertVideo(video)
-                                Log.d(TAG, "onActivityResult: video=$video")
-                            } else {
-                                context?.showMessage("Đã có lỗi xảy ra, vui lòng thử lại!")
                             }
                         }
                     } else {
@@ -154,7 +140,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
         Log.d(TAG, "onClick() called with: v = $v")
         when (v.id) {
             R.id.fab -> {
-                val intent = Intent().apply {
+                val intent = Intent(Intent.ACTION_PICK).apply {
                     type = "video/*"
                     action = Intent.ACTION_GET_CONTENT
                 }

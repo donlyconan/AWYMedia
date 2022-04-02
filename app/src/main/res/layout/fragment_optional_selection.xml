@@ -11,21 +11,19 @@
 
     <TextView
         android:id="@+id/btn_play"
+        style="@style/BottomMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_play_circle_24"
-        android:text="Xem"
-        style="@style/BottomMenuItem"
-        />
+        android:text="Xem" />
 
     <TextView
         android:id="@+id/btn_play_music"
+        style="@style/BottomMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_audiotrack_24"
-        android:text="Phát âm thanh"
-        style="@style/BottomMenuItem"
-        />
+        android:text="Phát âm thanh" />
 
     <TextView
         android:id="@+id/btn_favorite"
@@ -55,13 +53,13 @@
         />
 
 
-    <TextView
-        android:id="@+id/btn_make_copy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/outline_content_copy_24"
-        android:text="Tạo bản sao"
-        style="@style/BottomMenuItem"
-        />
+<!--    <TextView-->
+<!--        android:id="@+id/btn_up_load"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:drawableStart="@drawable/outline_content_copy_24"-->
+<!--        android:text="Tạo bản sao"-->
+<!--        style="@style/BottomMenuItem"-->
+<!--        />-->
 
 </LinearLayout>

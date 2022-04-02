@@ -37,4 +37,6 @@ interface ListVideosDao {
     @Query("Select count(video_id) from videos where url=:url")
     fun countUrl(url: String): Int
 
+    @Query("Select * from videos where video_name like :keyword")
+    fun findAllVideos(keyword: String): LiveData<List<Video>>
 }

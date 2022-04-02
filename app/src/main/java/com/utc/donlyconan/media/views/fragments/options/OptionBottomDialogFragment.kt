@@ -35,7 +35,6 @@ class OptionBottomDialogFragment : BottomSheetDialogFragment(), View.OnClickList
         binding.btnPlay.setOnClickListener(this)
         binding.btnDelete.setOnClickListener(this)
         binding.btnFavorite.setOnClickListener(this)
-        binding.btnMakeCopy.setOnClickListener(this)
         binding.btnShare.setOnClickListener(this)
         binding.btnPlayMusic.setOnClickListener(this)
         binding.btnFavorite.isSelected = video.isFavorite

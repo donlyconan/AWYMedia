@@ -10,7 +10,7 @@ import com.utc.donlyconan.media.data.dao.ListVideosDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.extension.components.getAllVideos
 
-class VideoRepositoryImpl(val dao: ListVideosDao, val contentResolver: ContentResolver): VideoRepository {
+class GoogleDriveVideoRepositoryImpl(val dao: ListVideosDao, val contentResolver: ContentResolver): VideoRepository {
 
     suspend fun loadVideos(): List<Video> = contentResolver.getAllVideos(MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
 

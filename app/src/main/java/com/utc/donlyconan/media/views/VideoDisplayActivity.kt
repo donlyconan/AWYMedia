@@ -10,6 +10,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.ExoPlayer
@@ -49,6 +50,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
         if(viewModel.video.value == null) {
             viewModel.video.value = intent.getParcelableExtra(KEY_VIDEO)
         }
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
     }
 
@@ -166,6 +168,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                 exoPlayer.setMediaItem(mediaItem, false)
                 exoPlayer.seekTo(video.playedTime)
                 exoPlayer.prepare()
+                exoPlayer.playWhenReady = false
                 exoPlayer.playWhenReady = viewModel.playWhenReady
             }
         player?.addListener(listener)

@@ -43,7 +43,7 @@ class FavoriteFragment : Fragment(), OnItemClickListener, View.OnClickListener {
             MainDisplayFragment.TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, ArrayList(), VideoAdapter.MODE_RECENT)
+        adapter = VideoAdapter(context!!, ArrayList(), VideoAdapter.MODE_NORMAL)
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         viewModel.videoList.observe(this, adapter::submit)
