@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.PlaybackParams
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,23 +18,29 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
 import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
+import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
 
 
+/**
+ * Lớp cung cấp các phương tiện chức năng hỗ trợ cho việc phát video
+ */
 class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
     private val binding by lazy { ActivityVideoDisplayBinding.inflate(layoutInflater) }
     private val bindingScrim by lazy { PlayerControlViewBinding.bind(findViewById(R.id.scrim_view)) }
     private val bindingExtView by lazy {
-        CustomOptionPlayerControlViewBinding.bind(bindingScrim.layoutCustomPlayerControlView.rootView)
+        CustomOptionPlayerControlViewBinding.bind(bindingScrim.layoutPlayerControlView.rootView)
     }
     private var player: ExoPlayer? = null
     private val viewModel by viewModels<VideoDisplayViewModel>()
+    private val videoDao by lazy { (applicationContext as AwyMediaApplication).videoDao }
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
             or View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -47,6 +54,14 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
         Log.d(TAG, "onCreate: This Activity is created on portrait screen " +
                 "[${resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT}]")
         setContentView(binding.root)
+        viewModel.video.observe(this) { video ->
+            bindingExtView.headerTv.text = video.title
+            val nextVideo = videoDao.getNextVideo(video.videoId)
+            nextVideo?.let {
+                val item = MediaItem.fromUri(Uri.parse(it.path))
+                player?.addMediaItem(item)
+            }
+        }
         if(viewModel.video.value == null) {
             viewModel.video.value = intent.getParcelableExtra(KEY_VIDEO)
         }
@@ -54,13 +69,14 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
         initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
     }
 
-    private fun initialize(isLandscapeScreen: Boolean) {
+    private fun  initialize(isLandscapeScreen: Boolean) {
         Log.d(TAG, "initialize() called with: isLandscapeScreen = $isLandscapeScreen")
         if(isLandscapeScreen) {
             bindingExtView.exoLoop?.setOnClickListener(this)
             bindingExtView.exoLock?.setOnClickListener(this)
             bindingExtView.exoSubtitle?.setOnClickListener(this)
             bindingExtView.exoPlaybackSpeed?.setOnClickListener(this)
+            bindingExtView.exoNext?.setOnClickListener(this)
         } else{
             bindingExtView.exoOption?.setOnClickListener(this)
         }
@@ -68,6 +84,16 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
         bindingExtView.exoRotate.setOnClickListener(this)
         bindingExtView.exoBack.setOnClickListener(this)
         initializePlayer(viewModel.video.value!!)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        enterPictureInPictureMode()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        Log.d(TAG, "onUserLeaveHint() called")
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -89,6 +115,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         releasePlayer()
+        viewModel.saveVideoIfNeed()
         super.onDestroy()
     }
 
@@ -107,16 +134,16 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 R.id.exo_rotate -> {
                     requestedOrientation =
-                        if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                        else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 }
                 R.id.exo_unlock -> {
-                    bindingScrim.layoutCustomPlayerControlView.rootView.visibility = View.VISIBLE
+                    bindingScrim.layoutPlayerControlView.rootView.visibility = View.VISIBLE
                     bindingScrim.layoutScrim.visibility = View.INVISIBLE
                 }
                 R.id.exo_lock -> {
-                    bindingScrim.layoutCustomPlayerControlView.rootView.visibility = View.INVISIBLE
+                    bindingScrim.layoutPlayerControlView.rootView.visibility = View.INVISIBLE
                     bindingScrim.layoutScrim.visibility = View.VISIBLE
                 }
                 R.id.exo_option -> {
@@ -138,6 +165,11 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                             }
                         }
                     ).show(supportFragmentManager, TAG)
+                }
+                R.id.exo_next -> {
+                    val nextVideo = videoDao.getNextVideo(viewModel.video.value!!.videoId)
+                    viewModel.video.value = nextVideo
+                    player?.seekToNextWindow()
                 }
                 else -> {
                     Log.d(TAG, "onClick: not found ${msg.what}")
@@ -164,7 +196,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
             .build()
             .also { exoPlayer ->
                 binding.videoView.player = exoPlayer
-                val mediaItem = MediaItem.fromUri(video.data)
+                val mediaItem = MediaItem.fromUri(Uri.parse(video.path))
                 exoPlayer.setMediaItem(mediaItem, false)
                 exoPlayer.seekTo(video.playedTime)
                 exoPlayer.prepare()
@@ -198,19 +230,15 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private val onSystemUiVisibilityChangeListener =
-        object : View.OnSystemUiVisibilityChangeListener {
-            override fun onSystemUiVisibilityChange(visibility: Int) {
-                Log.d(TAG, "onSystemUiVisibilityChange() called with: visibility = $visibility")
-                if (visibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION != 0) {
-                    Log.d(TAG, "onSystemUiVisibilityChange() called hide systemui")
-                    window.decorView.systemUiVisibility = systemFlags
-                }
+        View.OnSystemUiVisibilityChangeListener { visibility ->
+            Log.d(TAG, "onSystemUiVisibilityChange() called with: visibility = $visibility")
+            if (visibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION != 0) {
+                Log.d(TAG, "onSystemUiVisibilityChange() called hide systemui")
+                window.decorView.systemUiVisibility = systemFlags
             }
-
         }
 
     companion object {
-        val TAG = VideoDisplayActivity::class.java.simpleName
         val KEY_VIDEO = "key_video"
     }
 

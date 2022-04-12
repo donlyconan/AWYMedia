@@ -26,7 +26,7 @@
             android:id="@+id/header_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_centerInParent="true"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@+id/exo_close"
@@ -50,7 +50,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -98,16 +98,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@id/exo_position"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            tool:text="10:02" />
-
-        <com.google.android.exoplayer2.ui.DefaultTimeBar
+        <SeekBar
             android:id="@+id/exo_progress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -116,22 +107,7 @@
             android:layout_marginLeft="3dp"
             android:layout_marginEnd="3dp"
             android:layout_marginRight="3dp"
-            android:layout_weight="1"
-            app:buffered_color="@color/white_50"
-            app:played_color="@color/live_red"
-            app:scrubber_color="@color/live_red"
-            app:unplayed_color="@color/white_20" />
-
-        <TextView
-            android:id="@id/exo_duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="right"
-            android:minWidth="50dp"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            tool:text="01:10:00" />
+            android:layout_weight="1" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/exo_go_live"

@@ -7,7 +7,11 @@ interface IGoogleDriveListener {
 
     void onUploading();
 
-    void onUploadingComplete();
+    void onDownloading();
+
+    void onDownloadingCompleted();
+
+    void onUploadingCompleted();
 
     void onCancel();
 

@@ -12,20 +12,12 @@
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        app:queryHint="Tìm kiếm..."
+        app:queryHint="Tìm kiếm video của tôi..."
         app:iconifiedByDefault="false"
         app:searchIcon="@drawable/ic_baseline_arrow_back_24"
         app:closeIcon="@drawable/ic_baseline_close"
         android:background="?colorPrimary"
         style="@style/SearchViewLight"/>
-
-    <TextView
-        android:id="@+id/tv_search_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Đang tìm kiếm trong thư mục Yêu thích"
-        android:textSize="16sp"
-        android:padding="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

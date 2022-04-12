@@ -2,31 +2,38 @@ package com.utc.donlyconan.media.viewmodels
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Video
-import com.utc.donlyconan.media.data.repo.VideoRepositoryImpl
-import com.utc.donlyconan.media.views.fragments.PersonalVideoFragment.Companion.TAG
+import com.utc.donlyconan.media.extension.widgets.TAG
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class PersonalVideoViewModel(app: Application) : AndroidViewModel(app) {
-    val repository = VideoRepositoryImpl((app as AwyMediaApplication).listVideoDao, app.contentResolver)
-    val videoList: LiveData<List<Video>> = repository.getAllVideos()
-    var isLoaded: Boolean = false
-    var selectedVideo: Video ?= null
+class PersonalVideoViewModel(val app: Application) : BaseAndroidViewModel(app) {
+    val lstVideoRepo = awyApp.lstVideoRepo
+    val videoRepo = awyApp.videoRepo
+    lateinit var videoList: Flow<PagingData<Video>>
+    var selectedVideo: Video? = null
 
-    fun insertVideosIntoDbIfNeed() {
-        Log.d(TAG, "insertVideosIntoDbIfNeed() called")
+    fun insertDataIntoDbIfNeed() {
+        Log.d(TAG, "insertDataIntoDb() called")
         viewModelScope.launch {
-            val videoList = repository.loadVideos()
-            if(!isLoaded && !videoList.isEmpty()) {
-                repository.insertVideo(*videoList.toTypedArray())
-                Log.d(TAG, "insertVideosIfNeed() called inserted=" + videoList.size)
-                isLoaded = true
+            if(videoRepo.count() != 0) {
+                Log.d(TAG, "insertDataIntoDbIfNeed: Database had been loaded!")
+                return@launch
             }
+            val videoList = lstVideoRepo.loadAllVideos()
+            Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
+            videoRepo.insert(*videoList.toTypedArray())
         }
+    }
+
+    fun sortBy(sortId: Int): Flow<PagingData<Video>> {
+        Log.d(TAG, "sortVideoList() called with: sortId = $sortId")
+        videoList = lstVideoRepo.getAllVideos(sortId).cachedIn(viewModelScope)
+        return videoList
     }
 }

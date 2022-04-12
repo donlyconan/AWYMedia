@@ -1,12 +1,11 @@
 package com.utc.donlyconan.media.data.db
 
 import android.content.Context
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.room.Database
-import androidx.room.Entity
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.utc.donlyconan.media.data.dao.ListVideosDao
+import com.utc.donlyconan.media.data.dao.ListVideoDao
+import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
 
 @Database(entities = [Video::class], version = 1, exportSchema = false)
@@ -28,6 +27,8 @@ abstract class AwyMediaDatabase: RoomDatabase() {
     }
 
     // Create daos in here
-    abstract fun getListVideoDao(): ListVideosDao
+    abstract fun listVideoDao(): ListVideoDao
+
+    abstract fun videoDao(): VideoDao
 
 }

@@ -8,14 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentRecentBinding
 import com.utc.donlyconan.media.viewmodels.RecentVideoViewModel
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.MainDisplayFragment.Companion.TAG
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
+import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.views.fragments.options.OptionBottomDialogFragment
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class RecentFragment : Fragment(), OnItemClickListener, View.OnClickListener {
@@ -39,20 +42,32 @@ class RecentFragment : Fragment(), OnItemClickListener, View.OnClickListener {
         Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, ArrayList(), VideoAdapter.MODE_RECENT)
+        adapter = VideoAdapter(context!!, VideoAdapter.MODE_RECENT)
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
-        viewModel.videoList.observe(this, adapter::submit)
+        viewModel.apply{
+            viewModelScope.launch {
+                videoList.collectLatest(adapter::submitData)
+            }
+            binding.llLoading.apply {
+                if(adapter.itemCount == 0) {
+                    tvNoData.visibility = View.VISIBLE
+                    llLoading1.visibility = View.INVISIBLE
+                } else {
+                    frameContainer.visibility = View.INVISIBLE
+                }
+            }
+        }
     }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.videosList[position]
+        val video = adapter.getVideo(position)
         if(v.id == R.id.img_menu_more) {
             OptionBottomDialogFragment.newInstance(video, this)
                 .show(fragmentManager!!, TAG)
         } else {
-            val item = viewModel.videoList.value?.get(position)
+            val item = adapter.getVideo(position)
             val intent = Intent(context, VideoDisplayActivity::class.java)
             intent.putExtra(VideoDisplayActivity.KEY_VIDEO,item)
             startActivity(intent)

@@ -13,4 +13,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="action_bar_size">55dp</dimen>
     <dimen name="list_video_item_margin_bottom">5dp</dimen>
+    <item name="scrim_opacity" type="dimen" format="float">0.3</item>
 </resources>

@@ -1,28 +1,26 @@
 package com.utc.donlyconan.media.data.repo
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingData
+import androidx.room.Query
 import com.utc.donlyconan.media.data.models.Video
+import kotlinx.coroutines.flow.Flow
 
+/**
+ * Handle CRUD with Video Objects
+ */
 interface VideoRepository {
 
-    fun getAllVideos(): LiveData<List<Video>>
+    suspend fun count(): Int
 
-    suspend fun insertVideo(vararg videos: Video)
+    suspend fun insert(vararg videos: Video)
 
-    fun updateVideo(video: Video): Int
+    fun update(video: Video): Int
 
-    suspend fun countVideoWithUri(dataUri: String): Int
+    fun countPath(path: String): Int
 
-    suspend fun deleteVideo(videoId: Long): Int
+    suspend fun delete(videoId: Long): Int
 
-    fun getAllPlayingVideos(): LiveData<List<Video>>
-
-    fun getAllFavoriteVideo(): LiveData<List<Video>>
-
-    fun getAllNextVideos(startId: Long): LiveData<List<Video>>
-
-    fun hasUrl(url: String): Boolean
-
-    fun findAllVideos(keyword: String): LiveData<List<Video>>
+    fun getVideo(videoId: Long): Video
 
 }

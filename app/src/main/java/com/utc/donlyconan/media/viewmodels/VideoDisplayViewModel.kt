@@ -4,27 +4,25 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.utc.donlyconan.media.data.db.AwyMediaDatabase
+import androidx.lifecycle.asLiveData
+import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Video
-import com.utc.donlyconan.media.data.repo.VideoRepositoryImpl
-import com.utc.donlyconan.media.views.VideoDisplayActivity.Companion.TAG
-import kotlinx.coroutines.launch
+import com.utc.donlyconan.media.extension.widgets.TAG
 
-class VideoDisplayViewModel(app: Application) : AndroidViewModel(app) {
+class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
     val video: MutableLiveData<Video> = MutableLiveData<Video>()
     val playWhenReady = true
-    val dao = AwyMediaDatabase.getInstance(app).getListVideoDao()
-    val repository = VideoRepositoryImpl(dao, app.contentResolver)
+    val lstVideoRepo = awyApp.lstVideoRepo
+    val videoRepo = awyApp.videoRepo
+    val videoList = lstVideoRepo.getAllVideos(Settings.SORT_BY_NAME).asLiveData()
 
-
-    override fun onCleared() {
-        Log.d(TAG, "onCleared() called video=" + video.value)
-        video.value?.let {
-            repository.updateVideo(it)
-            Log.d(TAG, "clear: video updated")
+    fun saveVideoIfNeed() {
+        Log.d(TAG, "saveVideoIfNeed() called video=${video.value}")
+        video.value?.let { video ->
+            videoRepo.update(video)
+            Log.d(TAG, "saveVideoIfNeed: video updated")
         }
-        super.onCleared()
     }
 
     override fun toString(): String {

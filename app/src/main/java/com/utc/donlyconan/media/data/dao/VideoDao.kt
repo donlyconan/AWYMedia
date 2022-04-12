@@ -1,0 +1,36 @@
+package com.utc.donlyconan.media.data.dao
+
+import androidx.room.*
+import com.utc.donlyconan.media.data.models.Video
+
+@Dao
+interface VideoDao {
+
+    /**
+     * Returns number of records available
+     */
+    @Query("Select count(video_id) from videos")
+    suspend fun count(): Int
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(vararg videos: Video)
+
+    @Update
+    fun update(video: Video): Int
+
+    @Query("Delete from videos where video_id = :videoId")
+    suspend fun delete(videoId: Long): Int
+
+    @Query("Select * from videos where video_id = :videoId")
+    fun getVideo(videoId: Long): Video
+
+    @Query("Select * from videos where video_id > :fromId order by video_id asc limit 1")
+    fun getNextVideo(fromId: Long): Video
+
+    @Query("Select * from videos where video_id < :fromId order by video_id desc limit 1")
+    fun getPreviousVideo(fromId: Long): Video
+
+    @Query("Select count(video_id) from videos where path=:path")
+    fun countPath(path: String): Int
+
+}

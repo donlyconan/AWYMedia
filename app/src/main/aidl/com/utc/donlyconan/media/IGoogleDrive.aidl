@@ -17,6 +17,8 @@ interface IGoogleDrive {
 
     void pushAllOnQueue(in List<String> paths);
 
+    void upload();
+
     void cancel();
 
     void registerGoogleDriveListener(in IGoogleDriveListener listener);

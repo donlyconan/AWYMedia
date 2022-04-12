@@ -8,15 +8,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
 import com.utc.donlyconan.media.databinding.FragmentRecentBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
+import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.viewmodels.FavoriteVideoViewModel
 import com.utc.donlyconan.media.viewmodels.RecentVideoViewModel
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.OptionBottomDialogFragment
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class FavoriteFragment : Fragment(), OnItemClickListener, View.OnClickListener {
@@ -27,36 +32,46 @@ class FavoriteFragment : Fragment(), OnItemClickListener, View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(MainDisplayFragment.TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
+        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        Log.d(
-            MainDisplayFragment.TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
+        Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                 "savedInstanceState = $savedInstanceState")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(
-            MainDisplayFragment.TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
+        Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, ArrayList(), VideoAdapter.MODE_NORMAL)
+        adapter = VideoAdapter(context!!, VideoAdapter.MODE_NORMAL)
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
-        viewModel.videoList.observe(this, adapter::submit)
+        viewModel.apply{
+            viewModelScope.launch {
+                videoList.collectLatest(adapter::submitData)
+            }
+            binding.llLoading.apply {
+                if(adapter.itemCount == 0) {
+                    tvNoData.visibility = View.VISIBLE
+                    llLoading1.visibility = View.INVISIBLE
+                } else {
+                    frameContainer.visibility = View.INVISIBLE
+                }
+            }
+        }
     }
 
     override fun onItemClick(v: View, position: Int) {
-        Log.d(MainDisplayFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.videosList[position]
+        Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
+        val video = adapter.getVideo(position)
         if(v.id == R.id.img_menu_more) {
             OptionBottomDialogFragment.newInstance(video, this)
-                .show(fragmentManager!!, MainDisplayFragment.TAG)
+                .show(fragmentManager!!, TAG)
         } else {
-            val item = viewModel.videoList.value?.get(position)
+            val item = adapter.getVideo(position)
             val intent = Intent(context, VideoDisplayActivity::class.java)
             intent.putExtra(VideoDisplayActivity.KEY_VIDEO,item)
             startActivity(intent)

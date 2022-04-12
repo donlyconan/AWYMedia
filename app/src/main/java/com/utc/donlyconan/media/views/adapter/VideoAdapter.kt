@@ -1,10 +1,12 @@
 package com.utc.donlyconan.media.views.adapter
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
@@ -12,19 +14,20 @@ import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.toShortTime
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemVideoSingleModeBinding
-import com.utc.donlyconan.media.views.fragments.PersonalVideoFragment.Companion.TAG
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
+import com.utc.donlyconan.media.extension.widgets.TAG
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import kotlin.io.path.Path
 
-class VideoAdapter(var context: Context, var videosList: List<Video>, val mode: Int = MODE_NORMAL):
-    RecyclerView.Adapter<VideoAdapter.VideoHolder>(), OnItemClickListener {
+
+class VideoAdapter(var context: Context, val mode: Int = MODE_NORMAL) :
+    PagingDataAdapter<Video, VideoAdapter.VideoHolder>(VideoComparator), OnItemClickListener {
+
     var inflater = LayoutInflater.from(context)
     var onItemClickListener: OnItemClickListener? = null
-    var selectedPostion: Int = -1
+    var selectedPosition: Int = -1
         private set
-
-    override fun getItemCount(): Int = videosList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
         val binding: ItemVideoSingleModeBinding = ItemVideoSingleModeBinding.inflate(inflater)
@@ -32,20 +35,15 @@ class VideoAdapter(var context: Context, var videosList: List<Video>, val mode: 
     }
 
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
-        val item: Video = videosList[position]
-        holder.bind(item, this, position == videosList.size - 1, mode)
+        val item: Video = getVideo(position)
+        holder.bind(item, this, position == itemCount - 1, mode)
     }
 
-    fun submit(videoList: List<Video>) {
-        Log.d(TAG, "submit() called with: it = ${videoList?.size}")
-        this.videosList = videoList
-        notifyDataSetChanged()
-        selectedPostion = -1
-    }
+    fun getVideo(position: Int) = getItem(position)!!
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
-        selectedPostion = position
+        selectedPosition = position
         onItemClickListener?.onItemClick(v, position)
     }
 
@@ -64,16 +62,21 @@ class VideoAdapter(var context: Context, var videosList: List<Video>, val mode: 
         }
 
         fun bind(video: Video, listener: OnItemClickListener?, isLastItem: Boolean, mode: Int) {
-            Log.d(TAG, "bind() called with: video = $video, listener = $listener, " +
-                    "isLastItem = $isLastItem, mode = $mode")
+            Log.d(
+                TAG, "bind() called with: video = $video, listener = $listener, " +
+                        "isLastItem = $isLastItem, mode = $mode"
+            )
             binding.tvTitle.setText(video.title)
-            Glide.with(itemView.context)
-                .load(video.data)
-                .into(binding.imgThumbnail)
+
             binding.tvDate.text = DateFormat.getDateInstance().format(video.updatedAt)
             binding.tvSize.text = video.size.convertToStorageData()
-            binding.tvDuration.text = (video.duration/1000).toShortTime()
+            binding.tvDuration.text = (video.duration / 1000).toShortTime()
             onItemClickListener = listener
+
+            Glide.with(itemView.context)
+                .load(video.path)
+                .into(binding.imgThumbnail)
+
             if (isLastItem) {
                 binding.container.apply {
                     val paddingBottom =
@@ -81,7 +84,7 @@ class VideoAdapter(var context: Context, var videosList: List<Video>, val mode: 
                     setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
                 }
             }
-            if(mode == MODE_RECENT) {
+            if (mode == MODE_RECENT) {
                 binding.progress.apply {
                     visibility = View.VISIBLE
                     max = video.duration

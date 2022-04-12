@@ -17,5 +17,12 @@
         tools:itemCount="10"
         tools:listitem="@layout/item_video_single_mode" />
 
+    <include
+        android:id="@+id/ll_loading"
+        layout="@layout/include_loading_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
 
 </FrameLayout>
