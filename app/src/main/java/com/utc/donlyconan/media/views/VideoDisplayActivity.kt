@@ -1,18 +1,19 @@
 package com.utc.donlyconan.media.views
 
 import android.annotation.SuppressLint
+import android.app.PictureInPictureParams
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.PlaybackParams
 import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import android.os.*
 import android.util.Log
+import android.util.Rational
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -23,7 +24,6 @@ import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
 import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
-import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
@@ -33,14 +33,23 @@ import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
  * Lớp cung cấp các phương tiện chức năng hỗ trợ cho việc phát video
  */
 class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
-    private val binding by lazy { ActivityVideoDisplayBinding.inflate(layoutInflater) }
-    private val bindingScrim by lazy { PlayerControlViewBinding.bind(findViewById(R.id.scrim_view)) }
+    private val binding by lazy {
+        ActivityVideoDisplayBinding.inflate(layoutInflater)
+    }
+    private val bindingScrim by lazy {
+        PlayerControlViewBinding.bind(findViewById(R.id.scrim_view))
+    }
     private val bindingExtView by lazy {
         CustomOptionPlayerControlViewBinding.bind(bindingScrim.layoutPlayerControlView.rootView)
     }
+    private val videoDao by lazy {
+        (applicationContext as AwyMediaApplication).videoDao
+    }
     private var player: ExoPlayer? = null
     private val viewModel by viewModels<VideoDisplayViewModel>()
-    private val videoDao by lazy { (applicationContext as AwyMediaApplication).videoDao }
+    private val isCrossCheck = false
+    private lateinit var pipParam: PictureInPictureParams
+
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
             or View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -51,8 +60,10 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate: This Activity is created on portrait screen " +
-                "[${resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT}]")
+        Log.d(
+            TAG, "onCreate: This Activity is created on portrait screen " +
+                    "[${resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT}]"
+        )
         setContentView(binding.root)
         viewModel.video.observe(this) { video ->
             bindingExtView.headerTv.text = video.title
@@ -62,22 +73,35 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                 player?.addMediaItem(item)
             }
         }
-        if(viewModel.video.value == null) {
+        if (viewModel.video.value == null) {
             viewModel.video.value = intent.getParcelableExtra(KEY_VIDEO)
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
     }
 
-    private fun  initialize(isLandscapeScreen: Boolean) {
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d(TAG, "onNewIntent() called with: intent = $intent")
+        viewModel.video.value = intent?.getParcelableExtra(KEY_VIDEO)
+        initializePlayer(viewModel.video.value!!)
+    }
+
+    private fun initialize(isLandscapeScreen: Boolean) {
         Log.d(TAG, "initialize() called with: isLandscapeScreen = $isLandscapeScreen")
-        if(isLandscapeScreen) {
+        if (isLandscapeScreen) {
             bindingExtView.exoLoop?.setOnClickListener(this)
             bindingExtView.exoLock?.setOnClickListener(this)
             bindingExtView.exoSubtitle?.setOnClickListener(this)
             bindingExtView.exoPlaybackSpeed?.setOnClickListener(this)
             bindingExtView.exoNext?.setOnClickListener(this)
-        } else{
+            pipParam = PictureInPictureParams.Builder()
+                .setAspectRatio(Rational(16, 9))
+                .build()
+        } else {
+            pipParam = PictureInPictureParams.Builder()
+                .setAspectRatio(Rational(9, 16))
+                .build()
             bindingExtView.exoOption?.setOnClickListener(this)
         }
         bindingScrim.exoUnlock.setOnClickListener(this)
@@ -87,13 +111,8 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        Log.d(TAG, "onBackPressed() called")
         enterPictureInPictureMode()
-    }
-
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        Log.d(TAG, "onUserLeaveHint() called")
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -110,7 +129,21 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onPause() {
         super.onPause()
-        player?.stop()
+        Log.d(TAG, "onPause: isInPictureInPictureMode=$isInPictureInPictureMode")
+        if (isInPictureInPictureMode) {
+            player?.playWhenReady = true
+        } else {
+            player?.stop()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: ")
+        if (isCrossCheck) {
+            releasePlayer()
+            finish()
+        }
     }
 
     override fun onDestroy() {
@@ -178,11 +211,26 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        if (isInPictureInPictureMode) {
+            binding.videoView.hideController()
+        } else {
+            binding.videoView.showController()
+        }
+    }
+
     private val listener = object : Player.Listener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            Log.d(TAG, "onPlayerStateChanged() called with: playWhenReady = $playWhenReady, " +
-                    "playbackState = $playbackState")
-            if(playbackState == Player.STATE_ENDED) {
+            Log.d(
+                TAG, "onPlayerStateChanged() called with: playWhenReady = $playWhenReady, " +
+                        "playbackState = $playbackState"
+            )
+            if (playbackState == Player.STATE_ENDED) {
                 viewModel.video.value?.playedTime = 0
             }
         }
@@ -238,9 +286,9 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
 
+
     companion object {
         val KEY_VIDEO = "key_video"
+        val TAG = VideoDisplayActivity::class.java.simpleName
     }
-
-
 }

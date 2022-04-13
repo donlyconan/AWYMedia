@@ -39,4 +39,5 @@
         <argument android:name="directFrom"
             app:argType="integer" />
     </fragment>
+
 </navigation>

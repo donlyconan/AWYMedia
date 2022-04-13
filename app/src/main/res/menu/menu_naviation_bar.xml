@@ -13,8 +13,8 @@
 
     <item
         android:id="@+id/nav_shared"
-        android:icon="@drawable/bg_shared_item"
-        android:title="@string/shared" />
+        android:icon="@drawable/bg_playlist_item"
+        android:title="Playlist" />
 
     <item
         android:id="@+id/nav_favorite"
