@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
+import androidx.paging.PagingData
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentSearchBarBinding
 import com.utc.donlyconan.media.viewmodels.SearchViewModel
@@ -26,7 +26,6 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
     private val binding by lazy { FragmentSearchBarBinding.inflate(layoutInflater) }
     private lateinit var adapter: VideoAdapter
     private val searchViewModel by viewModels<SearchViewModel>()
-    private val args by navArgs<SearchBarFragmentArgs>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
@@ -45,25 +44,6 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
         }
         adapter = VideoAdapter(requireContext())
         binding.recyclerView.adapter = adapter
-        setupSearchText(args.directFrom)
-    }
-
-    private fun setupSearchText(directFrom: Int) {
-        Log.d(TAG, "setupSearchText() called")
-        when(directFrom) {
-            MainDisplayFragment.RECENT_FRAGMENT -> {
-                binding.searchBar.queryHint = "Tìm kiếm trong mục đang phát..."
-            }
-            MainDisplayFragment.SHARED_FRAGMENT -> {
-                binding.searchBar.queryHint = "Tìm kiếm trong mục được chia sẻ..."
-            }
-            MainDisplayFragment.FAVORITE_FRAGMENT -> {
-                binding.searchBar.queryHint = "Tìm kiếm trong mục yêu thích..."
-            }
-            else -> {
-                binding.searchBar.queryHint = "Tìm kiếm video của bạn..."
-            }
-        }
     }
 
     private val onQueryTextListener = object : SearchView.OnQueryTextListener {
@@ -72,23 +52,31 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
             return true
         }
 
-        override fun onQueryTextChange(newText: String): Boolean {
+        override fun onQueryTextChange(newText: String?): Boolean {
             Log.d(TAG, "onQueryTextChange() called with: newText = $newText")
-            searchViewModel.apply {
-                viewModelScope.launch {
-                    searchAllVideos("%$newText%").collectLatest(adapter::submitData)
+            if(newText != null && newText.isNotEmpty()) {
+                searchViewModel.apply {
+                    viewModelScope.launch {
+                        val keyword = "%$newText%"
+                        searchAllVideos(keyword).collectLatest(adapter::submitData)
+                    }
+                }
+            } else {
+                searchViewModel.viewModelScope.launch {
+                    adapter.submitData(PagingData.empty())
                 }
             }
             return true
         }
-
     }
 
     override fun onClick(v: View) {
         Log.d(TAG, "onClick() called with: v = $v")
         when(v.id) {
             androidx.appcompat.R.id.search_mag_icon -> {
-                findNavController().navigateUp()
+                findNavController().navigate(
+                    SearchBarFragmentDirections.actionSearchBarFragmentToMainDisplayFragment()
+                )
             }
             else -> {
                 Log.d(TAG, "onClick haven't been handled yet!")

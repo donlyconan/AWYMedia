@@ -162,8 +162,12 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
         hideSystemUi()
     }
 
-    override fun onResume() {
+    override fun onStart() {
         hideSystemUi()
+        super.onStart()
+    }
+
+    override fun onResume() {
         super.onResume()
         player?.play()
     }
@@ -181,6 +185,7 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop: ")
+        showSystemUI()
         if (isCrossCheck) {
             releasePlayer()
             requireActivity().finish()
@@ -205,7 +210,10 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
             Log.d(TAG, "handleMessage() called with: msg = $msg")
             when (msg.what) {
                 R.id.exo_back -> {
-                    findNavController().navigateUp()
+                    findNavController().navigate(
+                        VideoDisplayFragmentDirections
+                            .actionVideoDisplayFragmentToMainDisplayFragment()
+                    )
                 }
                 R.id.exo_rotate -> {
                     requireActivity().requestedOrientation =
@@ -314,6 +322,13 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
         Log.d(TAG, "hideSystemUi() called")
         window.decorView.systemUiVisibility = systemFlags
         window.decorView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener)
+    }
+
+    private fun showSystemUI() {
+        Log.d(TAG, "showSystemUI() called")
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LOW_PROFILE
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
     }
 
     private val onSystemUiVisibilityChangeListener =

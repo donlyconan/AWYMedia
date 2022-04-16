@@ -23,7 +23,6 @@ import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
-import com.utc.donlyconan.media.databinding.IncludeLoadingDataBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
@@ -43,7 +42,6 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
-    private val loadingBinder by lazy { IncludeLoadingDataBinding.bind(view!!.findViewById(R.id.ll_loading)) }
     private lateinit var adapter: VideoAdapter
     private val application by lazy { context?.applicationContext as? AwyMediaApplication }
     val settings by lazy { Settings.getInstance(requireContext()) }
@@ -76,9 +74,6 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                 model.viewModelScope.launch {
                     model.sortBy(settings.sortBy)
                     model.videoList
-                        .onCompletion {
-                            showHideProgress()
-                        }
                         .collectLatest(adapter::submitData)
                 }
             }
@@ -89,29 +84,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
         }
     }
 
-    private fun showHideProgress() {
-        Log.d(TAG, "showHideProgress() called")
-        loadingBinder.frameContainer.visibility = View.VISIBLE
-        if(adapter.snapshot().isEmpty()) {
-            loadingBinder.tvNoData.visibility = View.VISIBLE
-            loadingBinder.llLoading1.visibility = View.INVISIBLE
-        } else {
-            loadingBinder.tvNoData.visibility = View.VISIBLE
-            loadingBinder.llLoading1.visibility = View.VISIBLE
-            loadingBinder.frameContainer.visibility = View.GONE
-        }
-    }
 
-    private fun loadVideoInfo(url: String): Video {
-        val fFmpegMediaMetadataRetriever = MediaMetadataRetriever()
-        fFmpegMediaMetadataRetriever.setDataSource(url)
-        val title = fFmpegMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-        val duration = fFmpegMediaMetadataRetriever
-            .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt() ?: 0
-        val type = fFmpegMediaMetadataRetriever
-            .extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
-        return Video(-1L, title, url, duration, 0L, type, 0L, System.currentTimeMillis())
-    }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
@@ -174,7 +147,6 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                     model.viewModelScope.launch {
                         model.sortBy(settings.sortBy)
                         model.videoList
-                            .onCompletion { showHideProgress() }
                             .collectLatest(adapter::submitData)
                     }
                 }
@@ -226,9 +198,6 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                     viewModelScope.launch {
                         adapter.submitData(PagingData.empty())
                         sortBy(Settings.SORT_BY_DURATION)
-                            .onEach {
-                                showHideProgress()
-                            }
                             .collectLatest(adapter::submitData)
                     }
                 }
@@ -238,9 +207,6 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                     viewModelScope.launch {
                         adapter.submitData(PagingData.empty())
                         sortBy(Settings.SORT_BY_DURATION)
-                            .onCompletion {
-                                showHideProgress()
-                            }
                             .collectLatest(adapter::submitData)
                     }
                 }
@@ -250,9 +216,6 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                     viewModelScope.launch {
                         adapter.submitData(PagingData.empty())
                         sortBy(Settings.SORT_BY_DURATION)
-                            .onEach {
-                                showHideProgress()
-                            }
                             .collectLatest(adapter::submitData)
                     }
                 }
@@ -262,9 +225,6 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                     viewModelScope.launch {
                         adapter.submitData(PagingData.empty())
                         sortBy(Settings.SORT_BY_DURATION)
-                            .onEach {
-                                showHideProgress()
-                            }
                             .collectLatest(adapter::submitData)
                     }
                 }

@@ -49,14 +49,6 @@ class RecentFragment : Fragment(), OnItemClickListener, View.OnClickListener {
             viewModelScope.launch {
                 videoList.collectLatest(adapter::submitData)
             }
-            binding.llLoading.apply {
-                if(adapter.itemCount == 0) {
-                    tvNoData.visibility = View.VISIBLE
-                    llLoading1.visibility = View.INVISIBLE
-                } else {
-                    frameContainer.visibility = View.INVISIBLE
-                }
-            }
         }
     }
 
