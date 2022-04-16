@@ -18,18 +18,19 @@
         tools:layout="@layout/fragment_main_display" >
 
         <action
-            android:id="@+id/action_mainDisplayFragment_to_actionBottomDialogFragment2"
-            app:destination="@id/actionBottomDialogFragment" />
-        <action
             android:id="@+id/action_mainDisplayFragment_to_searchBarFragment"
+            app:launchSingleTop="true"
+            app:restoreState="true"
+            app:popUpTo="@id/mainDisplayFragment"
             app:destination="@id/searchBarFragment" />
-    </fragment>
 
-    <fragment
-        android:id="@+id/actionBottomDialogFragment"
-        android:name="com.utc.donlyconan.media.views.fragments.options.OptionBottomDialogFragment"
-        android:label="ActionBottomDialogFragment"
-        tools:layout="@layout/fragment_optional_selection"/>
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_videoDisplayFragment"
+            app:launchSingleTop="true"
+            app:restoreState="true"
+            app:popUpTo="@id/mainDisplayFragment"
+            app:destination="@id/videoDisplayFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchBarFragment"
@@ -39,5 +40,17 @@
         <argument android:name="directFrom"
             app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/videoDisplayFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.VideoDisplayFragment"
+        android:label="VideoDisplayFragment"
+        app:popUpTo="@id/mainDisplayFragment"
+        tools:layout="@layout/activity_video_display">
+        <argument
+            android:name="video"
+            app:argType="com.utc.donlyconan.media.data.models.Video" />
+    </fragment>
+
 
 </navigation>

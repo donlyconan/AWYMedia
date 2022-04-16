@@ -16,14 +16,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AWYMedia">
+
         <activity
             android:name=".views.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:supportsPictureInPicture="true"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation"
+            android:resizeableActivity="true"
+            android:launchMode="singleTop">
+
             <nav-graph android:value="@navigation/nav_graph" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <activity

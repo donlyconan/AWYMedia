@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import androidx.paging.PagingData
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
@@ -126,9 +127,8 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
 
     private fun playVideo(video: Video) {
         Log.d(TAG, "playVideo() called with: video = $video")
-        val intent = Intent(context, VideoDisplayActivity::class.java)
-        intent.putExtra(VideoDisplayActivity.KEY_VIDEO, video)
-        startActivity(intent)
+        val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToVideoDisplayFragment(video)
+        findNavController().navigate(action)
     }
 
     private val onItemClickListener = object : View.OnClickListener {
