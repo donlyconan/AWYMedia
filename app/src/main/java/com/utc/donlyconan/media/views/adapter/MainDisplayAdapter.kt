@@ -22,7 +22,7 @@ class MainDisplayAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
                 return RecentFragment.newInstance()
             }
             MainDisplayFragment.SHARED_FRAGMENT -> {
-                return SharedVideoFragment.newInstance()
+                return PlaylistFragment.newInstance()
             }
             MainDisplayFragment.FAVORITE_FRAGMENT -> {
                 return FavoriteFragment.newInstance()

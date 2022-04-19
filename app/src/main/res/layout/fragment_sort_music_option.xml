@@ -9,6 +9,7 @@
     android:paddingBottom="10dp">
 
 
+
     <TextView
         style="@style/BottomMenuItem"
         android:layout_width="match_parent"
@@ -16,7 +17,6 @@
         android:gravity="center"
         android:text="Sắp xếp theo"
         android:textSize="18sp" />
-
 
     <TextView
         android:id="@+id/btn_sort_by_name"

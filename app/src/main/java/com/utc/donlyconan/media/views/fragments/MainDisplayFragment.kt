@@ -34,19 +34,15 @@ class MainDisplayFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(
-            TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
-                    "savedInstanceState = $savedInstanceState"
-        )
+        Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
+                    "savedInstanceState = $savedInstanceState")
         setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(
-            TAG, "onViewCreated() called with: view = $view, " + "savedInstanceState = " +
-                    "$savedInstanceState"
-        )
+        Log.d(TAG, "onViewCreated() called with: view = $view, " + "savedInstanceState = " +
+                    "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
         setUpViewPager()
         binding.navBar.setOnItemSelectedListener(onItemSelectedListener)
@@ -121,6 +117,10 @@ class MainDisplayFragment : Fragment() {
                     ArrangementVideoBottomDialogFragment.newInstance(frag)
                         .show(parentFragmentManager, TAG)
                 }
+            }
+            R.id.it_trash -> {
+                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToTrashFragment()
+                findNavController().navigate(action)
             }
             else -> {
                 Log.d(TAG, "onOptionsItemSelected: item not found!")

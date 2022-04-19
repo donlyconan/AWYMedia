@@ -9,14 +9,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentOptionalSelectionBinding
 
-class MainMenuMoreBottomDialogFragment : BaseBottomSheetFragment(), View.OnClickListener {
+class MenuMoreDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentOptionalSelectionBinding.inflate(layoutInflater) }
     private var listener: OnItemClickListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        isFullscreen = false
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate: ")
+        setStyle(STYLE_NORMAL, R.style.SheetDialog)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -42,8 +43,8 @@ class MainMenuMoreBottomDialogFragment : BaseBottomSheetFragment(), View.OnClick
 
     companion object {
         const val TAG = "ActionBottomDialog"
-        fun newInstance(): MainMenuMoreBottomDialogFragment {
-            return MainMenuMoreBottomDialogFragment()
+        fun newInstance(): MenuMoreDialogFragment {
+            return MenuMoreDialogFragment()
         }
     }
 }

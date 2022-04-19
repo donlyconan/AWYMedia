@@ -44,6 +44,6 @@
 
     <include
         android:id="@+id/layout_player_control_view"
-        layout="@layout/custom_option_player_control_view"/>
+        layout="@layout/video_controller"/>
 
 </FrameLayout>
