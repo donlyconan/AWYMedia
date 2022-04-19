@@ -19,4 +19,5 @@ interface ListVideoRepository {
 
     fun findAllVideos(keyword: String): Flow<PagingData<Video>>
 
+    fun getListInTrash(): Flow<PagingData<Video>>
 }

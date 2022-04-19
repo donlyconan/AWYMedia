@@ -32,6 +32,9 @@
             app:popUpTo="@id/mainDisplayFragment"
             app:popUpToInclusive="false"
             app:restoreState="true" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_trashFragment"
+            app:destination="@id/trashFragment" />
     </fragment>
 
     <fragment
@@ -62,6 +65,21 @@
             app:destination="@id/mainDisplayFragment"
             app:popUpTo="@id/mainDisplayFragment"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_videoDisplayFragment_self"
+            app:destination="@id/videoDisplayFragment"
+            app:popUpTo="@id/videoDisplayFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/trashFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.TrashFragment"
+        android:label="TrashFragment"
+        tools:layout="@layout/fragment_trash">
+        <action
+            android:id="@+id/action_trashFragment_to_mainDisplayFragment"
+            app:destination="@id/mainDisplayFragment"
+            app:popUpTo="@id/mainDisplayFragment" />
     </fragment>
 
 

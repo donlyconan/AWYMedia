@@ -2,10 +2,8 @@ package com.utc.donlyconan.media.views.fragments
 
 import android.annotation.SuppressLint
 import android.app.PictureInPictureParams
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.media.PlaybackParams
 import android.net.Uri
 import android.os.*
 import android.util.Log
@@ -14,15 +12,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.navigateUp
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -42,15 +37,9 @@ import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
  * Lớp cung cấp các phương tiện chức năng hỗ trợ cho việc phát video
  */
 class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.ActivityEventHandler {
-    private val binding by lazy {
-        ActivityVideoDisplayBinding.inflate(layoutInflater)
-    }
-    private val bindingScrim by lazy {
-        PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
-    }
-    private val bindingExtView by lazy {
-        CustomOptionPlayerControlViewBinding.bind(bindingScrim.layoutPlayerControlView.rootView)
-    }
+    private lateinit var binding: ActivityVideoDisplayBinding
+    private lateinit var bindingOverlay: PlayerControlViewBinding
+    private lateinit var bindingExtView: CustomOptionPlayerControlViewBinding
     private val videoDao by lazy {
         (requireContext().applicationContext as AwyMediaApplication).videoDao
     }
@@ -60,7 +49,6 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
     private var player: ExoPlayer? = null
     private val viewModel by viewModels<VideoDisplayViewModel>()
     private val isCrossCheck = false
-    private lateinit var pipParam: PictureInPictureParams
 
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
@@ -73,6 +61,7 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity.registerActivityEventHandler(this)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onCreateView(
@@ -80,6 +69,10 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView: ")
+        binding = ActivityVideoDisplayBinding.inflate(layoutInflater)
+        bindingOverlay = PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
+        bindingExtView = CustomOptionPlayerControlViewBinding.bind(bindingOverlay.layoutPlayerControlView.rootView)
         return binding.root
     }
 
@@ -98,7 +91,6 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
         if (viewModel.video.value == null) {
             viewModel.video.value = args.video
         }
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
     }
 
@@ -137,7 +129,7 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
         } else {
             bindingExtView.exoOption?.setOnClickListener(this)
         }
-        bindingScrim.exoUnlock.setOnClickListener(this)
+        bindingOverlay.exoUnlock.setOnClickListener(this)
         bindingExtView.exoRotate.setOnClickListener(this)
         bindingExtView.exoBack.setOnClickListener(this)
         initializePlayer(viewModel.video.value!!)
@@ -197,6 +189,7 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
         viewModel.saveVideoIfNeed()
         super.onDestroy()
         activity.unregisterActivityEventHandler(this)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onClick(v: View) {
@@ -222,12 +215,12 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
                         else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 }
                 R.id.exo_unlock -> {
-                    bindingScrim.layoutPlayerControlView.rootView.visibility = View.VISIBLE
-                    bindingScrim.layoutScrim.visibility = View.INVISIBLE
+                    bindingOverlay.layoutPlayerControlView.rootView.visibility = View.VISIBLE
+                    bindingOverlay.layoutScrim.visibility = View.INVISIBLE
                 }
                 R.id.exo_lock -> {
-                    bindingScrim.layoutPlayerControlView.rootView.visibility = View.INVISIBLE
-                    bindingScrim.layoutScrim.visibility = View.VISIBLE
+                    bindingOverlay.layoutPlayerControlView.rootView.visibility = View.INVISIBLE
+                    bindingOverlay.layoutScrim.visibility = View.VISIBLE
                 }
                 R.id.exo_option -> {
                     val enabled = player?.repeatMode != ExoPlayer.REPEAT_MODE_OFF

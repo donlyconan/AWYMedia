@@ -4,7 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -28,14 +28,10 @@ import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
-import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.options.OptionBottomDialogFragment
+import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreDialogFragment
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import wseemann.media.FFmpegMediaMetadataRetriever
 
 
 class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListener {
@@ -45,7 +41,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
     private lateinit var adapter: VideoAdapter
     private val application by lazy { context?.applicationContext as? AwyMediaApplication }
     val settings by lazy { Settings.getInstance(requireContext()) }
-
+    val videoDao by lazy { (application as AwyMediaApplication).videoDao }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,7 +87,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
         val video = adapter.getVideo(position)
         viewModel.selectedVideo = video
         if (v.id == R.id.img_menu_more) {
-            OptionBottomDialogFragment.newInstance(video, onItemClickListener)
+            VideoMenuMoreDialogFragment.newInstance(video, onItemClickListener)
                 .show(parentFragmentManager, TAG)
         } else {
             playVideo(video)
@@ -124,14 +120,18 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
                     }
                 }
                 R.id.btn_delete -> {
-                    viewModel.apply {
-                        viewModelScope.launch {
-                            videoRepo.delete(viewModel.selectedVideo!!.videoId)
-                        }
+                    viewModel.selectedVideo?.let { video ->
+                        video.deletedAt = System.currentTimeMillis() + MS_TO_30DAY
+                        videoDao.update(video)
                     }
                 }
                 R.id.btn_share -> {
-
+                    val video = viewModel.selectedVideo
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.type = "video/*"
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video?.path))
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
+                    startActivity(Intent.createChooser(intent, "Share File"))
                 }
                 else -> {
                 }
@@ -234,7 +234,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
 
     companion object {
         const val REQ_READ_WRITE_PERMISSION = 100
-
+        const val MS_TO_30DAY = 30 * 24 * 60 * 60 * 1000 // day * hour * min * sec * ms
         fun newInstance() = PersonalVideoFragment()
     }
 

@@ -11,7 +11,7 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentOptionalSelectionBinding
 
-class OptionBottomDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
+class VideoMenuMoreDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentOptionalSelectionBinding.inflate(layoutInflater) }
     private var listener: View.OnClickListener? = null
@@ -47,8 +47,9 @@ class OptionBottomDialogFragment : BottomSheetDialogFragment(), View.OnClickList
 
     companion object {
         const val TAG = "ActionBottomDialog"
-        val KEY_VIDEO = "KEY_VIDEO"
-        fun newInstance(video: Video, listener: View.OnClickListener) = OptionBottomDialogFragment().apply {
+        const val KEY_VIDEO = "com.utc.media.EXTRA_VIDEO"
+
+        fun newInstance(video: Video, listener: View.OnClickListener) = VideoMenuMoreDialogFragment().apply {
             this.listener = listener
             arguments = bundleOf(KEY_VIDEO to video)
         }

@@ -5,10 +5,13 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.dao.ListVideoDao
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.views.adapter.Constant
+import kotlinx.coroutines.flow.Flow
 
 class ListVideoRepositoryImpl(val app: Application, private val dao: ListVideoDao) : ListVideoRepository {
 
@@ -54,6 +57,11 @@ class ListVideoRepositoryImpl(val app: Application, private val dao: ListVideoDa
     override fun findAllVideos(keyword: String) = Pager(
         config = PagingConfig(Constant.PAGE_SIZE, Constant.PREFETCH_DISTANCE, false),
         pagingSourceFactory = { dao.findAllVideos(keyword) }
+    ).flow
+
+    override fun getListInTrash() = Pager(
+        config = PagingConfig(Constant.PAGE_SIZE, Constant.PREFETCH_DISTANCE, false),
+        pagingSourceFactory = { dao.getListInTrash() }
     ).flow
 
 }

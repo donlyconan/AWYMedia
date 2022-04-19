@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="86dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:background="@drawable/bg_rv_item"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:padding="8dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/thumbnail_card"
+            android:layout_width="124dp"
+            android:layout_height="70dp"
+            app:cardCornerRadius="3dp">
+
+            <ImageView
+                android:id="@+id/img_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/video_play_demo" />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_gravity="bottom"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:progress="20"
+                android:progressDrawable="@drawable/video_play_progress"
+                android:visibility="invisible"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:alpha="0.7"
+                android:gravity="center"
+                android:layout_gravity="bottom|end"
+                android:background="@android:color/black">
+
+                <TextView
+                    android:id="@+id/tv_icon_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10"/>
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/outline_playlist_play_24"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="8dp"
+            android:layout_toStartOf="@+id/img_menu_more"
+            android:layout_toEndOf="@+id/thumbnail_card"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="Tây du ký phần 2"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/tv_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="3dp"
+            android:layout_toEndOf="@+id/thumbnail_card"
+            android:text="10 video"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+
+        <ImageButton
+            android:id="@+id/img_menu_more"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:scaleType="centerInside"
+            android:background="@android:color/transparent"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_more_event" />
+
+    </RelativeLayout>
+</FrameLayout>
