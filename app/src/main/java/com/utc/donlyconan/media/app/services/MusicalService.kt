@@ -93,7 +93,7 @@ class MusicalService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand() called with: intent = $intent, flags = $flags, startId = $startId")
-        val notificationLayout = RemoteViews(packageName, R.layout.popup_media_player_info)
+        val notificationLayout = RemoteViews(packageName, R.layout.notify_media_player_info)
         return Service.START_STICKY
     }
 

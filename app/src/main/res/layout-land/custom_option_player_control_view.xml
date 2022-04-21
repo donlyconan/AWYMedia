@@ -100,7 +100,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tool:ignore="DuplicateClickableBoundsCheck" />
 
         <ImageButton
             android:id="@+id/exo_pause"
@@ -151,7 +152,8 @@
                 app:buffered_color="@color/white_50"
                 app:played_color="@color/live_red"
                 app:scrubber_color="@color/live_red"
-                app:unplayed_color="@color/white_20" />
+                app:unplayed_color="@color/white_20"
+                tool:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck" />
 
             <TextView
                 android:id="@id/exo_duration"
@@ -288,14 +290,6 @@
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <Button
-        android:id="@+id/btn_pip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="PiP"
-        android:layout_gravity="end"
-        />
 
     <View
         android:layout_width="match_parent"
