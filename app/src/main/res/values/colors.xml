@@ -50,5 +50,6 @@
     <color name="black_50">#80000000</color>
     <color name="live_red">#FF3144</color>
     <color name="color_checked">#3ABDCD</color>
+    <color name="text_color_hint">#C5C8C8</color>
 
 </resources>

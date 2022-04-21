@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_drawer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/recycler_color"
+    android:fitsSystemWindows="true">
+
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_bar"
+        style="@style/SearchViewLight"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        app:queryBackground="@android:color/transparent"
+        android:background="?colorPrimary"
+        app:closeIcon="@drawable/ic_baseline_close"
+        app:iconifiedByDefault="false"
+        app:queryHint="Nhập nội dung tìm kiếm..."
+        app:searchIcon="@drawable/ic_baseline_arrow_back_24" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/search_bar"
+        android:layout_above="@id/btn_done"
+        android:layout_weight="1"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        tools:itemCount="10"
+        tools:listitem="@layout/item_video_choise"
+        android:layout_marginBottom="5dp"/>
+
+    <Button
+        android:id="@+id/btn_done"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_button_done"
+        android:text="@string/done"/>
+
+</RelativeLayout>

@@ -59,7 +59,7 @@ class FavoriteFragment : Fragment(), OnItemClickListener, View.OnClickListener {
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
         val video = adapter.getVideo(position)
-        if(v.id == R.id.img_menu_more) {
+        if(v.id == R.id.cb_selected) {
             VideoMenuMoreDialogFragment.newInstance(video, this)
                 .show(fragmentManager!!, TAG)
         } else {

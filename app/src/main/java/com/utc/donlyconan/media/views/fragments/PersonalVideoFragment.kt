@@ -86,7 +86,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
         val video = adapter.getVideo(position)
         viewModel.selectedVideo = video
-        if (v.id == R.id.img_menu_more) {
+        if (v.id == R.id.cb_selected) {
             VideoMenuMoreDialogFragment.newInstance(video, onItemClickListener)
                 .show(parentFragmentManager, TAG)
         } else {
