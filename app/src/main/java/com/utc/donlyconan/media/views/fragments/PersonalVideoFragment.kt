@@ -21,6 +21,7 @@ import androidx.paging.PagingData
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
@@ -32,16 +33,20 @@ import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreDialogFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
+/**
+ * Represent for Main Screen of app where app will shows all video list has on it
+ */
 class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
     private lateinit var adapter: VideoAdapter
-    private val application by lazy { context?.applicationContext as? AwyMediaApplication }
-    val settings by lazy { Settings.getInstance(requireContext()) }
-    val videoDao by lazy { (application as AwyMediaApplication).videoDao }
+    private val application by lazy { context?.applicationContext as AwyMediaApplication }
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var videoDao: VideoDao
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +54,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
     ): View {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                     "savedInstanceState = $savedInstanceState")
+        application.applicationComponent().inject(this)
         return binding.root
     }
 
@@ -106,7 +112,7 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
             when (v.id) {
                 R.id.btn_play -> playVideo(viewModel.selectedVideo!!)
                 R.id.btn_play_music -> {
-                    application?.iMusicalService?.apply {
+                    application.iMusicalService()?.apply {
                         setVideoId(viewModel.selectedVideo?.videoId!!)
                         play()
                     }

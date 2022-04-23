@@ -2,9 +2,12 @@ package com.utc.donlyconan.media.data.repo
 
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class VideoRepositoryImpl(private val dao: VideoDao) : VideoRepository {
+@Singleton
+class VideoRepositoryImpl @Inject constructor(private val dao: VideoDao) : VideoRepository {
 
     companion object {
         val TAG = VideoRepository::class.java.simpleName

@@ -5,7 +5,6 @@ import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.media.PlaybackParams
 import android.net.Uri
 import android.os.*
 import android.util.Log
@@ -20,6 +19,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
@@ -27,6 +27,7 @@ import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
+import javax.inject.Inject
 
 
 /**
@@ -42,14 +43,11 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
     private val bindingExtView by lazy {
         CustomOptionPlayerControlViewBinding.bind(bindingScrim.layoutPlayerControlView.rootView)
     }
-    private val videoDao by lazy {
-        (applicationContext as AwyMediaApplication).videoDao
-    }
     private var player: ExoPlayer? = null
     private val viewModel by viewModels<VideoDisplayViewModel>()
     private val isCrossCheck = false
     private lateinit var pipParam: PictureInPictureParams
-
+    @Inject lateinit var videoDao: VideoDao
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
             or View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -60,11 +58,11 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(
-            TAG, "onCreate: This Activity is created on portrait screen " +
-                    "[${resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT}]"
-        )
+        Log.d(TAG, "onCreate: This Activity is created on portrait screen " +
+                    "[${resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT}]")
         setContentView(binding.root)
+        (applicationContext as AwyMediaApplication).applicationComponent()
+            .inject(this)
         viewModel.video.observe(this) { video ->
             bindingExtView.headerTv.text = video.title
             val nextVideo = videoDao.getNextVideo(video.videoId)

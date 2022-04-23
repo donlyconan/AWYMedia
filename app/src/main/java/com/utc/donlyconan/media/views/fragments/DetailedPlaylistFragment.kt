@@ -7,18 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.databinding.FragmentExpendedPlaylistBinding
+import com.utc.donlyconan.media.databinding.FragmentDetailedPlaylistBinding
 
 
-class ExpendedPlaylistFragment : Fragment() {
+class DetailedPlaylistFragment : Fragment() {
 
-    private val binding by lazy { FragmentExpendedPlaylistBinding.inflate(layoutInflater) }
-
+    val binding by lazy { FragmentDetailedPlaylistBinding.inflate(layoutInflater) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d(TAG, "onCreateView: ")
         return binding.root
     }
 
@@ -28,6 +28,6 @@ class ExpendedPlaylistFragment : Fragment() {
     }
 
     companion object {
-        val TAG = ExpendedPlaylistFragment::class.java.simpleName
+        val TAG = DetailedPlaylistFragment::class.simpleName
     }
 }

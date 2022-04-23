@@ -28,13 +28,12 @@ class RecentFragment : Fragment(), OnItemClickListener, View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
+        Log.d(TAG, "onCreate: ")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
-                "savedInstanceState = $savedInstanceState")
+        Log.d(TAG, "onCreateView: ")
         return binding.root
     }
 

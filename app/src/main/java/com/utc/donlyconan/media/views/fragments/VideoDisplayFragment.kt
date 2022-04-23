@@ -23,6 +23,8 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
@@ -31,24 +33,24 @@ import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.MainActivity
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
+import javax.inject.Inject
 
 
 /**
  * Lớp cung cấp các phương tiện chức năng hỗ trợ cho việc phát video
  */
 class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.ActivityEventHandler {
+    private val viewModel by viewModels<VideoDisplayViewModel>()
+    private val args by navArgs<VideoDisplayFragmentArgs>()
+    private val activity by lazy { requireActivity() as MainActivity }
+    private val window by lazy { requireActivity().window }
     private lateinit var binding: ActivityVideoDisplayBinding
     private lateinit var bindingOverlay: PlayerControlViewBinding
     private lateinit var bindingExtView: CustomOptionPlayerControlViewBinding
-    private val videoDao by lazy {
-        (requireContext().applicationContext as AwyMediaApplication).videoDao
-    }
-    private val activity by lazy { requireActivity() as MainActivity }
-    private val window by lazy { requireActivity().window }
-    private val args by navArgs<VideoDisplayFragmentArgs>()
     private var player: ExoPlayer? = null
-    private val viewModel by viewModels<VideoDisplayViewModel>()
     private val isCrossCheck = false
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var videoDao: VideoDao
 
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
@@ -60,6 +62,8 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (context?.applicationContext as AwyMediaApplication).applicationComponent()
+            .inject(this)
         activity.registerActivityEventHandler(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }

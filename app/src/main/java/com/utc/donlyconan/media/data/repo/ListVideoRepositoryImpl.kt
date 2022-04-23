@@ -12,8 +12,11 @@ import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.views.adapter.Constant
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ListVideoRepositoryImpl(val app: Application, private val dao: ListVideoDao) : ListVideoRepository {
+@Singleton
+class ListVideoRepositoryImpl @Inject constructor(val app: Application, private val dao: ListVideoDao) : ListVideoRepository {
 
     override suspend fun loadAllVideos() = app.contentResolver
         .getAllVideos(MediaStore.Video.Media.EXTERNAL_CONTENT_URI)

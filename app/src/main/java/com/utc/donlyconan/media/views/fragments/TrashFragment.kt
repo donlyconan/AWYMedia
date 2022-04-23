@@ -1,7 +1,6 @@
 package com.utc.donlyconan.media.views.fragments
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -14,18 +13,17 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
+import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
-import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.MainActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.options.ArrangementVideoBottomDialogFragment
 import com.utc.donlyconan.media.views.fragments.options.TrashItemOptionFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Show list of video that was temporarily deleted by user
@@ -35,12 +33,14 @@ class TrashFragment : Fragment(), OnItemLongClickListener {
     val binding by lazy { FragmentTrashBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<TrashViewModel>()
     private lateinit var adapter: VideoAdapter
-    val settings by lazy { Settings.getInstance(requireContext()) }
-    val videoDao by lazy { AwyMediaApplication.getInstance().videoDao }
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var videoDao: VideoDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
+        (context?.applicationContext as AwyMediaApplication).applicationComponent()
+            .inject(this)
         setHasOptionsMenu(true)
         val appCompat = activity as MainActivity
         appCompat.setSupportActionBar(binding.toolbar)

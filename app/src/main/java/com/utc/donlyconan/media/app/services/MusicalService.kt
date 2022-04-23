@@ -11,6 +11,8 @@ import android.widget.RemoteViews
 import com.utc.donlyconan.media.IMusicalService
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.data.dao.VideoDao
+import javax.inject.Inject
 
 class MusicalService: Service() {
 
@@ -76,11 +78,13 @@ class MusicalService: Service() {
 
     var videoId: Long = -1L
     private var player: MediaPlayer? = null
-    private val videoDao by lazy { (applicationContext as AwyMediaApplication).videoDao }
+    @Inject lateinit var videoDao: VideoDao
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate() called")
+        (applicationContext as AwyMediaApplication).applicationComponent()
+            .inject(this)
         player = MediaPlayer().apply {
             setAudioAttributes(
                 AudioAttributes.Builder()

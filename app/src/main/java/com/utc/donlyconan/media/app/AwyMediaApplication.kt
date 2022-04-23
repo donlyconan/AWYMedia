@@ -9,28 +9,25 @@ import android.os.IBinder
 import android.util.Log
 import com.utc.donlyconan.media.IMusicalService
 import com.utc.donlyconan.media.app.services.MusicalService
-import com.utc.donlyconan.media.app.settings.Settings
-import com.utc.donlyconan.media.data.dao.VideoDao
-import com.utc.donlyconan.media.data.db.AwyMediaDatabase
-import com.utc.donlyconan.media.data.repo.ListVideoRepositoryImpl
-import com.utc.donlyconan.media.data.repo.VideoRepositoryImpl
+import com.utc.donlyconan.media.dagger.components.ApplicationComponent
+import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
+import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 
+/**
+ * Represent a application of AWYMedia that provides all app's dependencies
+ */
 class AwyMediaApplication: Application() {
-
-    val database by lazy { AwyMediaDatabase.getInstance(this) }
-    val listVideoDao by lazy { database.listVideoDao() }
-    val videoDao by lazy { database.videoDao() }
-    val videoRepo by lazy { VideoRepositoryImpl(videoDao) }
-    val lstVideoRepo by lazy { ListVideoRepositoryImpl(this, listVideoDao) }
-
-    var iMusicalService: IMusicalService? = null
-        private set
+    private lateinit var appComponent: ApplicationComponent
+    private var iMusicalService: IMusicalService? = null
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate() called")
-        Settings.getInstance(this)
-        instance = this
+
+//         Create dagger component
+        appComponent = DaggerApplicationComponent.builder()
+            .applicationModule(ApplicationModule(this))
+            .build()
 
         // Start musical service
         val intent = Intent(this, MusicalService::class.java)
@@ -47,7 +44,17 @@ class AwyMediaApplication: Application() {
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.d(TAG, "onServiceDisconnected() called with: name = $name")
         }
+    }
 
+    /**
+     * Provide Application Component
+     */
+    fun applicationComponent(): ApplicationComponent {
+        return appComponent
+    }
+
+    fun iMusicalService(): IMusicalService? {
+        return iMusicalService
     }
 
     override fun onTerminate() {

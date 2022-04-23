@@ -4,8 +4,9 @@ import android.content.Context
 import com.donly.sradatn.app.settings.BooleanPreferenceDelegate
 import com.donly.sradatn.app.settings.IntPreferenceDelegate
 import com.donly.sradatn.app.settings.StringPreferenceDelegate
+import javax.inject.Inject
 
-class Settings(val appContext: Context) {
+class Settings @Inject constructor(val appContext: Context) {
 
     companion object {
         const val SETTINGS_NAME = "sra-datn"
