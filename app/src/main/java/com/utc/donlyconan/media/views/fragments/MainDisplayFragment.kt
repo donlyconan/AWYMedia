@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.findFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
@@ -26,9 +27,11 @@ import com.utc.donlyconan.media.views.fragments.options.ArrangementVideoBottomDi
  * Represent for Main Screen where will info as Navigation and Base View
  */
 class MainDisplayFragment : Fragment() {
+
     val binding by lazy { FragmentMainDisplayBinding.inflate(layoutInflater) }
     lateinit var mainDisplayAdapter: MainDisplayAdapter
     var sortedMenu: MenuItem? = null
+    private val args by navArgs<MainDisplayFragmentArgs>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +61,7 @@ class MainDisplayFragment : Fragment() {
             adapter = mainDisplayAdapter
             registerOnPageChangeCallback(onPageChangedCallBackListener)
         }
+        binding.viewPager2.setCurrentItem(args.screenId, false)
     }
 
 
@@ -132,9 +136,10 @@ class MainDisplayFragment : Fragment() {
 
     companion object {
         // Bộ const để ánh xạ fragment
+        val TAG = MainDisplayFragment::class.simpleName
         const val PERSONAL_FRAGMENT = 0
         const val RECENT_FRAGMENT = 1
-        const val SHARED_FRAGMENT = 2
+        const val PLAYLIST_FRAGMENT = 2
         const val FAVORITE_FRAGMENT = 3
     }
 }

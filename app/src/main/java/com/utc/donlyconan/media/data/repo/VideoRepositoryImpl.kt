@@ -21,8 +21,8 @@ class VideoRepositoryImpl @Inject constructor(private val dao: VideoDao) : Video
 
     override fun countPath(path: String): Int = dao.countPath(path)
 
-    override suspend fun delete(videoId: Long): Int = dao.delete(videoId)
+    override suspend fun delete(videoId: Int): Int = dao.delete(videoId)
 
-    override fun getVideo(videoId: Long): Video = dao.getVideo(videoId)
+    override fun getVideo(videoId: Int): Video = dao.getVideo(videoId)
 
 }

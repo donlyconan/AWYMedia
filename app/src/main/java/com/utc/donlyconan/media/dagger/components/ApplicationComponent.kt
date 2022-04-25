@@ -12,6 +12,7 @@ import com.utc.donlyconan.media.data.dao.ListVideoDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
+import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.*
 import dagger.BindsInstance
@@ -56,4 +57,5 @@ interface ApplicationComponent {
     fun inject(fragment: VideoDisplayFragment)
     fun inject(fragment: MusicalService)
     fun inject(fragment: VideoDisplayActivity)
+    fun inject(fragment: PlaylistViewModel)
 }

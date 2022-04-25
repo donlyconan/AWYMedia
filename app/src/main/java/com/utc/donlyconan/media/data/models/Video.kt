@@ -1,11 +1,7 @@
 package com.utc.donlyconan.media.data.models
 
-import android.net.Uri
 import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -13,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
 data class Video(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
-    var videoId: Long,
+    var videoId: Int,
     @ColumnInfo(name = "video_name")
     var title: String?,
     @ColumnInfo(name = "path")
@@ -33,5 +29,7 @@ data class Video(
     @ColumnInfo(name = "deleted_at")
     var deletedAt: Long?= null,
     @ColumnInfo(name = "is_favorite")
-    var isFavorite: Boolean = false
-): Parcelable
+    var isFavorite: Boolean = false,
+): Parcelable {
+    @Ignore var isSelected: Boolean = false
+}

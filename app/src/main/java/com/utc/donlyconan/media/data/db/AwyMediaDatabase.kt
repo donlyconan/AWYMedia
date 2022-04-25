@@ -5,10 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.utc.donlyconan.media.data.dao.ListVideoDao
+import com.utc.donlyconan.media.data.dao.PlaylistDao
+import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.dao.VideoDao
+import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
+import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 
-@Database(entities = [Video::class], version = 1, exportSchema = false)
+@Database(entities = [Video::class, Playlist::class, VideoPlaylistCrossRef::class], version = 1, exportSchema = false)
 abstract class AwyMediaDatabase: RoomDatabase() {
 
     companion object {
@@ -30,5 +34,9 @@ abstract class AwyMediaDatabase: RoomDatabase() {
     abstract fun listVideoDao(): ListVideoDao
 
     abstract fun videoDao(): VideoDao
+
+    abstract fun playlistDao(): PlaylistDao
+
+    abstract fun playlistWithVideosDao(): PlaylistWithVideosDao
 
 }

@@ -1,9 +1,6 @@
 package com.utc.donlyconan.media.dagger.modules
 
-import com.utc.donlyconan.media.data.repo.ListVideoRepository
-import com.utc.donlyconan.media.data.repo.ListVideoRepositoryImpl
-import com.utc.donlyconan.media.data.repo.VideoRepository
-import com.utc.donlyconan.media.data.repo.VideoRepositoryImpl
+import com.utc.donlyconan.media.data.repo.*
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -19,5 +16,9 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindVideoRepository(impl: VideoRepositoryImpl): VideoRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindPlaylistRepo(impl: PlaylistRepositoryImpl): PlaylistRepository
 
 }

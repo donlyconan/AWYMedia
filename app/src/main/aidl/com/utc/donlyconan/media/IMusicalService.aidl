@@ -5,7 +5,7 @@ package com.utc.donlyconan.media;
 
 interface IMusicalService {
 
-   void setVideoId(long videoId);
+   void setVideoId(int videoId);
 
    void play();
 

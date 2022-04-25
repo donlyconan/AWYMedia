@@ -13,13 +13,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagingData
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
@@ -29,8 +27,9 @@ import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
+import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreDialogFragment
+import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,28 +38,33 @@ import javax.inject.Inject
 /**
  * Represent for Main Screen of app where app will shows all video list has on it
  */
-class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListener {
+class PersonalVideoFragment : BaseFragment(), OnItemClickListener, View.OnClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
     private lateinit var adapter: VideoAdapter
-    private val application by lazy { context?.applicationContext as AwyMediaApplication }
-    @Inject lateinit var settings: Settings
-    @Inject lateinit var videoDao: VideoDao
+    @Inject
+    lateinit var settings: Settings
+    @Inject
+    lateinit var videoDao: VideoDao
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
-                    "savedInstanceState = $savedInstanceState")
-        application.applicationComponent().inject(this)
+        Log.d(
+            TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
+                    "savedInstanceState = $savedInstanceState"
+        )
+        applicationComponent.inject(this)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
-                    "$savedInstanceState")
+        Log.d(
+            TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
+                    "$savedInstanceState"
+        )
         super.onViewCreated(view, savedInstanceState)
         adapter = VideoAdapter(context!!)
         adapter.onItemClickListener = this
@@ -68,8 +72,11 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
         binding.fab.setOnClickListener(this)
 
         // Check permission of your app
-        if(ContextCompat.checkSelfPermission(requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             Log.d(TAG, "onViewCreated: loading...")
             viewModel.let { model ->
                 model.insertDataIntoDbIfNeed()
@@ -81,11 +88,14 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
             }
         } else {
             Log.d(TAG, "onViewCreated: register permission!")
-            requestPermissionResult.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            requestPermissionResult.launch(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            )
         }
     }
-
 
 
     override fun onItemClick(v: View, position: Int) {
@@ -93,57 +103,58 @@ class PersonalVideoFragment : Fragment(), OnItemClickListener, View.OnClickListe
         val video = adapter.getVideo(position)
         viewModel.selectedVideo = video
         if (v.id == R.id.cb_selected) {
-            VideoMenuMoreDialogFragment.newInstance(video, onItemClickListener)
+            MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) {
+                when (v.id) {
+                    R.id.btn_play -> {
+                        val action = MainDisplayFragmentDirections
+                            .actionMainDisplayFragmentToVideoDisplayFragment(video, TAG)
+                        findNavController().navigate(action)
+                    }
+                    R.id.btn_play_music -> {
+                        application.iMusicalService()?.apply {
+                            setVideoId(viewModel.selectedVideo?.videoId!!)
+                            play()
+                        }
+                    }
+                    R.id.btn_favorite -> {
+                        video.isFavorite = !video.isFavorite
+                        videoDao.update(video)
+                        adapter.notifyItemChanged(position)
+                    }
+                    R.id.btn_delete -> {
+                        viewModel.viewModelScope.launch {
+                            videoDao.delete(video.videoId)
+                        }
+                    }
+                    R.id.btn_share -> {
+                        val video = viewModel.selectedVideo
+                        val intent = Intent(Intent.ACTION_SEND)
+                        intent.type = "video/*"
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video?.path))
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
+                        startActivity(Intent.createChooser(intent, "Share File"))
+                    }
+                    else -> {
+                        Log.d(TAG, "onClick: actionId hasn't found!")
+                    }
+                }
+            }
+                .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, TAG)
         } else {
-            playVideo(video)
+            val action = MainDisplayFragmentDirections
+                .actionMainDisplayFragmentToVideoDisplayFragment(video, TAG)
+            findNavController().navigate(action)
         }
     }
 
     private fun playVideo(video: Video) {
         Log.d(TAG, "playVideo() called with: video = $video")
-        val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToVideoDisplayFragment(video)
+        val action = MainDisplayFragmentDirections
+            .actionMainDisplayFragmentToVideoDisplayFragment(video, TAG)
         findNavController().navigate(action)
     }
 
-    private val onItemClickListener = object : View.OnClickListener {
-        override fun onClick(v: View) {
-            Log.d(TAG, "onClick() called with: v = $v")
-            when (v.id) {
-                R.id.btn_play -> playVideo(viewModel.selectedVideo!!)
-                R.id.btn_play_music -> {
-                    application.iMusicalService()?.apply {
-                        setVideoId(viewModel.selectedVideo?.videoId!!)
-                        play()
-                    }
-                }
-                R.id.btn_favorite -> {
-                    viewModel.apply {
-                        selectedVideo?.let { video ->
-                            video.isFavorite = !v.isSelected
-                            videoRepo.update(video)
-                        }
-                    }
-                }
-                R.id.btn_delete -> {
-                    viewModel.selectedVideo?.let { video ->
-                        video.deletedAt = System.currentTimeMillis() + MS_TO_30DAY
-                        videoDao.update(video)
-                    }
-                }
-                R.id.btn_share -> {
-                    val video = viewModel.selectedVideo
-                    val intent = Intent(Intent.ACTION_SEND)
-                    intent.type = "video/*"
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video?.path))
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
-                    startActivity(Intent.createChooser(intent, "Share File"))
-                }
-                else -> {
-                }
-            }
-        }
-    }
 
     private val requestPermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->

@@ -207,10 +207,17 @@ class VideoDisplayFragment : Fragment(), View.OnClickListener, MainActivity.Acti
             Log.d(TAG, "handleMessage() called with: msg = $msg")
             when (msg.what) {
                 R.id.exo_back -> {
-                    findNavController().navigate(
-                        VideoDisplayFragmentDirections
-                            .actionVideoDisplayFragmentToMainDisplayFragment()
-                    )
+                    if(args.backScreen == MainDisplayFragment.TAG) {
+                        findNavController().navigate(
+                            VideoDisplayFragmentDirections
+                                .actionVideoDisplayFragmentToMainDisplayFragment()
+                        )
+                    } else {
+                        findNavController().navigate(
+                            VideoDisplayFragmentDirections
+                                .actionVideoDisplayFragmentToDetailedPlaylistFragment(1)
+                        )
+                    }
                 }
                 R.id.exo_rotate -> {
                     requireActivity().requestedOrientation =

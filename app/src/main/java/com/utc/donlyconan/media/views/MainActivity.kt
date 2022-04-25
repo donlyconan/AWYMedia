@@ -11,7 +11,9 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -21,6 +23,7 @@ import com.utc.donlyconan.media.R
 class MainActivity : AppCompatActivity() {
 
     private lateinit var listActivityEventHandler: ArrayList<ActivityEventHandler>
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: ")
@@ -47,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         }
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
     }
-
 
     override fun onBackPressed() {
         Log.d(TAG, "onBackPressed() called")

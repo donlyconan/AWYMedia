@@ -2,14 +2,14 @@ package com.utc.donlyconan.media.data.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(tableName = "playlist")
-data class Playlist(
+
+@Entity(tableName = "video_playlist", primaryKeys = ["video_id", "playlist_id"])
+data class VideoPlaylistCrossRef(
+    @ColumnInfo(name = "video_id")
+    var videoId: Int,
     @ColumnInfo(name = "playlist_id")
-    @PrimaryKey(autoGenerate = true)
-    var playlistId: Int?,
-    var title: String,
+    var playlistId: Int,
     @ColumnInfo(name = "created_at")
     var createdAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "updated_at")

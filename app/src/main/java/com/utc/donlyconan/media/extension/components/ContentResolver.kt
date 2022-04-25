@@ -45,7 +45,7 @@ fun ContentResolver.getAllVideos(uri: Uri, selection: String? = null, sortOrder:
             val type = title.split('.').last()
             val data =
                 ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, videoId)
-            videoList += Video(videoId, title, data.toString(), duration, size, type, 0L,
+            videoList += Video(videoId.toInt(), title, data.toString(), duration, size, type, 0L,
                 createdAt, updatedAt)
         }
     }

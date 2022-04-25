@@ -19,8 +19,8 @@ interface VideoRepository {
 
     fun countPath(path: String): Int
 
-    suspend fun delete(videoId: Long): Int
+    suspend fun delete(videoId: Int): Int
 
-    fun getVideo(videoId: Long): Video
+    fun getVideo(videoId: Int): Video
 
 }

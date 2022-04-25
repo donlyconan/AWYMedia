@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.data.dao
 
 import android.view.View
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.utc.donlyconan.media.data.models.Video
@@ -34,5 +35,8 @@ interface ListVideoDao {
 
     @Query("Select * from videos where deleted_at is not null order by deleted_at asc")
     fun getListInTrash(): PagingSource<Int, Video>
+
+    @Query("Select * from videos where video_id not in (select video_id from video_playlist where playlist_id = :playlistId)")
+    fun getAllVideosNotInPlaylist(playlistId: Int): LiveData<List<Video>>
 
 }
