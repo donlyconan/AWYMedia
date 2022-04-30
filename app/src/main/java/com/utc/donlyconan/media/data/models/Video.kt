@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 @Entity(tableName = "videos", indices = [Index(value = ["path"], unique = true)])
-data class Video(
+open class Video(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
     var videoId: Int,
@@ -26,8 +26,6 @@ data class Video(
     var createdAt: Long,
     @ColumnInfo(name = "updated_at")
     var updatedAt: Long = System.currentTimeMillis(),
-    @ColumnInfo(name = "deleted_at")
-    var deletedAt: Long?= null,
     @ColumnInfo(name = "is_favorite")
     var isFavorite: Boolean = false,
 ): Parcelable {

@@ -72,8 +72,10 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
             }
             R.id.btn_done -> {
                 adapter.videos.forEach { video ->
-                    val item = VideoPlaylistCrossRef(video.videoId, args.playlistId)
-                    playlistWithVideosDao.insert(item)
+                    if(video.isSelected) {
+                        val item = VideoPlaylistCrossRef(video.videoId, args.playlistId)
+                        playlistWithVideosDao.insert(item)
+                    }
                 }
                 findNavController().navigate(ExpendedPlaylistFragmentDirections
                     .actionExpendedPlaylistFragmentToMainDisplayFragment())

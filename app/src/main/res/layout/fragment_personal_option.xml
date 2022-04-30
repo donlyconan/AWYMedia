@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/container"
     android:paddingTop="15dp"
     android:paddingBottom="10dp"
     android:layout_gravity="bottom"
@@ -52,15 +53,5 @@
         android:text="Chia sẻ"
         style="@style/BottomMenuItem"
         />
-
-
-<!--    <TextView-->
-<!--        android:id="@+id/btn_up_load"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:drawableStart="@drawable/outline_content_copy_24"-->
-<!--        android:text="Tạo bản sao"-->
-<!--        style="@style/BottomMenuItem"-->
-<!--        />-->
 
 </LinearLayout>

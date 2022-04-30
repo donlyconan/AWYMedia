@@ -15,22 +15,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.findNavController
-import androidx.paging.PagingData
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.dao.VideoDao
-import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
-import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.extension.widgets.showMessage
-import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
+import com.utc.donlyconan.media.viewmodels.ListVideoViewModel
 import com.utc.donlyconan.media.views.BaseFragment
+import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,21 +37,16 @@ import javax.inject.Inject
 class PersonalVideoFragment : BaseFragment(), OnItemClickListener, View.OnClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<PersonalVideoViewModel>()
+    private val viewModel by viewModels<ListVideoViewModel>()
     private lateinit var adapter: VideoAdapter
-    @Inject
-    lateinit var settings: Settings
-    @Inject
-    lateinit var videoDao: VideoDao
+    @Inject lateinit var settings: Settings
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(
-            TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
-                    "savedInstanceState = $savedInstanceState"
-        )
+        Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
+                    "savedInstanceState = $savedInstanceState")
         applicationComponent.inject(this)
         return binding.root
     }
@@ -66,33 +57,30 @@ class PersonalVideoFragment : BaseFragment(), OnItemClickListener, View.OnClickL
                     "$savedInstanceState"
         )
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!)
+        adapter = VideoAdapter(context!!, arrayListOf())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         binding.fab.setOnClickListener(this)
+        viewModel.getVideoList(settings.sortBy).observe(this) { videos ->
+            adapter.submit(videos)
+        }
 
         // Check permission of your app
-        if (ContextCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+            == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onViewCreated: loading...")
-            viewModel.let { model ->
-                model.insertDataIntoDbIfNeed()
-                model.viewModelScope.launch {
-                    model.sortBy(settings.sortBy)
-                    model.videoList
-                        .collectLatest(adapter::submitData)
-                }
-            }
+//            viewModel.let { model ->
+//                model.insertDataIntoDbIfNeed()
+//                model.viewModelScope.launch {
+//                    model.sortBy(settings.sortBy)
+//                    model.videoList
+//                        .collectLatest(adapter::submitData)
+//                }
+//            }
         } else {
             Log.d(TAG, "onViewCreated: register permission!")
             requestPermissionResult.launch(
-                arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             )
         }
     }
@@ -101,33 +89,29 @@ class PersonalVideoFragment : BaseFragment(), OnItemClickListener, View.OnClickL
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
         val video = adapter.getVideo(position)
-        viewModel.selectedVideo = video
-        if (v.id == R.id.cb_selected) {
+
+        if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) {
                 when (v.id) {
                     R.id.btn_play -> {
-                        val action = MainDisplayFragmentDirections
-                            .actionMainDisplayFragmentToVideoDisplayFragment(video, TAG)
-                        findNavController().navigate(action)
+                       val intent = VideoDisplayActivity.newIntent(requireContext(), video, false)
+                        startActivity(intent)
                     }
                     R.id.btn_play_music -> {
                         application.iMusicalService()?.apply {
-                            setVideoId(viewModel.selectedVideo?.videoId!!)
+                            setVideoId(video.videoId!!)
                             play()
                         }
                     }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
-                        videoDao.update(video)
+                        viewModel.update(video)
                         adapter.notifyItemChanged(position)
                     }
                     R.id.btn_delete -> {
-                        viewModel.viewModelScope.launch {
-                            videoDao.delete(video.videoId)
-                        }
+                        viewModel.moveToTrash(video)
                     }
                     R.id.btn_share -> {
-                        val video = viewModel.selectedVideo
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
                         intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video?.path))
@@ -142,31 +126,23 @@ class PersonalVideoFragment : BaseFragment(), OnItemClickListener, View.OnClickL
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, TAG)
         } else {
-            val action = MainDisplayFragmentDirections
-                .actionMainDisplayFragmentToVideoDisplayFragment(video, TAG)
-            findNavController().navigate(action)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), video, false)
+            startActivity(intent)
         }
-    }
-
-    private fun playVideo(video: Video) {
-        Log.d(TAG, "playVideo() called with: video = $video")
-        val action = MainDisplayFragmentDirections
-            .actionMainDisplayFragmentToVideoDisplayFragment(video, TAG)
-        findNavController().navigate(action)
     }
 
 
     private val requestPermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
             if (result.values.isNotEmpty()) {
-                viewModel.let { model ->
-                    model.insertDataIntoDbIfNeed()
-                    model.viewModelScope.launch {
-                        model.sortBy(settings.sortBy)
-                        model.videoList
-                            .collectLatest(adapter::submitData)
-                    }
-                }
+//                viewModel.let { model ->
+//                    model.insertDataIntoDbIfNeed()
+////                    model.viewModelScope.launch {
+////                        model.sortBy(settings.sortBy)
+////                        model.videoList
+////                            .collectLatest(adapter::submitData)
+////                    }
+//                }
             } else {
                 activity?.finish()
             }
@@ -188,14 +164,13 @@ class PersonalVideoFragment : BaseFragment(), OnItemClickListener, View.OnClickL
                         )?.first()
                         if (video != null) {
                             Log.d(TAG, "activityResultLauncher() called video=$video")
-                            if (viewModel.videoRepo.countPath(video.path) != 0) {
+                            if (viewModel.hasVideo(video.path)) {
                                 context?.showMessage("Video đã tồn tại.")
                             } else {
                                 viewModel.videoRepo.insert(video)
                             }
                         }
                     }
-
                 }
             }
         }
@@ -210,48 +185,52 @@ class PersonalVideoFragment : BaseFragment(), OnItemClickListener, View.OnClickL
                 }
                 activityResultLauncher.launch(intent)
             }
-            R.id.btn_sort_by_name -> {
-                viewModel.apply {
-                    viewModelScope.launch {
-                        adapter.submitData(PagingData.empty())
-                        sortBy(Settings.SORT_BY_DURATION)
-                            .collectLatest(adapter::submitData)
-                    }
-                }
-            }
-            R.id.btn_sort_by_creation -> {
-                viewModel.apply {
-                    viewModelScope.launch {
-                        adapter.submitData(PagingData.empty())
-                        sortBy(Settings.SORT_BY_DURATION)
-                            .collectLatest(adapter::submitData)
-                    }
-                }
-            }
-            R.id.btn_sort_by_recent -> {
-                viewModel.apply {
-                    viewModelScope.launch {
-                        adapter.submitData(PagingData.empty())
-                        sortBy(Settings.SORT_BY_DURATION)
-                            .collectLatest(adapter::submitData)
-                    }
-                }
-            }
-            R.id.btn_sort_by_size -> {
-                viewModel.apply {
-                    viewModelScope.launch {
-                        adapter.submitData(PagingData.empty())
-                        sortBy(Settings.SORT_BY_DURATION)
-                            .collectLatest(adapter::submitData)
-                    }
-                }
-            }
+//            R.id.btn_sort_by_name -> {
+//                viewModel.apply {
+//                    viewModelScope.launch {
+//                        adapter.submitData(PagingData.empty())
+//                        sortBy(Settings.SORT_BY_DURATION)
+//                            .collectLatest(adapter::submitData)
+//                    }
+//                }
+//            }
+//            R.id.btn_sort_by_creation -> {
+//                viewModel.apply {
+//                    viewModelScope.launch {
+//                        adapter.submitData(PagingData.empty())
+//                        sortBy(Settings.SORT_BY_DURATION)
+//                            .collectLatest(adapter::submitData)
+//                    }
+//                }
+//            }
+//            R.id.btn_sort_by_recent -> {
+//                viewModel.apply {
+//                    viewModelScope.launch {
+//                        adapter.submitData(PagingData.empty())
+//                        sortBy(Settings.SORT_BY_DURATION)
+//                            .collectLatest(adapter::submitData)
+//                    }
+//                }
+//            }
+//            R.id.btn_sort_by_size -> {
+//                viewModel.apply {
+//                    viewModelScope.launch {
+//                        adapter.submitData(PagingData.empty())
+//                        sortBy(Settings.SORT_BY_DURATION)
+//                            .collectLatest(adapter::submitData)
+//                    }
+//                }
+//            }
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        Log.d(TAG, "onDetach() called")
+    }
+
     companion object {
-        const val REQ_READ_WRITE_PERMISSION = 100
-        const val MS_TO_30DAY = 30 * 24 * 60 * 60 * 1000 // day * hour * min * sec * ms
+        val TAG = PersonalVideoFragment::class.simpleName
         fun newInstance() = PersonalVideoFragment()
     }
 

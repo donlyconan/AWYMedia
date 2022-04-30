@@ -15,11 +15,13 @@ import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
+import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.MainActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.TrashItemOptionFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -28,7 +30,7 @@ import javax.inject.Inject
 /**
  * Show list of video that was temporarily deleted by user
  */
-class TrashFragment : Fragment(), OnItemLongClickListener {
+class TrashFragment : Fragment(), OnItemClickListener {
 
     val binding by lazy { FragmentTrashBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<TrashViewModel>()
@@ -61,24 +63,21 @@ class TrashFragment : Fragment(), OnItemLongClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
-        adapter = VideoAdapter(context!!, VideoAdapter.MODE_TRASH)
-        adapter.onItemLongClickListener = this
+        adapter = VideoAdapter(context!!, arrayListOf())
+        adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         viewModel.apply {
-            viewModelScope.launch {
-                videoList.collectLatest(adapter::submitData)
-            }
+
         }
     }
 
-    override fun onItemLongClick(v: View, position: Int) {
+    override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemLongClick() called with: v = $v, position = $position")
         val video = adapter.getVideo(position)
-        TrashItemOptionFragment.newInstance { v ->
+        MenuMoreOptionFragment.newInstance(R.layout.fragment_trash_item_option) { v ->
             Log.d(TAG, "onItemLongClick() called with: v = $v")
             when(v.id) {
                 R.id.btn_restore -> {
-                    video.deletedAt = null
                     videoDao.update(video)
                 }
                 R.id.btn_delete -> {
@@ -115,12 +114,6 @@ class TrashFragment : Fragment(), OnItemLongClickListener {
                 }
                 AlertDialogManager.createDeleteAlertDialog(
                     requireContext(), "Deleting file", "Do you wan to remove all files?") {
-                    viewModel.viewModelScope.launch {
-                        for (i in 0 until adapter.itemCount) {
-                            val item = adapter.getVideo(i)
-                            videoDao.delete(item.videoId)
-                        }
-                    }
                 }.show()
             }
         }

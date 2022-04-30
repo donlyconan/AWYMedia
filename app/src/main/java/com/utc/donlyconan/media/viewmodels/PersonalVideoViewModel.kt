@@ -3,17 +3,13 @@ package com.utc.donlyconan.media.viewmodels
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.extension.widgets.TAG
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class PersonalVideoViewModel(val app: Application) : BaseAndroidViewModel(app) {
-    val lstVideoRepo = awyApp.applicationComponent().getListVideoRepo()
-    val videoRepo = awyApp.applicationComponent().getVideoRepo()
-    lateinit var videoList: Flow<PagingData<Video>>
+    val lstVideoRepo = myApp.applicationComponent().getListVideoRepo()
+    val videoRepo = myApp.applicationComponent().getVideoRepo()
     var selectedVideo: Video? = null
 
     fun insertDataIntoDbIfNeed() {
@@ -29,9 +25,8 @@ class PersonalVideoViewModel(val app: Application) : BaseAndroidViewModel(app) {
         }
     }
 
-    fun sortBy(sortId: Int): Flow<PagingData<Video>> {
+    fun sortBy(sortId: Int): LiveData<List<Video>> {
         Log.d(TAG, "sortVideoList() called with: sortId = $sortId")
-        videoList = lstVideoRepo.getAllVideos(sortId).cachedIn(viewModelScope)
-        return videoList
+        return lstVideoRepo.getAllVideos()
     }
 }

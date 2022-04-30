@@ -1,15 +1,17 @@
 package com.utc.donlyconan.media.data.repo
 
-import androidx.paging.PagingData
+import androidx.lifecycle.LiveData
 import com.utc.donlyconan.media.data.models.Playlist
-import kotlinx.coroutines.flow.Flow
+import com.utc.donlyconan.media.data.models.Video
 
 interface PlaylistRepository {
 
     fun insert(vararg playlist: Playlist)
 
-    fun delete(vararg playlist: Playlist)
+    fun delete(vararg playlists: Playlist)
 
-    fun getAllPlaylist(): Flow<PagingData<Playlist>>
+    fun countVideos(playlistId: Int): Int
+
+    fun getAllPlaylist(): LiveData<List<Playlist>>
 
 }

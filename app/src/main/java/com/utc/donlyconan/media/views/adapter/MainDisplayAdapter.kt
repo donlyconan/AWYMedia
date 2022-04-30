@@ -8,30 +8,38 @@ import com.utc.donlyconan.media.views.fragments.*
 
 class MainDisplayAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
 
+    private val fragMap = HashMap<Int, Fragment>()
+
+    fun getFragment(fragId: Int) = fragMap[fragId]
+
     override fun getItemCount(): Int {
         return 4 /* tổng số fragment sẽ có */
     }
 
     override fun createFragment(fragId: Int): Fragment {
         Log.d(TAG, "createFragment() called with: fragId = $fragId")
-        when(fragId) {
-            MainDisplayFragment.PERSONAL_FRAGMENT -> {
-                return PersonalVideoFragment.newInstance()
+        var fragment: Fragment? = null
+        if(!fragMap.containsKey(fragId)) {
+            when(fragId) {
+                MainDisplayFragment.PERSONAL_FRAGMENT -> {
+                    fragment = PersonalVideoFragment.newInstance()
+                }
+                MainDisplayFragment.RECENT_FRAGMENT -> {
+                    fragment = RecentFragment.newInstance()
+                }
+                MainDisplayFragment.PLAYLIST_FRAGMENT -> {
+                    fragment = PlaylistFragment.newInstance()
+                }
+                MainDisplayFragment.FAVORITE_FRAGMENT -> {
+                    fragment = FavoriteFragment.newInstance()
+                }
+                else -> {
+                    Log.d(TAG, "createFragment: $fragId isn't found!")
+                }
             }
-            MainDisplayFragment.RECENT_FRAGMENT -> {
-                return RecentFragment.newInstance()
-            }
-            MainDisplayFragment.PLAYLIST_FRAGMENT -> {
-                return PlaylistFragment.newInstance()
-            }
-            MainDisplayFragment.FAVORITE_FRAGMENT -> {
-                return FavoriteFragment.newInstance()
-            }
-            else -> {
-                Log.d(TAG, "createFragment: $fragId isn't found!")
-            }
+            fragMap[fragId] = fragment ?: PersonalVideoFragment.newInstance()
         }
-        return PersonalVideoFragment.newInstance()
+        return fragMap[fragId]!!
     }
 
 }

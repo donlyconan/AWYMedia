@@ -2,7 +2,6 @@ package com.utc.donlyconan.media.views.fragments
 
 import android.graphics.Color
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,12 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagingData
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentSearchBarBinding
 import com.utc.donlyconan.media.viewmodels.SearchViewModel
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class SearchBarFragment : Fragment(), View.OnClickListener {
@@ -42,7 +39,7 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
             findViewById<View>(androidx.appcompat.R.id.search_mag_icon).setOnClickListener(this@SearchBarFragment)
             setOnQueryTextListener(onQueryTextListener)
         }
-        adapter = VideoAdapter(requireContext())
+        adapter = VideoAdapter(requireContext(), arrayListOf())
         binding.recyclerView.adapter = adapter
     }
 
@@ -58,12 +55,12 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
                 searchViewModel.apply {
                     viewModelScope.launch {
                         val keyword = "%$newText%"
-                        searchAllVideos(keyword).collectLatest(adapter::submitData)
+
                     }
                 }
             } else {
                 searchViewModel.viewModelScope.launch {
-                    adapter.submitData(PagingData.empty())
+
                 }
             }
             return true

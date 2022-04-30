@@ -5,18 +5,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.models.Playlist
+import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
-import java.text.SimpleDateFormat
 
-
-class PlaylistAdapter(var context: Context) :
-    PagingDataAdapter<Playlist, PlaylistAdapter.VideoHolder>(PlaylistComparator), OnItemClickListener {
+class PlaylistAdapter(var context: Context,
+                      var playlists: ArrayList<Playlist>,
+                      val repository: PlaylistRepository) :
+    RecyclerView.Adapter<PlaylistAdapter.VideoHolder>(), OnItemClickListener {
 
     var inflater: LayoutInflater = LayoutInflater.from(context)
     var onItemClickListener: OnItemClickListener? = null
@@ -29,16 +29,25 @@ class PlaylistAdapter(var context: Context) :
     }
 
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
-        val item = getPlaylistItem(position)
+        val item = playlists[position]
+        item.itemSize = repository.countVideos(item.playlistId!!)
         holder.bind(item, this, position == itemCount - 1)
     }
 
-    fun getPlaylistItem(position: Int) = getItem(position)!!
+    override fun getItemCount(): Int {
+        return playlists.size
+    }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
         selectedPosition = position
         onItemClickListener?.onItemClick(v, position)
+    }
+
+    fun submit(playlists: List<Playlist>) {
+        Log.d(TAG, "submit() called with: playlists = ${playlists.size}")
+        this.playlists = ArrayList(playlists)
+        notifyDataSetChanged()
     }
 
 
@@ -59,6 +68,7 @@ class PlaylistAdapter(var context: Context) :
                         "isLastItem = $isLastItem")
             binding.tvTitle.text = playlist.title
             onItemClickListener = listener
+            binding.tvNumber.text = "${playlist.itemSize} videos"
             if (isLastItem) {
                 binding.container.apply {
                     val paddingBottom =
@@ -67,9 +77,5 @@ class PlaylistAdapter(var context: Context) :
                 }
             }
         }
-    }
-
-    companion object {
-        val simpleDateFormat = SimpleDateFormat("dd MMM yyyy HH:mm")
     }
 }

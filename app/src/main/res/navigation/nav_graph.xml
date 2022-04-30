@@ -16,7 +16,10 @@
         android:name="com.utc.donlyconan.media.views.fragments.MainDisplayFragment"
         android:label="fragment_main_display"
         tools:layout="@layout/fragment_main_display" >
-
+        <argument
+            android:name="screenId"
+            app:argType="integer"
+            android:defaultValue="0" />
         <action
             android:id="@+id/action_mainDisplayFragment_to_searchBarFragment"
             app:destination="@id/searchBarFragment"
@@ -26,13 +29,6 @@
             app:restoreState="true" />
 
         <action
-            android:id="@+id/action_mainDisplayFragment_to_videoDisplayFragment"
-            app:destination="@id/videoDisplayFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/mainDisplayFragment"
-            app:popUpToInclusive="false"
-            app:restoreState="true" />
-        <action
             android:id="@+id/action_mainDisplayFragment_to_trashFragment"
             app:destination="@id/trashFragment" />
         <action
@@ -41,10 +37,10 @@
         <action
             android:id="@+id/action_mainDisplayFragment_to_detailedPlaylistFragment"
             app:destination="@id/detailedPlaylistFragment" />
-        <argument
-            android:name="screenId"
-            app:argType="integer"
-            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_helpAndFeedbackFragment"
+            app:destination="@id/helpAndFeedbackFragment" />
+
     </fragment>
 
     <fragment
@@ -61,32 +57,6 @@
             app:popUpToInclusive="false" />
     </fragment>
 
-    <fragment
-        android:id="@+id/videoDisplayFragment"
-        android:name="com.utc.donlyconan.media.views.fragments.VideoDisplayFragment"
-        android:label="VideoDisplayFragment"
-        app:popUpTo="@id/mainDisplayFragment"
-        tools:layout="@layout/activity_video_display">
-        <argument
-            android:name="video"
-            app:argType="com.utc.donlyconan.media.data.models.Video" />
-        <action
-            android:id="@+id/action_videoDisplayFragment_to_mainDisplayFragment"
-            app:destination="@id/mainDisplayFragment"
-            app:popUpTo="@id/mainDisplayFragment"
-            app:popUpToInclusive="false" />
-        <action
-            android:id="@+id/action_videoDisplayFragment_self"
-            app:destination="@id/videoDisplayFragment"
-            app:popUpTo="@id/videoDisplayFragment"
-            app:popUpToInclusive="true" />
-        <argument
-            android:name="backScreen"
-            app:argType="string"/>
-        <action
-            android:id="@+id/action_videoDisplayFragment_to_detailedPlaylistFragment"
-            app:destination="@id/detailedPlaylistFragment" />
-    </fragment>
     <fragment
         android:id="@+id/trashFragment"
         android:name="com.utc.donlyconan.media.views.fragments.TrashFragment"
@@ -108,13 +78,6 @@
         <argument
             android:name="playlistId"
             app:argType="integer" />
-        <action
-            android:id="@+id/action_detailedPlaylistFragment_to_videoDisplayFragment"
-            app:destination="@id/videoDisplayFragment" >
-            <argument
-                android:name="backScreen"
-                android:defaultValue="@null" />
-        </action>
     </fragment>
     <fragment
         android:id="@+id/expendedPlaylistFragment"
@@ -127,6 +90,15 @@
         <argument
             android:name="playlistId"
             app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/helpAndFeedbackFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.HelpAndFeedbackFragment"
+        android:label="fragment_help_and_feedback"
+        tools:layout="@layout/fragment_help_and_feedback" >
+        <action
+            android:id="@+id/action_helpAndFeedbackFragment_to_mainDisplayFragment"
+            app:destination="@id/mainDisplayFragment" />
     </fragment>
 
 

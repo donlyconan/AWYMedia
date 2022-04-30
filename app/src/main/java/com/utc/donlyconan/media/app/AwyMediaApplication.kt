@@ -63,7 +63,7 @@ class AwyMediaApplication: Application() {
     }
 
     companion object {
-        val TAG = AwyMediaApplication.javaClass.simpleName
+        val TAG: String = AwyMediaApplication.javaClass.simpleName
 
         private lateinit var instance: AwyMediaApplication
 

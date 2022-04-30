@@ -46,13 +46,11 @@ class FavoriteFragment : BaseFragment(), OnItemClickListener, View.OnClickListen
         Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, VideoAdapter.MODE_NORMAL)
+        adapter = VideoAdapter(context!!, arrayListOf())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         viewModel.apply{
-            viewModelScope.launch {
-                videoList.collectLatest(adapter::submitData)
-            }
+            
         }
     }
 
@@ -66,7 +64,7 @@ class FavoriteFragment : BaseFragment(), OnItemClickListener, View.OnClickListen
         } else {
             val item = adapter.getVideo(position)
             val intent = Intent(context, VideoDisplayActivity::class.java)
-            intent.putExtra(VideoDisplayActivity.KEY_VIDEO,item)
+            intent.putExtra(VideoDisplayActivity.EXTRA_VIDEO,item)
             startActivity(intent)
         }
     }

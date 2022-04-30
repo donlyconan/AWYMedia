@@ -15,14 +15,18 @@ class VideoRepositoryImpl @Inject constructor(private val dao: VideoDao) : Video
 
     override suspend fun count(): Int = dao.count()
 
-    override suspend fun insert(vararg videos: Video) = dao.insert(*videos)
+    override fun insert(vararg videos: Video) = dao.insert(*videos)
 
     override fun update(video: Video): Int = dao.update(video)
 
     override fun countPath(path: String): Int = dao.countPath(path)
 
-    override suspend fun delete(videoId: Int): Int = dao.delete(videoId)
+    override fun delete(videoId: Int): Int = dao.delete(videoId)
 
     override fun getVideo(videoId: Int): Video = dao.getVideo(videoId)
+
+    override fun getNext(videoId: Int): Video = dao.getNextVideo(videoId)
+
+    override fun getPrevious(videoId: Int): Video = dao.getPreviousVideo(videoId)
 
 }

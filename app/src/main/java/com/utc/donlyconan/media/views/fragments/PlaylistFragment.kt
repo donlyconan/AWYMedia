@@ -51,18 +51,18 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
-        adapter = PlaylistAdapter(context!!)
+        adapter = PlaylistAdapter(context!!, arrayListOf(), playlistRepo)
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         binding.fab.setOnClickListener(this)
-        viewModel.viewModelScope.launch {
-            viewModel.listPlaylist.collectLatest { adapter.submitData(it) }
+        viewModel.listPlaylist.observe(this) { playlists ->
+            adapter.submit(playlists)
         }
     }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
-        val item = adapter.getPlaylistItem(position)
+        val item = adapter.playlists[position]
         MenuMoreOptionFragment.newInstance(R.layout.fragment_playlist_option) {
             when(it.id) {
                 R.id.btn_open -> {

@@ -1,23 +1,18 @@
 package com.utc.donlyconan.media.dagger.components
 
-import android.app.Application
-import android.content.Context
-import android.os.Binder
 import com.utc.donlyconan.media.app.services.MusicalService
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
 import com.utc.donlyconan.media.dagger.modules.RepositoryModule
 import com.utc.donlyconan.media.dagger.modules.SettingsModule
-import com.utc.donlyconan.media.data.dao.ListVideoDao
-import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
+import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
+import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.*
-import dagger.BindsInstance
 import dagger.Component
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
@@ -41,6 +36,7 @@ interface ApplicationComponent {
 
     fun getVideoRepo(): VideoRepository
     fun getListVideoRepo(): ListVideoRepository
+    fun getPlaylistRepo(): PlaylistRepository
 
     fun inject(fragment: PersonalVideoFragment)
     fun inject(fragment: DetailedPlaylistFragment)
@@ -54,8 +50,9 @@ interface ApplicationComponent {
     fun inject(fragment: SearchBarFragment)
     fun inject(fragment: SplashScreenFragment)
     fun inject(fragment: TrashFragment)
-    fun inject(fragment: VideoDisplayFragment)
+    fun inject(fragment: ListVideoDisplayFragment)
     fun inject(fragment: MusicalService)
     fun inject(fragment: VideoDisplayActivity)
     fun inject(fragment: PlaylistViewModel)
+    fun inject(videoDisplayViewModel: VideoDisplayViewModel)
 }

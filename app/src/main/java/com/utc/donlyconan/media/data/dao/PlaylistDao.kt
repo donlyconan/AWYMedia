@@ -1,7 +1,6 @@
 package com.utc.donlyconan.media.data.dao
 
-import androidx.paging.PagingData
-import androidx.paging.PagingSource
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.utc.donlyconan.media.data.models.Playlist
 
@@ -12,9 +11,12 @@ interface PlaylistDao {
     fun insert(vararg playlist: Playlist)
 
     @Delete
-    fun delete(vararg playlist: Playlist)
+    fun delete(vararg playlists: Playlist)
+
+    @Query("Select count(video_id) from video_playlist where playlist_id=:playlistId")
+    fun countVideos(playlistId: Int): Int
 
     @Query("Select * from playlist")
-    fun getAllPlaylist(): PagingSource<Int, Playlist>
+    fun getAllPlaylist(): LiveData<List<Playlist>>
 
 }

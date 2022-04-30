@@ -16,7 +16,8 @@ import com.utc.donlyconan.media.databinding.FragmentDetailedPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.MainActivity
-import com.utc.donlyconan.media.views.adapter.NVideoAdapter
+import com.utc.donlyconan.media.views.VideoDisplayActivity
+import com.utc.donlyconan.media.views.adapter.ListVideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import javax.inject.Inject
 
@@ -28,7 +29,7 @@ class DetailedPlaylistFragment : BaseFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentDetailedPlaylistBinding.inflate(layoutInflater) }
     val args by navArgs<DetailedPlaylistFragmentArgs>()
-    lateinit var adapter: NVideoAdapter
+    lateinit var adapter: ListVideoAdapter
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
     @Inject lateinit var videoDao: VideoDao
 
@@ -60,7 +61,7 @@ class DetailedPlaylistFragment : BaseFragment(), OnItemClickListener {
         }
         binding.title.text = null
 
-        adapter = NVideoAdapter(requireContext(), emptyList())
+        adapter = ListVideoAdapter(requireContext(), emptyList())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         playlistWithVideosDao.getPlaylist(args.playlistId).observe(this) { videoPl ->
@@ -112,8 +113,8 @@ class DetailedPlaylistFragment : BaseFragment(), OnItemClickListener {
                 .show(supportFragmentManager, TAG)
         } else {
             val video = adapter.videos[position]
-            val action = DetailedPlaylistFragmentDirections
-                .actionDetailedPlaylistFragmentToVideoDisplayFragment(video)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), video)
+            startActivity(intent)
         }
     }
 

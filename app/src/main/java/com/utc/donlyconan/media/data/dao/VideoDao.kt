@@ -13,13 +13,13 @@ interface VideoDao {
     suspend fun count(): Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(vararg videos: Video)
+    fun insert(vararg videos: Video)
 
     @Update
     fun update(video: Video): Int
 
     @Query("Delete from videos where video_id = :videoId")
-    suspend fun delete(videoId: Int): Int
+    fun delete(videoId: Int): Int
 
     @Query("Select * from videos where video_id = :videoId")
     fun getVideo(videoId: Int): Video

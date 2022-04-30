@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.findFragment
@@ -17,16 +18,19 @@ import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.databinding.DialogAboutBinding
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
 import com.utc.donlyconan.media.extension.widgets.TAG
+import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.MainActivity
 import com.utc.donlyconan.media.views.fragments.options.ArrangementVideoBottomDialogFragment
+import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 
 /**
  * Represent for Main Screen where will info as Navigation and Base View
  */
-class MainDisplayFragment : Fragment() {
+class MainDisplayFragment : BaseFragment() {
 
     val binding by lazy { FragmentMainDisplayBinding.inflate(layoutInflater) }
     lateinit var mainDisplayAdapter: MainDisplayAdapter
@@ -115,15 +119,25 @@ class MainDisplayFragment : Fragment() {
                 findNavController().navigate(action)
             }
             R.id.it_sort_by -> {
-                val fragment = mainDisplayAdapter.createFragment(binding.viewPager2.currentItem)
+                val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)
                         as? PersonalVideoFragment
-                fragment.let { frag ->
-                    ArrangementVideoBottomDialogFragment.newInstance(frag)
-                        .show(parentFragmentManager, TAG)
+                fragment?.let { frag ->
+                    MenuMoreOptionFragment.newInstance(R.layout.fragment_sorted_video_option, frag)
+                        .show(supportFragmentManager, TAG)
                 }
             }
             R.id.it_trash -> {
                 val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToTrashFragment()
+                findNavController().navigate(action)
+            }
+            R.id.it_about -> {
+                val binding = DialogAboutBinding.inflate(layoutInflater)
+                val dialog = AlertDialog.Builder(context!!)
+                    .setView(binding.root)
+                    .show()
+            }
+            R.id.it_help -> {
+                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToHelpAndFeedbackFragment()
                 findNavController().navigate(action)
             }
             else -> {

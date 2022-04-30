@@ -20,9 +20,6 @@
         <activity
             android:name=".views.MainActivity"
             android:exported="true"
-            android:supportsPictureInPicture="true"
-            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation"
-            android:resizeableActivity="true"
             android:launchMode="singleTop">
 
             <nav-graph android:value="@navigation/nav_graph" />
@@ -33,6 +30,10 @@
             </intent-filter>
 
         </activity>
+
+        <activity android:name=".views.VideoDisplayActivity"
+            android:exported="true"
+            android:launchMode="singleTask" />
 
         <meta-data
             android:name="preloaded_fonts"

@@ -16,11 +16,10 @@ import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 
-class NVideoAdapter(var context: Context, var videos: List<Video>) :
-    RecyclerView.Adapter<NVideoAdapter.VideoHolder>(), OnItemClickListener {
+class ListVideoAdapter(var context: Context, var videos: List<Video>) :
+    RecyclerView.Adapter<ListVideoAdapter.VideoHolder>(), OnItemClickListener {
 
     var inflater: LayoutInflater = LayoutInflater.from(context)
     var onItemClickListener: OnItemClickListener? = null
