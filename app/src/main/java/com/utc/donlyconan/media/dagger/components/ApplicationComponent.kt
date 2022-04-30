@@ -12,6 +12,9 @@ import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.*
+import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.RecentFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -42,7 +45,6 @@ interface ApplicationComponent {
     fun inject(fragment: DetailedPlaylistFragment)
     fun inject(fragment: ExpendedPlaylistFragment)
     fun inject(fragment: FavoriteFragment)
-    fun inject(fragment: ListVideoFragment)
     fun inject(fragment: MainDisplayFragment)
     fun inject(fragment: MusicalFragment)
     fun inject(fragment: PlaylistFragment)

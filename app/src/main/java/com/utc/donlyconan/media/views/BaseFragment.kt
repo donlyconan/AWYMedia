@@ -1,8 +1,8 @@
 package com.utc.donlyconan.media.views
 
+import android.content.Context
 import androidx.fragment.app.Fragment
 import com.utc.donlyconan.media.app.AwyMediaApplication
-import com.utc.donlyconan.media.views.MainActivity
 
 
 /**
@@ -13,4 +13,9 @@ open class BaseFragment : Fragment() {
     protected val application by lazy { requireContext().applicationContext as AwyMediaApplication }
     protected val applicationComponent by lazy { application.applicationComponent() }
     protected val supportFragmentManager by lazy { activity.supportFragmentManager }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+    }
+
 }

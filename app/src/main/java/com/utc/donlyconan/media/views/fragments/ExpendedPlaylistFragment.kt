@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.R
@@ -15,6 +16,8 @@ import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.data.dao.ListVideoDao
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
+import com.utc.donlyconan.media.data.repo.ListVideoRepository
+import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentExpendedPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
@@ -27,7 +30,7 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
     private val binding by lazy { FragmentExpendedPlaylistBinding.inflate(layoutInflater) }
     private val args by navArgs<ExpendedPlaylistFragmentArgs>()
     lateinit var adapter: VideoChoiceAdapter
-    @Inject lateinit var listVideoDao: ListVideoDao
+    @Inject lateinit var listVideoRepo: ListVideoRepository
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +51,8 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
-        val editText = binding.searchBar.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        val editText =
+            binding.searchBar.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
         editText.setTextColor(Color.WHITE)
         editText.setHintTextColor(resources.getColor(R.color.search_bar_hint))
         binding.searchBar.run {
@@ -57,41 +61,55 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
         adapter = VideoChoiceAdapter(requireContext(), arrayListOf())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
-        listVideoDao.getAllVideosNotInPlaylist(args.playlistId).observe(this) { videos ->
+        listVideoRepo.getAllVideosNotInPlaylist(args.playlistId).observe(this) { videos ->
             adapter.submit(videos)
         }
         binding.btnDone.setOnClickListener(this)
+        binding.searchBar.setOnQueryTextListener(onQueryTextListener)
+    }
+
+    private val onQueryTextListener = object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            Log.d(TAG, "onQueryTextSubmit() called with: query = $query")
+            return true
+        }
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+            Log.d(SearchBarFragment.TAG, "onQueryTextChange() called with: newText = $newText")
+            listVideoRepo.findAllVideos("%$newText%")
+                .observe(this@ExpendedPlaylistFragment) { videos ->
+                    adapter.submit(videos)
+                }
+            return true
+        }
     }
 
     override fun onClick(v: View?) {
         Log.d(TAG, "onClick() called with: v = $v")
-        when(v?.id) {
+        when (v?.id) {
             androidx.appcompat.R.id.search_mag_icon -> {
-                findNavController().navigate(ExpendedPlaylistFragmentDirections
-                    .actionExpendedPlaylistFragmentToMainDisplayFragment())
+                findNavController().navigateUp()
             }
             R.id.btn_done -> {
-                adapter.videos.forEach { video ->
-                    if(video.isSelected) {
-                        val item = VideoPlaylistCrossRef(video.videoId, args.playlistId)
-                        playlistWithVideosDao.insert(item)
-                    }
-                }
-                findNavController().navigate(ExpendedPlaylistFragmentDirections
-                    .actionExpendedPlaylistFragmentToMainDisplayFragment())
+                findNavController().navigateUp()
             }
         }
     }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
-        val item = adapter.videos[position]
-        item.isSelected = !item.isSelected
+        val video = adapter.videos[position]
+        video.isSelected = !video.isSelected
         adapter.notifyItemChanged(position)
+
+        val videoCross = VideoPlaylistCrossRef(video.videoId, args.playlistId)
+        playlistWithVideosDao.insert(videoCross)
+        adapter.notifyItemRemoved(position)
+        adapter.notifyItemRangeChanged(position, adapter.videos.size)
     }
 
     companion object {
-        val TAG = ExpendedPlaylistFragment::class.java.simpleName
+        val TAG: String = ExpendedPlaylistFragment::class.java.simpleName
     }
 
 

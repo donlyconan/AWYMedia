@@ -38,7 +38,7 @@ class VideoAdapter(var context: Context, var videoList: ArrayList<Video>, var sh
         val item: Video = videoList[position]
         holder.onItemLongClickListener = onItemLongClickListener
         holder.onItemClickListener = onItemClickListener
-        holder.bind(item, position == itemCount - 1, showProgress)
+        holder.bind(item, position == videoList.size - 1, showProgress)
     }
 
     override fun getItemCount(): Int {
@@ -56,6 +56,12 @@ class VideoAdapter(var context: Context, var videoList: ArrayList<Video>, var sh
     fun submit(videos: List<Video>) {
         Log.d(TAG, "submit() called with: videos.size = $videos.size")
         videoList = ArrayList(videos)
+        notifyDataSetChanged()
+    }
+
+    fun submit(videos: ArrayList<Video>) {
+        Log.d(TAG, "submit() called with: videos.size = $videos.size")
+        videoList = videos
         notifyDataSetChanged()
     }
 

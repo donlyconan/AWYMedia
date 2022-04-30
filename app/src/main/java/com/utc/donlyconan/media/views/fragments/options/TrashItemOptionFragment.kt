@@ -47,7 +47,7 @@ class TrashItemOptionFragment : BottomSheetDialogFragment(), View.OnClickListene
     }
 
     companion object {
-        val TAG = TrashFragment::class.java.simpleName
+        val TAG: String = TrashFragment::class.java.simpleName
 
         fun newInstance(listener: View.OnClickListener): TrashItemOptionFragment {
             return TrashItemOptionFragment().apply {

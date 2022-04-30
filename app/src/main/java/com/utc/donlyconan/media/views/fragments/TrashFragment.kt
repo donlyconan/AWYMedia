@@ -49,13 +49,12 @@ class TrashFragment : Fragment(), OnItemClickListener {
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(false)
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(true)
         binding.toolbar.setNavigationOnClickListener {
-            val action = TrashFragmentDirections.actionTrashFragmentToMainDisplayFragment()
-            findNavController().navigate(action)
+            findNavController().navigateUp()
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView: ")
         return  binding.root
     }

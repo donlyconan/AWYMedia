@@ -23,4 +23,6 @@ interface VideoRepository {
 
     fun getPrevious(videoId: Int): Video
 
+    fun moveToTrash(video: Video)
+
 }

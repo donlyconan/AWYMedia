@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.data.repo
 
 import androidx.lifecycle.LiveData
+import com.utc.donlyconan.media.data.models.PlaylistWithVideos
 import com.utc.donlyconan.media.data.models.Video
 
 interface ListVideoRepository {
@@ -18,4 +19,6 @@ interface ListVideoRepository {
     fun findAllVideos(keyword: String): LiveData<List<Video>>
 
     fun getListInTrash(): LiveData<List<Video>>
+
+    fun getAllVideosNotInPlaylist(playlistId: Int): LiveData<List<Video>>
 }

@@ -5,6 +5,9 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.views.fragments.*
+import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.RecentFragment
 
 class MainDisplayAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
 

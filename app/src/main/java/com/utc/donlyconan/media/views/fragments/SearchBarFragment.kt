@@ -10,14 +10,15 @@ import android.widget.EditText
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentSearchBarBinding
 import com.utc.donlyconan.media.viewmodels.SearchViewModel
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import kotlinx.coroutines.launch
 
+/**
+ * This class is search screen of the app. It allows user who can find video on user's app
+ */
 class SearchBarFragment : Fragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentSearchBarBinding.inflate(layoutInflater) }
@@ -52,16 +53,11 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
         override fun onQueryTextChange(newText: String?): Boolean {
             Log.d(TAG, "onQueryTextChange() called with: newText = $newText")
             if(newText != null && newText.isNotEmpty()) {
-                searchViewModel.apply {
-                    viewModelScope.launch {
-                        val keyword = "%$newText%"
-
-                    }
+                searchViewModel.searchAllVideos("%$newText%").observe(this@SearchBarFragment) { videos ->
+                    adapter.submit(videos)
                 }
             } else {
-                searchViewModel.viewModelScope.launch {
-
-                }
+                adapter.submit(arrayListOf())
             }
             return true
         }
@@ -71,9 +67,7 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
         Log.d(TAG, "onClick() called with: v = $v")
         when(v.id) {
             androidx.appcompat.R.id.search_mag_icon -> {
-                findNavController().navigate(
-                    SearchBarFragmentDirections.actionSearchBarFragmentToMainDisplayFragment()
-                )
+                findNavController().navigateUp()
             }
             else -> {
                 Log.d(TAG, "onClick haven't been handled yet!")

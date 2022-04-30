@@ -1,24 +1,23 @@
 package com.utc.donlyconan.media.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.util.Log
+import androidx.lifecycle.*
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Video
+import com.utc.donlyconan.media.extension.components.getAllVideos
+import com.utc.donlyconan.media.extension.widgets.TAG
+import kotlinx.coroutines.launch
 import java.util.*
 
-class ListVideoViewModel(app: Application) : BaseAndroidViewModel(app) {
-
-    private lateinit var _videoList: LiveData<List<Video>>
+open class ListVideoViewModel(app: Application) : BaseAndroidViewModel(app) {
     private val _selectedVideo = MutableLiveData<Video>()
-    val selectedVideo: LiveData<Video> = _selectedVideo
     val listVideoRepo = myApp.applicationComponent().getListVideoRepo()
     val videoRepo = myApp.applicationComponent().getVideoRepo()
+    val selectedVideo: LiveData<Video> = _selectedVideo
 
-    fun getVideoList(sortId: Int): LiveData<List<Video>> {
-        return listVideoRepo.getAllVideos(sortId)
+    fun getVideoList(): LiveData<List<Video>> {
+        return listVideoRepo.getAllVideos()
     }
 
     fun hasVideo(path: String): Boolean {
@@ -35,6 +34,16 @@ class ListVideoViewModel(app: Application) : BaseAndroidViewModel(app) {
 
     fun moveToTrash(video: Video) {
 
+    }
+
+    fun insertVideoIfNeed() = viewModelScope.launch {
+        if (videoRepo.count() != 0) {
+            Log.d(TAG, "insertDataIntoDbIfNeed: Database had been loaded!")
+            return@launch
+        }
+        val videoList = listVideoRepo.loadAllVideos()
+        Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
+        videoRepo.insert(*videoList.toTypedArray())
     }
 
 }

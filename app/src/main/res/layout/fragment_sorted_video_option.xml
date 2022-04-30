@@ -32,7 +32,7 @@
 
 
         <TextView
-            android:id="@+id/btn_sort_by_size"
+            android:id="@+id/btn_sort_by_duration"
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

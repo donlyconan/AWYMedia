@@ -50,31 +50,18 @@
         tools:layout="@layout/fragment_search_bar" >
         <argument android:name="directFrom"
             app:argType="integer" />
-        <action
-            android:id="@+id/action_searchBarFragment_to_mainDisplayFragment"
-            app:destination="@id/mainDisplayFragment"
-            app:popUpTo="@id/mainDisplayFragment"
-            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
         android:id="@+id/trashFragment"
         android:name="com.utc.donlyconan.media.views.fragments.TrashFragment"
         android:label="TrashFragment"
-        tools:layout="@layout/fragment_trash">
-        <action
-            android:id="@+id/action_trashFragment_to_mainDisplayFragment"
-            app:destination="@id/mainDisplayFragment"
-            app:popUpTo="@id/mainDisplayFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_trash"/>
     <fragment
         android:id="@+id/detailedPlaylistFragment"
         android:name="com.utc.donlyconan.media.views.fragments.DetailedPlaylistFragment"
         android:label="DetailedPlaylistFragment"
         tools:layout="@layout/fragment_detailed_playlist">
-        <action
-            android:id="@+id/action_detailedPlaylistFragment_to_mainDisplayFragment"
-            app:destination="@id/mainDisplayFragment" />
         <argument
             android:name="playlistId"
             app:argType="integer" />
@@ -84,9 +71,6 @@
         android:name="com.utc.donlyconan.media.views.fragments.ExpendedPlaylistFragment"
         android:label="ExpendedPlaylistFragment"
         tools:layout="@layout/fragment_expended_playlist">
-        <action
-            android:id="@+id/action_expendedPlaylistFragment_to_mainDisplayFragment"
-            app:destination="@id/mainDisplayFragment" />
         <argument
             android:name="playlistId"
             app:argType="integer" />
@@ -95,11 +79,7 @@
         android:id="@+id/helpAndFeedbackFragment"
         android:name="com.utc.donlyconan.media.views.fragments.HelpAndFeedbackFragment"
         android:label="fragment_help_and_feedback"
-        tools:layout="@layout/fragment_help_and_feedback" >
-        <action
-            android:id="@+id/action_helpAndFeedbackFragment_to_mainDisplayFragment"
-            app:destination="@id/mainDisplayFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_help_and_feedback" />
 
 
 </navigation>

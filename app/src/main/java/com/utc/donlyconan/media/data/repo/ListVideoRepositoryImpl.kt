@@ -2,7 +2,10 @@ package com.utc.donlyconan.media.data.repo
 
 import android.app.Application
 import android.provider.MediaStore
+import androidx.lifecycle.LiveData
 import com.utc.donlyconan.media.data.dao.ListVideoDao
+import com.utc.donlyconan.media.data.models.PlaylistWithVideos
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,5 +27,7 @@ class ListVideoRepositoryImpl @Inject constructor(val app: Application, private 
     override fun findAllVideos(keyword: String) = dao.findAllVideos(keyword)
 
     override fun getListInTrash() = dao.getListInTrash()
+
+    override fun getAllVideosNotInPlaylist(playlistId: Int) = dao.getAllVideosNotInPlaylist(playlistId)
 
 }

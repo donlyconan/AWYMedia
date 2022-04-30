@@ -271,7 +271,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         const val EXTRA_VIDEO = "EXTRA_VIDEO"
         const val EXTRA_CONTINUE = "EXTRA_CONTINUE"
-        val TAG = VideoDisplayActivity::class.java.simpleName
+        val TAG: String = VideoDisplayActivity::class.java.simpleName
 
         fun newIntent(context: Context, video: Video, isContinue: Boolean = false) =
             Intent(context, VideoDisplayActivity::class.java).apply {

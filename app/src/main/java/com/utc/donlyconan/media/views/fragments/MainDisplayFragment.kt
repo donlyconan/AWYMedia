@@ -1,30 +1,21 @@
 package com.utc.donlyconan.media.views.fragments
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.findFragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.DialogAboutBinding
-import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
-import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.views.BaseFragment
-import com.utc.donlyconan.media.views.MainActivity
-import com.utc.donlyconan.media.views.fragments.options.ArrangementVideoBottomDialogFragment
+import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
+import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 
 /**
@@ -53,7 +44,7 @@ class MainDisplayFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpViewPager()
         binding.navBar.setOnItemSelectedListener(onItemSelectedListener)
-        val appCompat = activity as MainActivity
+        val appCompat = activity
         appCompat.setSupportActionBar(binding.appbar.toolbar)
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(false)
     }
@@ -132,7 +123,7 @@ class MainDisplayFragment : BaseFragment() {
             }
             R.id.it_about -> {
                 val binding = DialogAboutBinding.inflate(layoutInflater)
-                val dialog = AlertDialog.Builder(context!!)
+                AlertDialog.Builder(context!!)
                     .setView(binding.root)
                     .show()
             }

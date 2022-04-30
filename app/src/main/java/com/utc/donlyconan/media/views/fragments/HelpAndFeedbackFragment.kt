@@ -45,8 +45,7 @@ class HelpAndFeedbackFragment : BaseFragment() {
             }
         }
         binding.toolbar.setNavigationOnClickListener {
-            val action = HelpAndFeedbackFragmentDirections.actionHelpAndFeedbackFragmentToMainDisplayFragment()
-            findNavController().navigate(action)
+            findNavController().navigateUp()
         }
     }
 

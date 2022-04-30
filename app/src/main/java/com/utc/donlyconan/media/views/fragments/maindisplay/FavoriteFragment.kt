@@ -1,6 +1,7 @@
-package com.utc.donlyconan.media.views.fragments
+package com.utc.donlyconan.media.views.fragments.maindisplay
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,18 +18,16 @@ import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
 /**
  * Represent for screen that will be contains all favorite user files
  */
-class FavoriteFragment : BaseFragment(), OnItemClickListener, View.OnClickListener {
+class FavoriteFragment : ListVideoFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentFavoriteBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<FavoriteVideoViewModel>()
-    private lateinit var adapter: VideoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,36 +42,17 @@ class FavoriteFragment : BaseFragment(), OnItemClickListener, View.OnClickListen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
+        Log.d(
+            RecentFragment.TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, arrayListOf())
+        adapter = VideoAdapter(context!!, arrayListOf(), false)
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
-        viewModel.apply{
-            
+        viewModel.lstVideos.observe(this) { videos ->
+            adapter.submit(videos)
         }
     }
-
-    override fun onItemClick(v: View, position: Int) {
-        Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.getVideo(position)
-        if(v.id == R.id.cb_selected) {
-            MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) {
-
-            }.show(fragmentManager!!, TAG)
-        } else {
-            val item = adapter.getVideo(position)
-            val intent = Intent(context, VideoDisplayActivity::class.java)
-            intent.putExtra(VideoDisplayActivity.EXTRA_VIDEO,item)
-            startActivity(intent)
-        }
-    }
-
-    override fun onClick(v: View?) {
-
-    }
-
 
     companion object {
         @JvmStatic

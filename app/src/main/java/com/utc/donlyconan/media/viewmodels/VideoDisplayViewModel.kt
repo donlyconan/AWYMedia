@@ -24,11 +24,11 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
         myApp.applicationComponent().inject(this)
     }
 
-    fun getNext(): Video? {
+    fun getNext(): Video {
         return videoRepo.getNext(video.value!!.videoId)
     }
 
-    fun getPrevious(): Video? {
+    fun getPrevious(): Video {
         return videoRepo.getPrevious(video.value!!.videoId)
     }
 

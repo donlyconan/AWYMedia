@@ -29,7 +29,7 @@ open class BaseBottomSheetFragment: BottomSheetDialogFragment() {
     }
 
     companion object {
-        val TAG = BaseBottomSheetFragment::class.java.simpleName
+        val TAG: String = BaseBottomSheetFragment::class.java.simpleName
     }
 
 }
