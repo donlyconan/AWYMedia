@@ -1,19 +1,16 @@
 package com.utc.donlyconan.media.data.models
 
-import android.net.Uri
 import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
+import com.utc.donlyconan.media.app.settings.Settings
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 @Entity(tableName = "videos", indices = [Index(value = ["path"], unique = true)])
-data class Video(
+open class Video(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
-    var videoId: Long,
+    var videoId: Int,
     @ColumnInfo(name = "video_name")
     var title: String?,
     @ColumnInfo(name = "path")
@@ -30,8 +27,26 @@ data class Video(
     var createdAt: Long,
     @ColumnInfo(name = "updated_at")
     var updatedAt: Long = System.currentTimeMillis(),
-    @ColumnInfo(name = "deleted_at")
-    var deletedAt: Long?= null,
     @ColumnInfo(name = "is_favorite")
-    var isFavorite: Boolean = false
-): Parcelable
+    var isFavorite: Boolean = false,
+) : Parcelable {
+    @Ignore
+    var isSelected: Boolean = false
+
+    fun compareTo(v: Video, sortBy: Int) = when (sortBy) {
+        Settings.SORT_BY_CREATION -> {
+            (createdAt - v.createdAt).toInt()
+        }
+        Settings.SORT_BY_DURATION -> {
+            duration - v.duration
+        }
+        Settings.SORT_BY_RECENT -> {
+            (updatedAt - v.updatedAt).toInt()
+        }
+        else -> {
+            val fch = title!!.first()
+            val sch = v.title!!.first()
+            fch.toInt() - sch.toInt()
+        }
+    }
+}

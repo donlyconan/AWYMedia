@@ -16,20 +16,32 @@
         android:name="com.utc.donlyconan.media.views.fragments.MainDisplayFragment"
         android:label="fragment_main_display"
         tools:layout="@layout/fragment_main_display" >
-
-        <action
-            android:id="@+id/action_mainDisplayFragment_to_actionBottomDialogFragment2"
-            app:destination="@id/actionBottomDialogFragment" />
+        <argument
+            android:name="screenId"
+            app:argType="integer"
+            android:defaultValue="0" />
         <action
             android:id="@+id/action_mainDisplayFragment_to_searchBarFragment"
-            app:destination="@id/searchBarFragment" />
-    </fragment>
+            app:destination="@id/searchBarFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/mainDisplayFragment"
+            app:popUpToInclusive="false"
+            app:restoreState="true" />
 
-    <fragment
-        android:id="@+id/actionBottomDialogFragment"
-        android:name="com.utc.donlyconan.media.views.fragments.options.OptionBottomDialogFragment"
-        android:label="ActionBottomDialogFragment"
-        tools:layout="@layout/fragment_optional_selection"/>
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_trashFragment"
+            app:destination="@id/trashFragment" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_expendedPlaylistFragment"
+            app:destination="@id/expendedPlaylistFragment" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_detailedPlaylistFragment"
+            app:destination="@id/detailedPlaylistFragment" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_helpAndFeedbackFragment"
+            app:destination="@id/helpAndFeedbackFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/searchBarFragment"
@@ -39,5 +51,35 @@
         <argument android:name="directFrom"
             app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/trashFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.TrashFragment"
+        android:label="TrashFragment"
+        tools:layout="@layout/fragment_trash"/>
+    <fragment
+        android:id="@+id/detailedPlaylistFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.DetailedPlaylistFragment"
+        android:label="DetailedPlaylistFragment"
+        tools:layout="@layout/fragment_detailed_playlist">
+        <argument
+            android:name="playlistId"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/expendedPlaylistFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.ExpendedPlaylistFragment"
+        android:label="ExpendedPlaylistFragment"
+        tools:layout="@layout/fragment_expended_playlist">
+        <argument
+            android:name="playlistId"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/helpAndFeedbackFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.HelpAndFeedbackFragment"
+        android:label="fragment_help_and_feedback"
+        tools:layout="@layout/fragment_help_and_feedback" />
+
 
 </navigation>

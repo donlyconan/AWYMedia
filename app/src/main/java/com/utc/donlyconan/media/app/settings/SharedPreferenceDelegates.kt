@@ -1,8 +1,7 @@
-package com.donly.sradatn.app.settings
+package com.utc.donlyconan.media.app.settings
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import java.io.File
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

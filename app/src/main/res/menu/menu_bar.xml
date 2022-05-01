@@ -21,10 +21,10 @@
         android:title="Settings" />
 
 
-    <item
-        android:id="@+id/it_backups"
-        android:icon="@drawable/ic_baseline_cloud_upload_24"
-        android:title="Backups" />
+<!--    <item-->
+<!--        android:id="@+id/it_backups"-->
+<!--        android:icon="@drawable/ic_baseline_cloud_upload_24"-->
+<!--        android:title="Backups" />-->
 
     <item
         android:id="@+id/it_trash"
@@ -33,17 +33,12 @@
 
 
     <item
-        android:id="@+id/it_login"
-        android:icon="@drawable/outline_login_24"
-        android:title="Login" />
-
-    <item
-        android:id="@+id/it_view_item_help"
+        android:id="@+id/it_help"
         android:icon="@drawable/ic_help_white_24dp"
         android:title="@string/nav_drawer_help_and_feedback" />
 
     <item
-        android:id="@+id/it_view_item_about"
+        android:id="@+id/it_about"
         android:icon="@drawable/ic_info_white_24dp"
         android:title="@string/nav_drawer_about" />
 

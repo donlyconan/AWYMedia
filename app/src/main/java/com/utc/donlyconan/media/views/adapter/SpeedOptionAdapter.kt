@@ -14,7 +14,7 @@ import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 
 class SpeedOptionAdapter(var context: Context, var speedList: List<Float>):
     RecyclerView.Adapter<SpeedOptionAdapter.SpeedOptionHolder>() {
-    var inflater = LayoutInflater.from(context)
+    var inflater: LayoutInflater = LayoutInflater.from(context)
     var onItemClickListener: OnItemClickListener? = null
     var selectedItem: Float = -1f
 

@@ -1,11 +1,9 @@
 package com.utc.donlyconan.media.app.settings
 
 import android.content.Context
-import com.donly.sradatn.app.settings.BooleanPreferenceDelegate
-import com.donly.sradatn.app.settings.IntPreferenceDelegate
-import com.donly.sradatn.app.settings.StringPreferenceDelegate
+import javax.inject.Inject
 
-class Settings(val appContext: Context) {
+class Settings @Inject constructor(val appContext: Context) {
 
     companion object {
         const val SETTINGS_NAME = "sra-datn"
@@ -28,8 +26,8 @@ class Settings(val appContext: Context) {
     }
 
     private var preferences = appContext.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE)
-    val language by StringPreferenceDelegate(preferences, "language", DEFAULT_LANGUAGE)
-    val isLoggedIn by BooleanPreferenceDelegate(preferences, "logged_in", false)
-    val sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_BY_NAME)
+    var language by StringPreferenceDelegate(preferences, "language", DEFAULT_LANGUAGE)
+    var isLoggedIn by BooleanPreferenceDelegate(preferences, "logged_in", false)
+    var sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_BY_NAME)
 
 }

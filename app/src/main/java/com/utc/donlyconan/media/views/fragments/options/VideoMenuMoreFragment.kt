@@ -43,7 +43,7 @@ class VideoMenuMoreFragment : BaseBottomSheetFragment(), View.OnClickListener {
     }
 
     companion object {
-        val TAG = VideoMenuMoreFragment::class.java.simpleName
+        val TAG: String = VideoMenuMoreFragment::class.java.simpleName
 
         @JvmStatic
         fun newInstance(listener:View.OnClickListener, isSelected: Boolean) =

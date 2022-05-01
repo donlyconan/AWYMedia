@@ -22,7 +22,7 @@ import kotlin.collections.ArrayList
 class GoogleDriveService : Service() {
 
     companion object {
-        val TAG = GoogleDriveService::class.java.simpleName
+        val TAG: String = GoogleDriveService::class.java.simpleName
         const val FOLDER_NAME = "Awy-Media"
     }
 

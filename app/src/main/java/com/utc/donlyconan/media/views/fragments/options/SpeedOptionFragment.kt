@@ -29,7 +29,7 @@ class SpeedOptionFragment : DialogFragment(), OnItemClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         return binding.root
     }
 

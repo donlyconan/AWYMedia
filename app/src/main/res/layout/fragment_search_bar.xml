@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSecondary"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".views.fragments.SearchBarFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".views.fragments.SearchBarFragment">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_bar"
+        style="@style/SearchViewLight"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        app:queryHint="Tìm kiếm video của tôi..."
-        app:iconifiedByDefault="false"
-        app:searchIcon="@drawable/ic_baseline_arrow_back_24"
-        app:closeIcon="@drawable/ic_baseline_close"
+        app:queryBackground="@android:color/transparent"
         android:background="?colorPrimary"
-        style="@style/SearchViewLight"/>
+        app:closeIcon="@drawable/ic_baseline_close"
+        app:iconifiedByDefault="false"
+        app:queryHint="Nhập nội dung tìm kiếm..."
+        app:searchIcon="@drawable/ic_baseline_arrow_back_24" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -28,5 +29,6 @@
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         tools:itemCount="10"
         tools:listitem="@layout/item_video_single_mode" />
+
 
 </LinearLayout>

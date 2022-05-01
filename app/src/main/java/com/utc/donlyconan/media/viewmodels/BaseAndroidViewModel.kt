@@ -5,5 +5,5 @@ import androidx.lifecycle.AndroidViewModel
 import com.utc.donlyconan.media.app.AwyMediaApplication
 
 open class BaseAndroidViewModel(app: Application): AndroidViewModel(app) {
-    val awyApp = app as AwyMediaApplication
+    val myApp = app as AwyMediaApplication
 }
