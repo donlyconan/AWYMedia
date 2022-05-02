@@ -4,18 +4,35 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/bg_extend_button.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/bg_loading_screen.xml" value="0.1775" />
+        <entry key="app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.1835" />
         <entry key="app/src/main/res/layout-land/custom_option_player_control_view.xml" value="0.2297454833984375" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.19610507246376813" />
-        <entry key="app/src/main/res/layout/activity_video_display.xml" value="0.19610507246376813" />
+        <entry key="app/src/main/res/layout/activity_video_display.xml" value="0.25" />
         <entry key="app/src/main/res/layout/custom_option_player_control_view.xml" value="0.19610507246376813" />
         <entry key="app/src/main/res/layout/dialog_add_playlist.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_detailed_playlist.xml" value="0.19270833333333334" />
+        <entry key="app/src/main/res/layout/fragment_detailed_playlist_option.xml" value="0.19270833333333334" />
+        <entry key="app/src/main/res/layout/fragment_expended_playlist.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_main_display.xml" value="0.19270833333333334" />
+        <entry key="app/src/main/res/layout/fragment_musical.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_personal_option.xml" value="0.19270833333333334" />
         <entry key="app/src/main/res/layout/fragment_personal_video.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_playlist.xml" value="0.19270833333333334" />
+        <entry key="app/src/main/res/layout/fragment_playlist_option.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_recent.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/fragment_search_bar.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.19270833333333334" />
         <entry key="app/src/main/res/layout/fragment_shared_video.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/fragment_trash.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/item_playlist.xml" value="0.32697906494140627" />
+        <entry key="app/src/main/res/layout/item_trash.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/item_video_single_mode.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/loading_data_screen.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/popup_media_player_info.xml" value="0.335" />
         <entry key="app/src/main/res/menu/menu_bar_recent.xml" value="0.3393157958984376" />
+        <entry key="app/src/main/res/xml/preferences.xml" value="0.3098958333333333" />
       </map>
     </option>
   </component>

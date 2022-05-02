@@ -21,4 +21,9 @@ abstract class RepositoryModule {
     @Binds
     abstract fun bindPlaylistRepo(impl: PlaylistRepositoryImpl): PlaylistRepository
 
+    @Singleton
+    @Binds
+    abstract fun bindTrashRepo(impl: TrashRepositoryImpl): TrashRepository
+
+
 }

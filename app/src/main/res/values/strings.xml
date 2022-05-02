@@ -30,4 +30,6 @@
     <string name="delete">Delete</string>
     <string name="done">Done</string>
     <string name="video_demo_title">Video demo title</string>
+    <string name="settings">Settings</string>
+    <string name="language_entries" />
 </resources>

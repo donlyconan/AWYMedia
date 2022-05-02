@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Cài đặt chung">
+
+        <ListPreference
+            android:title="Ngon ngu"
+            android:key="language"
+            />
+
+<!--        <ListPreference-->
+<!--            android:title="Tu dong xoa"-->
+<!--            android:key="deleted_time"-->
+<!--            />-->
+
+        <SwitchPreference
+            android:title="Xoa trong thiet bi"
+            android:key="delete_from_storage"
+            app:defaultValue="false"
+            android:summary="Cho phep ung dung thuc hien xoa video trong thiet bi."
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Video">
+        <SwitchPreference
+            android:title="Tu dong phat"
+            android:key="auto_play"
+            android:defaultValue="true"
+            android:summary="Cho phep video duoc tu dong phat khi duoc mo"
+            />
+    </PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

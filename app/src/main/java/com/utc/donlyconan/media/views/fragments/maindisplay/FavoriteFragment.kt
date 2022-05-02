@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.viewmodels.FavoriteVideoViewModel
@@ -28,6 +29,7 @@ class FavoriteFragment : ListVideoFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentFavoriteBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<FavoriteVideoViewModel>()
+    override val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +51,13 @@ class FavoriteFragment : ListVideoFragment(), OnItemClickListener {
         adapter = VideoAdapter(context!!, arrayListOf(), false)
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
+        showLoadingScreen()
         viewModel.lstVideos.observe(this) { videos ->
+            if(videos.isEmpty()) {
+                showNoDataScreen()
+            } else {
+                hideLoading()
+            }
             adapter.submit(videos)
         }
     }

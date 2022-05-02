@@ -11,13 +11,15 @@ import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
+import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 
 class PlaylistAdapter(var context: Context,
                       var playlists: ArrayList<Playlist>,
-                      val repository: PlaylistRepository) :
+                      private val repository: PlaylistRepository) :
     RecyclerView.Adapter<PlaylistAdapter.VideoHolder>(), OnItemClickListener {
 
+    var onItemLongClickListener: OnItemLongClickListener? = null
     var inflater: LayoutInflater = LayoutInflater.from(context)
     var onItemClickListener: OnItemClickListener? = null
     var selectedPosition: Int = -1
@@ -31,6 +33,7 @@ class PlaylistAdapter(var context: Context,
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
         val item = playlists[position]
         item.itemSize = repository.countVideos(item.playlistId!!)
+        holder.onItemLongClickListener = onItemLongClickListener
         holder.bind(item, this, position == itemCount - 1)
     }
 
@@ -52,11 +55,18 @@ class PlaylistAdapter(var context: Context,
 
 
     class VideoHolder(val binding: ItemPlaylistBinding) :
-        RecyclerView.ViewHolder(binding.root), View.OnClickListener {
-        private var onItemClickListener: OnItemClickListener? = null
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnLongClickListener {
+        var onItemClickListener: OnItemClickListener? = null
+        var onItemLongClickListener: OnItemLongClickListener? = null
 
         init {
             binding.rootLayout.setOnClickListener(this)
+            binding.rootLayout.setOnLongClickListener(this)
+        }
+
+        override fun onLongClick(v: View): Boolean {
+            onItemLongClickListener?.onItemLongClick(v, adapterPosition)
+            return true
         }
 
         override fun onClick(v: View) {

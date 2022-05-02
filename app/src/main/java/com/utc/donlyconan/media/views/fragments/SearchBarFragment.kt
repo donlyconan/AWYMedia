@@ -13,8 +13,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentSearchBarBinding
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.SearchViewModel
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
 
 /**
  * This class is search screen of the app. It allows user who can find video on user's app
@@ -40,6 +42,7 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
             findViewById<View>(androidx.appcompat.R.id.search_mag_icon).setOnClickListener(this@SearchBarFragment)
             setOnQueryTextListener(onQueryTextListener)
         }
+        showNoDataScreen()
         adapter = VideoAdapter(requireContext(), arrayListOf())
         binding.recyclerView.adapter = adapter
     }
@@ -53,7 +56,13 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
         override fun onQueryTextChange(newText: String?): Boolean {
             Log.d(TAG, "onQueryTextChange() called with: newText = $newText")
             if(newText != null && newText.isNotEmpty()) {
+                showLoadingScreen()
                 searchViewModel.searchAllVideos("%$newText%").observe(this@SearchBarFragment) { videos ->
+                    if(videos.isEmpty()) {
+                        showNoDataScreen()
+                    } else {
+                        hideLoading()
+                    }
                     adapter.submit(videos)
                 }
             } else {
@@ -61,6 +70,27 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
             }
             return true
         }
+    }
+
+    val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
+
+    fun showLoadingScreen() {
+        Log.d(ListVideoFragment.TAG, "showLoadingScreen() called")
+        lBinding.llLoading.visibility = View.VISIBLE
+        lBinding.tvNoData.visibility = View.INVISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun showNoDataScreen() {
+        Log.d(ListVideoFragment.TAG, "showNoDataScreen() called")
+        lBinding.llLoading.visibility = View.INVISIBLE
+        lBinding.tvNoData.visibility = View.VISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun hideLoading() {
+        Log.d(ListVideoFragment.TAG, "hideLoading() called")
+        lBinding.frameContainer.visibility = View.INVISIBLE
     }
 
     override fun onClick(v: View) {

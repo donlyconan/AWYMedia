@@ -1,10 +1,7 @@
 package com.utc.donlyconan.media.dagger.modules
 
 import android.app.Application
-import com.utc.donlyconan.media.data.dao.ListVideoDao
-import com.utc.donlyconan.media.data.dao.PlaylistDao
-import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
-import com.utc.donlyconan.media.data.dao.VideoDao
+import com.utc.donlyconan.media.data.dao.*
 import com.utc.donlyconan.media.data.db.AwyMediaDatabase
 import dagger.Module
 import dagger.Provides
@@ -35,6 +32,11 @@ class DatabaseModule {
     @Provides
     fun providePlaylistWithVideosDao(database: AwyMediaDatabase): PlaylistWithVideosDao {
         return database.playlistWithVideosDao()
+    }
+
+    @Provides
+    fun provideTrashDao(database: AwyMediaDatabase): TrashDao {
+        return database.getTrashDao()
     }
 
 }

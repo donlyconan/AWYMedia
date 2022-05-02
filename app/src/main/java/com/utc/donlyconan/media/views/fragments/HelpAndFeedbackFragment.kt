@@ -36,11 +36,12 @@ class HelpAndFeedbackFragment : BaseFragment() {
             } else if(binding.ipComment.text.isEmpty() || binding.ipComment.text.isBlank()) {
                 context?.showMessage("Hãy nhập gì đó")
             } else {
+                val content = "Rating: ${binding.ratingBar.rating}\n${binding.ipComment.text}"
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse("mailto:")
-                intent.putExtra(Intent.EXTRA_EMAIL,"awydeveloper@gmail.com")
+                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("awydeveloper@gmail.com"))
                 intent.putExtra(Intent.EXTRA_SUBJECT,"Help & Feedback")
-                intent.putExtra(Intent.EXTRA_TEXT,binding.ipComment.text.toString())
+                intent.putExtra(Intent.EXTRA_TEXT, content)
                 startActivity(Intent.createChooser(intent, "Send email"))
             }
         }

@@ -5,8 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity
@@ -17,10 +21,30 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
     
     protected lateinit var adapter: VideoAdapter
     protected lateinit var videoRepo: VideoRepository
+    protected abstract val lBinding: LoadingDataScreenBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         videoRepo = applicationComponent.getVideoRepo()
+    }
+
+    fun showLoadingScreen() {
+        Log.d(TAG, "showLoadingScreen() called")
+        lBinding.llLoading.visibility = View.VISIBLE
+        lBinding.tvNoData.visibility = View.INVISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun showNoDataScreen() {
+        Log.d(TAG, "showNoDataScreen() called")
+        lBinding.llLoading.visibility = View.INVISIBLE
+        lBinding.tvNoData.visibility = View.VISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun hideLoading() {
+        Log.d(TAG, "hideLoading() called")
+        lBinding.frameContainer.visibility = View.INVISIBLE
     }
 
 
@@ -67,6 +91,12 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
             val intent = VideoDisplayActivity.newIntent(requireContext(), video, false)
             startActivity(intent)
         }
+    }
+
+    companion object {
+
+        val TAG = ListVideoFragment::class.simpleName
+
     }
 
 }

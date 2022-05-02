@@ -104,6 +104,10 @@ class MainDisplayFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(TAG, "onOptionsItemSelected() called with: item = $item")
         when (item.itemId) {
+            R.id.it_settings -> {
+                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToSettingsFragment()
+                findNavController().navigate(action)
+            }
             R.id.it_search -> {
                 val action = MainDisplayFragmentDirections
                     .actionMainDisplayFragmentToSearchBarFragment(binding.viewPager2.currentItem)

@@ -19,6 +19,7 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
     var playWhenReady = true
     var isFinished = false
     var isContinue = false
+    var isInitial = true
 
     init {
         myApp.applicationComponent().inject(this)

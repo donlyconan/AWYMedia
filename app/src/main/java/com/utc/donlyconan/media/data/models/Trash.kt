@@ -6,8 +6,8 @@ import com.utc.donlyconan.media.app.settings.Settings
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-@Entity(tableName = "videos", indices = [Index(value = ["path"], unique = true)])
-open class Video(
+@Entity(tableName = "trashes", indices = [Index(value = ["path"], unique = true)])
+open class Trash(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
     var videoId: Int,
@@ -21,19 +21,18 @@ open class Video(
     var size: Long,
     @ColumnInfo(name = "type")
     var type: String?,
-    @ColumnInfo(name = "played_time")
-    var playedTime: Long = 0,
     @ColumnInfo(name = "created_at")
     var createdAt: Long,
     @ColumnInfo(name = "updated_at")
     var updatedAt: Long = System.currentTimeMillis(),
-    @ColumnInfo(name = "is_favorite")
-    var isFavorite: Boolean = false,
+    @ColumnInfo(name = "deleted_at")
+    var deletedAt: Long = System.currentTimeMillis(),
+
 ) : Parcelable {
     @Ignore
     var isSelected: Boolean = false
 
-    fun compareTo(v: Video, sortBy: Int) = when (sortBy) {
+    fun compareTo(v: Trash, sortBy: Int) = when (sortBy) {
         Settings.SORT_BY_CREATION -> {
             (createdAt - v.createdAt).toInt()
         }
@@ -50,9 +49,8 @@ open class Video(
         }
     }
 
-    fun toTrash(): Trash {
-        return Trash(videoId, title, path, duration, size, type, createdAt,
-            updatedAt, System.currentTimeMillis())
+    fun toVideo(): Video {
+        return Video(videoId, title, path, duration, size, type, 0, createdAt, updatedAt, false)
     }
 
 }

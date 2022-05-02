@@ -7,6 +7,7 @@ import com.utc.donlyconan.media.dagger.modules.RepositoryModule
 import com.utc.donlyconan.media.dagger.modules.SettingsModule
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
+import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
@@ -14,6 +15,7 @@ import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.*
 import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.PlaylistFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.RecentFragment
 import dagger.Component
 import javax.inject.Singleton
@@ -40,6 +42,7 @@ interface ApplicationComponent {
     fun getVideoRepo(): VideoRepository
     fun getListVideoRepo(): ListVideoRepository
     fun getPlaylistRepo(): PlaylistRepository
+    fun getTrashRepo(): TrashRepository
 
     fun inject(fragment: PersonalVideoFragment)
     fun inject(fragment: DetailedPlaylistFragment)

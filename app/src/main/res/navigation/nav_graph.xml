@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_mainDisplayFragment_to_helpAndFeedbackFragment"
             app:destination="@id/helpAndFeedbackFragment" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
 
     </fragment>
 
@@ -80,6 +83,10 @@
         android:name="com.utc.donlyconan.media.views.fragments.HelpAndFeedbackFragment"
         android:label="fragment_help_and_feedback"
         tools:layout="@layout/fragment_help_and_feedback" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.SettingsFragment"
+        android:label="SettingsFragment" />
 
 
 </navigation>

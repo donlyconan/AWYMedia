@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.databinding.FragmentDetailedPlaylistBinding
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
@@ -23,8 +24,10 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentDetailedPlaylistBinding.inflate(layoutInflater) }
     val args by navArgs<DetailedPlaylistFragmentArgs>()
+    override val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
     @Inject lateinit var videoDao: VideoDao
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,14 +53,20 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
-        binding.title.text = null
+        binding.title.text = "Untitled"
 
         adapter = VideoAdapter(requireContext(), arrayListOf())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
+        showLoadingScreen()
         playlistWithVideosDao.getPlaylist(args.playlistId).observe(this) { videoPl ->
             Log.d(TAG, "onViewCreated() called video.size=" + videoPl.videos.size)
             binding.title.text = videoPl.playlist.title
+            if(videoPl.videos.isEmpty()) {
+                showNoDataScreen()
+            } else {
+                binding.title.text = videoPl.playlist.title
+            }
             adapter.submit(videoPl.videos)
         }
     }

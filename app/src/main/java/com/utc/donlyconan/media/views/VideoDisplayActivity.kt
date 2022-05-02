@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.media.MediaMetadataRetriever
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH
 import android.net.Uri
 import android.os.*
 import android.util.Log
@@ -13,6 +16,7 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -213,6 +217,22 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initializePlayer(video: Video, isContinue: Boolean) {
         Log.d(TAG, "initializePlayer() called with: video = $video")
+        if(viewModel.isInitial) {
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(this, video.path.toUri())
+            val orientation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
+                ?.toInt()
+                ?.also { orientation ->
+                    if(orientation == 0 && resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    } else if(resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    }
+                }
+            Log.d(TAG, "initializePlayer: orientation=$orientation")
+            viewModel.isInitial = false
+        }
+
         player = ExoPlayer.Builder(this)
             .setSeekForwardIncrementMs(10000)
             .setSeekBackIncrementMs(10000)
@@ -231,7 +251,6 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                 exoPlayer.prepare()
                 exoPlayer.playWhenReady = viewModel.playWhenReady
             }
-
         player?.addListener(listener)
     }
 

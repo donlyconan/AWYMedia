@@ -18,7 +18,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
@@ -38,6 +40,7 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
+    override val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
     @Inject lateinit var settings: Settings
 
     override fun onCreateView(
@@ -51,20 +54,25 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(
-            TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
+        Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                     "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, arrayListOf())
+        adapter = VideoAdapter(requireContext(), arrayListOf())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         binding.fab.setOnClickListener(this)
-
+        showLoadingScreen()
         viewModel.lstVideos.observe(this) { videos ->
-            val sortedVideos = ArrayList(videos).apply {
-                sortWith { u,v -> u.compareTo(v, settings.sortBy) }
+            if(videos.isEmpty()) {
+                showNoDataScreen()
+                adapter.submit(videos)
+            } else {
+                val sortedVideos = ArrayList(videos).apply {
+                    sortWith { u, v -> u.compareTo(v, settings.sortBy) }
+                }
+                hideLoading()
+                adapter.submit(sortedVideos)
             }
-            adapter.submit(sortedVideos)
         }
 
         // Check permission of your app
@@ -79,7 +87,6 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
             )
         }
     }
-
 
     private val requestPermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->

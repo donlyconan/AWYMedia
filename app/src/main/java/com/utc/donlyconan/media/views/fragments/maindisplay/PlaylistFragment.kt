@@ -1,4 +1,4 @@
-package com.utc.donlyconan.media.views.fragments
+package com.utc.donlyconan.media.views.fragments.maindisplay
 
 import android.app.Dialog
 import android.content.Context
@@ -9,25 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.DialogAddPlaylistBinding
 import com.utc.donlyconan.media.databinding.FragmentPlaylistBinding
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
+import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.PlaylistAdapter
+import com.utc.donlyconan.media.views.fragments.MainDisplayFragmentDirections
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListener {
+class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListener ,
+    OnItemLongClickListener {
 
     val binding by lazy { FragmentPlaylistBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PlaylistViewModel>()
@@ -53,14 +54,29 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         Log.d(TAG, "onViewCreated: ")
         adapter = PlaylistAdapter(context!!, arrayListOf(), playlistRepo)
         adapter.onItemClickListener = this
+        adapter.onItemLongClickListener = this
         binding.recyclerView.adapter = adapter
         binding.fab.setOnClickListener(this)
+        showLoadingScreen()
         viewModel.listPlaylist.observe(this) { playlists ->
+            if(playlists.isEmpty()) {
+                showNoDataScreen()
+            } else {
+                hideLoading()
+            }
             adapter.submit(playlists)
         }
     }
 
     override fun onItemClick(v: View, position: Int) {
+        Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
+        val item = adapter.playlists[position]
+        val action = MainDisplayFragmentDirections
+            .actionMainDisplayFragmentToDetailedPlaylistFragment(item.playlistId!!)
+        findNavController().navigate(action)
+    }
+
+    override fun onItemLongClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
         val item = adapter.playlists[position]
         MenuMoreOptionFragment.newInstance(R.layout.fragment_playlist_option) {
@@ -72,7 +88,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                 }
                 R.id.btn_add -> {
                     val action = MainDisplayFragmentDirections
-                        .actionMainDisplayFragmentToExpendedPlaylistFragment(item.playlistId!!)
+                            .actionMainDisplayFragmentToExpendedPlaylistFragment(item.playlistId!!)
                     findNavController().navigate(action)
                 }
                 R.id.btn_delete -> {
@@ -91,6 +107,28 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
             }.show()
         }
     }
+
+    val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
+
+    fun showLoadingScreen() {
+        Log.d(ListVideoFragment.TAG, "showLoadingScreen() called")
+        lBinding.llLoading.visibility = View.VISIBLE
+        lBinding.tvNoData.visibility = View.INVISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun showNoDataScreen() {
+        Log.d(ListVideoFragment.TAG, "showNoDataScreen() called")
+        lBinding.llLoading.visibility = View.INVISIBLE
+        lBinding.tvNoData.visibility = View.VISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun hideLoading() {
+        Log.d(ListVideoFragment.TAG, "hideLoading() called")
+        lBinding.frameContainer.visibility = View.INVISIBLE
+    }
+
 
     companion object {
         val TAG: String = PlaylistFragment::class.java.simpleName

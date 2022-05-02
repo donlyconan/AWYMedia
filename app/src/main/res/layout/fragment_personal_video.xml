@@ -30,4 +30,12 @@
         app:maxImageSize="25dp"
         app:useCompatPadding="false" />
 
+    <include
+        android:id="@+id/icd_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/loading_data_screen"
+        android:layout_gravity="center"
+        />
+
 </FrameLayout>

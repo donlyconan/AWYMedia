@@ -157,4 +157,7 @@ dependencies {
     // Media notification
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation "androidx.media:media:1.1.0"
+
+    // Setting preferences
+    implementation 'androidx.preference:preference-ktx:1.2.0'
 }

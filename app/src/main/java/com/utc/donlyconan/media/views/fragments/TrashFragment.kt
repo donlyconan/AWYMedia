@@ -14,13 +14,18 @@ import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.data.dao.VideoDao
+import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
+import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.MainActivity
+import com.utc.donlyconan.media.views.adapter.TrashAdapter
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.TrashItemOptionFragment
 import kotlinx.coroutines.flow.collectLatest
@@ -30,13 +35,13 @@ import javax.inject.Inject
 /**
  * Show list of video that was temporarily deleted by user
  */
-class TrashFragment : Fragment(), OnItemClickListener {
+class TrashFragment : BaseFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentTrashBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<TrashViewModel>()
-    private lateinit var adapter: VideoAdapter
+    private lateinit var adapter: TrashAdapter
     @Inject lateinit var settings: Settings
-    @Inject lateinit var videoDao: VideoDao
+    @Inject lateinit var trashRepo: TrashRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +49,7 @@ class TrashFragment : Fragment(), OnItemClickListener {
         (context?.applicationContext as AwyMediaApplication).applicationComponent()
             .inject(this)
         setHasOptionsMenu(true)
-        val appCompat = activity as MainActivity
+        val appCompat = activity
         appCompat.setSupportActionBar(binding.toolbar)
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(false)
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(true)
@@ -62,28 +67,55 @@ class TrashFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
-        adapter = VideoAdapter(context!!, arrayListOf())
+        adapter = TrashAdapter(requireContext(), arrayListOf())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
-        viewModel.apply {
-
+        showLoadingScreen()
+        viewModel.videoList.observe(viewLifecycleOwner) { videos ->
+            if(videos.isEmpty()) {
+                showNoDataScreen()
+            } else {
+                hideLoading()
+            }
+            adapter.submit(videos)
         }
+    }
+
+    val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
+
+    fun showLoadingScreen() {
+        Log.d(ListVideoFragment.TAG, "showLoadingScreen() called")
+        lBinding.llLoading.visibility = View.VISIBLE
+        lBinding.tvNoData.visibility = View.INVISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun showNoDataScreen() {
+        Log.d(ListVideoFragment.TAG, "showNoDataScreen() called")
+        lBinding.llLoading.visibility = View.INVISIBLE
+        lBinding.tvNoData.visibility = View.VISIBLE
+        lBinding.frameContainer.visibility = View.VISIBLE
+    }
+
+    fun hideLoading() {
+        Log.d(ListVideoFragment.TAG, "hideLoading() called")
+        lBinding.frameContainer.visibility = View.INVISIBLE
     }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemLongClick() called with: v = $v, position = $position")
-        val video = adapter.getVideo(position)
+        val trash = adapter.trashes[position]
         MenuMoreOptionFragment.newInstance(R.layout.fragment_trash_item_option) { v ->
             Log.d(TAG, "onItemLongClick() called with: v = $v")
             when(v.id) {
                 R.id.btn_restore -> {
-                    videoDao.update(video)
+                    viewModel.restore(trash)
                 }
                 R.id.btn_delete -> {
                     AlertDialogManager.createDeleteAlertDialog(requireContext(),
-                        "Deleting file", "Do you want to delete file \"${video.title}\"?") {
+                        "Deleting file", "Do you want to delete file \"${trash.title}\"?") {
                         viewModel.viewModelScope.launch {
-                            videoDao.delete(video.videoId)
+                            viewModel.delete(trash)
                         }
                     }.show()
                 }

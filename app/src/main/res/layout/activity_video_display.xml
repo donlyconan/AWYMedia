@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         app:auto_show="true"
+        android:background="@color/recycler_color"
         app:show_timeout="3000"
         app:repeat_toggle_modes="none"
         app:resize_mode="fixed_width"
