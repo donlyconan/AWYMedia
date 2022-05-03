@@ -46,6 +46,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -93,6 +94,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                 }
                 R.id.btn_delete -> {
                     playlistRepo.delete(item)
+                    playlistRepo.removePlaylist(item.playlistId!!)
                 }
             }
         }.show(supportFragmentManager, TAG)
@@ -106,27 +108,6 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                 viewModel.playlistRepo.insert(item)
             }.show()
         }
-    }
-
-    val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
-
-    fun showLoadingScreen() {
-        Log.d(ListVideoFragment.TAG, "showLoadingScreen() called")
-        lBinding.llLoading.visibility = View.VISIBLE
-        lBinding.tvNoData.visibility = View.INVISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun showNoDataScreen() {
-        Log.d(ListVideoFragment.TAG, "showNoDataScreen() called")
-        lBinding.llLoading.visibility = View.INVISIBLE
-        lBinding.tvNoData.visibility = View.VISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun hideLoading() {
-        Log.d(ListVideoFragment.TAG, "hideLoading() called")
-        lBinding.frameContainer.visibility = View.INVISIBLE
     }
 
 

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.view.menu.MenuBuilder
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
@@ -13,22 +12,15 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
-import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
-import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.BaseFragment
-import com.utc.donlyconan.media.views.MainActivity
 import com.utc.donlyconan.media.views.adapter.TrashAdapter
-import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import com.utc.donlyconan.media.views.fragments.options.TrashItemOptionFragment
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -61,6 +53,7 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView: ")
+        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return  binding.root
     }
 
@@ -79,27 +72,6 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
             }
             adapter.submit(videos)
         }
-    }
-
-    val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
-
-    fun showLoadingScreen() {
-        Log.d(ListVideoFragment.TAG, "showLoadingScreen() called")
-        lBinding.llLoading.visibility = View.VISIBLE
-        lBinding.tvNoData.visibility = View.INVISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun showNoDataScreen() {
-        Log.d(ListVideoFragment.TAG, "showNoDataScreen() called")
-        lBinding.llLoading.visibility = View.INVISIBLE
-        lBinding.tvNoData.visibility = View.VISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun hideLoading() {
-        Log.d(ListVideoFragment.TAG, "hideLoading() called")
-        lBinding.frameContainer.visibility = View.INVISIBLE
     }
 
     override fun onItemClick(v: View, position: Int) {
@@ -144,7 +116,8 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
                     return false
                 }
                 AlertDialogManager.createDeleteAlertDialog(
-                    requireContext(), "Deleting file", "Do you wan to remove all files?") {
+                    requireContext(), "Deleting file", "Do you want to remove all files?") {
+                    viewModel.clearAll()
                 }.show()
             }
         }

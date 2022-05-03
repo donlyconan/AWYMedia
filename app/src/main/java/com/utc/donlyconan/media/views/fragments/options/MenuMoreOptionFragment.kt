@@ -17,6 +17,7 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
     private var listener: View.OnClickListener? = null
     private val layoutId by lazy { arguments!!.getInt(EXTRA_LAYOUT_ID) }
     private val map by lazy { HashMap<Int, Boolean>() }
+    private var onInitialView: OnInitialView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,12 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
                 view.isSelected = map[view.id] ?: false
             }
         }
+        onInitialView?.onInitial(view)
+    }
+
+    fun setOnInitialView(listener: OnInitialView): MenuMoreOptionFragment {
+        onInitialView = listener
+        return this
     }
 
     override fun onClick(view: View) {
@@ -54,6 +61,10 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
         Log.d(TAG, "setSelectedView() called with: viewId = $viewId, isSelected = $isSelected")
         map[viewId] = isSelected
         return this
+    }
+
+    interface OnInitialView {
+        fun onInitial(v: View)
     }
 
     companion object {

@@ -21,32 +21,11 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
     
     protected lateinit var adapter: VideoAdapter
     protected lateinit var videoRepo: VideoRepository
-    protected abstract val lBinding: LoadingDataScreenBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         videoRepo = applicationComponent.getVideoRepo()
     }
-
-    fun showLoadingScreen() {
-        Log.d(TAG, "showLoadingScreen() called")
-        lBinding.llLoading.visibility = View.VISIBLE
-        lBinding.tvNoData.visibility = View.INVISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun showNoDataScreen() {
-        Log.d(TAG, "showNoDataScreen() called")
-        lBinding.llLoading.visibility = View.INVISIBLE
-        lBinding.tvNoData.visibility = View.VISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun hideLoading() {
-        Log.d(TAG, "hideLoading() called")
-        lBinding.frameContainer.visibility = View.INVISIBLE
-    }
-
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
@@ -56,7 +35,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), video, false)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), video)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -88,7 +67,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), video, false)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), video)
             startActivity(intent)
         }
     }

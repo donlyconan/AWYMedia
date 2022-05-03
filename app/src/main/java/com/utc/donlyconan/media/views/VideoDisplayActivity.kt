@@ -45,7 +45,8 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var beView: CustomOptionPlayerControlViewBinding
     private var player: ExoPlayer? = null
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
             or View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -67,29 +68,30 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
         viewModel.video.observe(this) { video ->
             beView.headerTv.text = video.title
-            initializePlayer(video, false)
+            initializePlayer(video)
         }
         viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
-        if(viewModel.isContinue) {
+        if (!viewModel.isContinue && viewModel.isInitial) {
             val binding = DialogDisplayAgainBinding.inflate(layoutInflater)
             val dialog = AlertDialog.Builder(this)
                 .setView(binding.root)
                 .create()
             binding.btnNo.setOnClickListener {
-                viewModel.video.value = intent.getParcelableExtra(EXTRA_VIDEO)
-                dialog.dismiss()
-            }
-            binding.btnYes.setOnClickListener {
                 viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_VIDEO)?.apply {
                     playedTime = 0L
                 }
                 dialog.dismiss()
             }
-            dialog.show()
-        } else {
-            viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_VIDEO)?.apply {
-                playedTime = 0
+            binding.btnYes.setOnClickListener {
+                viewModel.video.value = intent.getParcelableExtra(EXTRA_VIDEO)
+                dialog.dismiss()
             }
+            dialog.show()
+            viewModel.isContinue = true
+        } else {
+            viewModel.video.value = if(viewModel.video.value == null)
+                intent.getParcelableExtra(EXTRA_VIDEO)
+             else viewModel.video.value?.copy(updatedAt = System.currentTimeMillis())
         }
     }
 
@@ -193,7 +195,6 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.exo_next -> {
                     releasePlayer()
                     val video = viewModel.getNext()
-                    
                     player?.seekToNextWindow()
                 }
                 else -> {
@@ -205,34 +206,36 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
     private val listener = object : Player.Listener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            Log.d(TAG, "onPlayerStateChanged() called with: playWhenReady = $playWhenReady, " +
-                        "playbackState = $playbackState")
+            Log.d(
+                TAG, "onPlayerStateChanged() called with: playWhenReady = $playWhenReady, " +
+                        "playbackState = $playbackState"
+            )
             if (playbackState == Player.STATE_ENDED) {
                 viewModel.endVideo()
-            } else if(playbackState == Player.STATE_READY) {
+            } else if (playbackState == Player.STATE_READY) {
                 viewModel.isFinished = false
             }
         }
     }
 
-    private fun initializePlayer(video: Video, isContinue: Boolean) {
+    private fun initializePlayer(video: Video) {
         Log.d(TAG, "initializePlayer() called with: video = $video")
-        if(viewModel.isInitial) {
+        if (viewModel.isInitial) {
             val retriever = MediaMetadataRetriever()
             retriever.setDataSource(this, video.path.toUri())
-            val orientation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
-                ?.toInt()
-                ?.also { orientation ->
-                    if(orientation == 0 && resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    } else if(resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            val orientation =
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
+                    ?.toInt()
+                    ?.also { orientation ->
+                        if (orientation == 0 && resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                        } else if (resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
+                            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        }
                     }
-                }
             Log.d(TAG, "initializePlayer: orientation=$orientation")
             viewModel.isInitial = false
         }
-
         player = ExoPlayer.Builder(this)
             .setSeekForwardIncrementMs(10000)
             .setSeekBackIncrementMs(10000)
@@ -252,6 +255,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                 exoPlayer.playWhenReady = viewModel.playWhenReady
             }
         player?.addListener(listener)
+        viewModel.isContinue = true
     }
 
     private fun releasePlayer() {

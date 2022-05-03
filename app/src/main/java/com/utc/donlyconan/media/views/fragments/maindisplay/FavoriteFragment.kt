@@ -29,7 +29,6 @@ class FavoriteFragment : ListVideoFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentFavoriteBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<FavoriteVideoViewModel>()
-    override val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +39,7 @@ class FavoriteFragment : ListVideoFragment(), OnItemClickListener {
                               savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                 "savedInstanceState = $savedInstanceState")
+        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 

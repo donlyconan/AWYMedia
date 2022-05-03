@@ -19,6 +19,7 @@ import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentExpendedPlaylistBinding
+import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.VideoChoiceAdapter

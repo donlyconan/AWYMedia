@@ -19,7 +19,7 @@ interface PlaylistWithVideosDao {
 
     @Transaction
     @Query("Select * from playlist")
-    suspend fun getPlaylistWithVideos(): List<PlaylistWithVideos>
+    fun getPlaylistWithVideos(): LiveData<List<PlaylistWithVideos>>
 
     @Transaction
     @Query("Select * from playlist where playlist_id = :playlistId")

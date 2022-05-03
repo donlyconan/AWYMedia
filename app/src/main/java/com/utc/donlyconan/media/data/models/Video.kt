@@ -7,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 @Entity(tableName = "videos", indices = [Index(value = ["path"], unique = true)])
-open class Video(
+data class Video(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
     var videoId: Int,

@@ -15,13 +15,14 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentSearchBarBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.SearchViewModel
+import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
 
 /**
  * This class is search screen of the app. It allows user who can find video on user's app
  */
-class SearchBarFragment : Fragment(), View.OnClickListener {
+class SearchBarFragment : BaseFragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentSearchBarBinding.inflate(layoutInflater) }
     private lateinit var adapter: VideoAdapter
@@ -30,6 +31,7 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                 "savedInstanceState = $savedInstanceState")
+        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -70,27 +72,6 @@ class SearchBarFragment : Fragment(), View.OnClickListener {
             }
             return true
         }
-    }
-
-    val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
-
-    fun showLoadingScreen() {
-        Log.d(ListVideoFragment.TAG, "showLoadingScreen() called")
-        lBinding.llLoading.visibility = View.VISIBLE
-        lBinding.tvNoData.visibility = View.INVISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun showNoDataScreen() {
-        Log.d(ListVideoFragment.TAG, "showNoDataScreen() called")
-        lBinding.llLoading.visibility = View.INVISIBLE
-        lBinding.tvNoData.visibility = View.VISIBLE
-        lBinding.frameContainer.visibility = View.VISIBLE
-    }
-
-    fun hideLoading() {
-        Log.d(ListVideoFragment.TAG, "hideLoading() called")
-        lBinding.frameContainer.visibility = View.INVISIBLE
     }
 
     override fun onClick(v: View) {

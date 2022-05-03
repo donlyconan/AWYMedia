@@ -40,7 +40,6 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
-    override val lBinding by lazy { LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer) }
     @Inject lateinit var settings: Settings
 
     override fun onCreateView(
@@ -50,6 +49,7 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                     "savedInstanceState = $savedInstanceState")
         applicationComponent.inject(this)
+        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
