@@ -1,34 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:icon="@drawable/ic_logo"
+    android:title="@string/settings"
+    android:fragment="com.utc.donlyconan.media.views.fragments.SettingsFragment">
 
     <PreferenceCategory android:title="Cài đặt chung">
 
         <ListPreference
-            android:title="Ngon ngu"
+            android:title="Ngôn ngữ"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
             android:key="language"
-            />
+            android:summary="Cài đặt ngôn ngữ sẽ hiển thị trên ứng dụng"/>
 
-<!--        <ListPreference-->
-<!--            android:title="Tu dong xoa"-->
-<!--            android:key="deleted_time"-->
-<!--            />-->
+        <ListPreference
+            android:title="Tự động xóa"
+            android:summary="Thiết lập chu kỳ xóa video."
+            android:entries="@array/remove_entries"
+            android:entryValues="@array/remove_values"
+            android:key="auto_remove" />
 
         <SwitchPreference
-            android:title="Xoa trong thiet bi"
+            android:title="Xóa video từ thiết bị"
             android:key="delete_from_storage"
             app:defaultValue="false"
-            android:summary="Cho phep ung dung thuc hien xoa video trong thiet bi."
+            android:summary="Cho phép ứng dụng xóa video trên thiết bị khi thực hiện thao tác xóa trên ứng dụng."
             />
 
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Video">
         <SwitchPreference
-            android:title="Tu dong phat"
+            android:title="Tự động phát"
             android:key="auto_play"
             android:defaultValue="true"
-            android:summary="Cho phep video duoc tu dong phat khi duoc mo"
+            android:summary="Cho phép ứng dụng phát video ngay sau khi video được mở."
+            />
+
+        <SwitchPreference
+            android:title="Khôi phục trạng thái"
+            android:key="restore_state"
+            android:defaultValue="true"
+            android:summary="Khôi phục lại trạng thái phát của video theo lần phát trước đó."
             />
     </PreferenceCategory>
 

@@ -26,5 +26,10 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.utc.donlyconan.media.views.fragments.SettingsFragment$SettingsScreen"/>
+
 
 </LinearLayout>

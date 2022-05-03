@@ -30,6 +30,30 @@
     <string name="delete">Delete</string>
     <string name="done">Done</string>
     <string name="video_demo_title">Video demo title</string>
+
     <string name="settings">Settings</string>
-    <string name="language_entries" />
+    <string-array name="language_entries">
+        <item>English</item>
+        <item>Việt Nam</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>en</item>
+        <item>vn</item>
+    </string-array>
+
+    <string-array name="remove_entries">
+        <item>Hàng ngày</item>
+        <item>Hàng ngày</item>
+        <item>Hàng tháng</item>
+        <item>Hàng năm</item>
+    </string-array>
+
+    <string-array name="remove_values">
+        <item>1</item>
+        <item>7</item>
+        <item>30</item>
+        <item>365</item>
+    </string-array>
+
+
 </resources>

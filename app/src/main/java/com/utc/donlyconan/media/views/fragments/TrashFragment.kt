@@ -117,7 +117,7 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
                 }
                 AlertDialogManager.createDeleteAlertDialog(
                     requireContext(), "Deleting file", "Do you want to remove all files?") {
-                    viewModel.clearAll()
+                    viewModel.clearAll(adapter.trashes)
                 }.show()
             }
         }
