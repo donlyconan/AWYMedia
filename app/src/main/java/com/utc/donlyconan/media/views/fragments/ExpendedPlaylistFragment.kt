@@ -62,7 +62,13 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
         adapter = VideoChoiceAdapter(requireContext(), arrayListOf())
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
+        showLoadingScreen()
         listVideoRepo.getAllVideosNotInPlaylist(args.playlistId).observe(this) { videos ->
+            if(videos.isEmpty()) {
+                showNoDataScreen()
+            } else {
+                hideLoading()
+            }
             adapter.submit(videos)
         }
         binding.btnDone.setOnClickListener(this)
@@ -77,8 +83,14 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
 
         override fun onQueryTextChange(newText: String?): Boolean {
             Log.d(SearchBarFragment.TAG, "onQueryTextChange() called with: newText = $newText")
+            showLoadingScreen()
             listVideoRepo.findAllVideos("%$newText%")
                 .observe(this@ExpendedPlaylistFragment) { videos ->
+                    if(videos.isEmpty()) {
+                        showNoDataScreen()
+                    } else {
+                        hideLoading()
+                    }
                     adapter.submit(videos)
                 }
             return true

@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.views.fragments
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -14,6 +15,7 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.DialogAboutBinding
 import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
 import com.utc.donlyconan.media.views.BaseFragment
+import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
@@ -105,8 +107,8 @@ class MainDisplayFragment : BaseFragment() {
         Log.d(TAG, "onOptionsItemSelected() called with: item = $item")
         when (item.itemId) {
             R.id.it_settings -> {
-                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToSettingsFragment()
-                findNavController().navigate(action)
+                val intent = Intent(requireContext(), SettingsActivity::class.java)
+                startActivity(intent)
             }
             R.id.it_search -> {
                 val action = MainDisplayFragmentDirections

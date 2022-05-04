@@ -37,7 +37,7 @@ import javax.inject.Inject
 /**
  * Lớp cung cấp các phương tiện chức năng hỗ trợ cho việc phát video
  */
-class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
+class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     private val viewModel by viewModels<VideoDisplayViewModel>()
     private val binding by lazy { ActivityVideoDisplayBinding.inflate(layoutInflater) }
@@ -45,8 +45,6 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var beView: CustomOptionPlayerControlViewBinding
     private var player: ExoPlayer? = null
 
-    @Inject
-    lateinit var settings: Settings
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
             or View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -71,22 +69,32 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
             initializePlayer(video)
         }
         viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
+        if(viewModel.isInitial) {
+            viewModel.playWhenReady = settings.autoPlay
+        }
         if (!viewModel.isContinue && viewModel.isInitial) {
-            val binding = DialogDisplayAgainBinding.inflate(layoutInflater)
-            val dialog = AlertDialog.Builder(this)
-                .setView(binding.root)
-                .create()
-            binding.btnNo.setOnClickListener {
+            // Show dialog to restore state of video when restoreState from setting equals true
+            if(settings.restoreState) {
+                val binding = DialogDisplayAgainBinding.inflate(layoutInflater)
+                val dialog = AlertDialog.Builder(this)
+                    .setView(binding.root)
+                    .create()
+                binding.btnNo.setOnClickListener {
+                    viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_VIDEO)?.apply {
+                        playedTime = 0L
+                    }
+                    dialog.dismiss()
+                }
+                binding.btnYes.setOnClickListener {
+                    viewModel.video.value = intent.getParcelableExtra(EXTRA_VIDEO)
+                    dialog.dismiss()
+                }
+                dialog.show()
+            } else {
                 viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_VIDEO)?.apply {
                     playedTime = 0L
                 }
-                dialog.dismiss()
             }
-            binding.btnYes.setOnClickListener {
-                viewModel.video.value = intent.getParcelableExtra(EXTRA_VIDEO)
-                dialog.dismiss()
-            }
-            dialog.show()
             viewModel.isContinue = true
         } else {
             viewModel.video.value = if(viewModel.video.value == null)
@@ -220,7 +228,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initializePlayer(video: Video) {
         Log.d(TAG, "initializePlayer() called with: video = $video")
-        if (viewModel.isInitial) {
+        if (viewModel.isInitial && settings.autoRotate) {
             val retriever = MediaMetadataRetriever()
             retriever.setDataSource(this, video.path.toUri())
             val orientation =
@@ -234,7 +242,6 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
                         }
                     }
             Log.d(TAG, "initializePlayer: orientation=$orientation")
-            viewModel.isInitial = false
         }
         player = ExoPlayer.Builder(this)
             .setSeekForwardIncrementMs(10000)
@@ -256,6 +263,7 @@ class VideoDisplayActivity : AppCompatActivity(), View.OnClickListener {
             }
         player?.addListener(listener)
         viewModel.isContinue = true
+        viewModel.isInitial = false
     }
 
     private fun releasePlayer() {

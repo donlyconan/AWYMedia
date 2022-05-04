@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.dagger.components
 
 import com.utc.donlyconan.media.app.services.MusicalService
+import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
 import com.utc.donlyconan.media.dagger.modules.RepositoryModule
@@ -11,6 +12,8 @@ import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
+import com.utc.donlyconan.media.views.BaseActivity
+import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.*
 import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
@@ -43,6 +46,7 @@ interface ApplicationComponent {
     fun getListVideoRepo(): ListVideoRepository
     fun getPlaylistRepo(): PlaylistRepository
     fun getTrashRepo(): TrashRepository
+    fun getSettings(): Settings
 
     fun inject(fragment: PersonalVideoFragment)
     fun inject(fragment: DetailedPlaylistFragment)
@@ -60,4 +64,5 @@ interface ApplicationComponent {
     fun inject(fragment: VideoDisplayActivity)
     fun inject(fragment: PlaylistViewModel)
     fun inject(videoDisplayViewModel: VideoDisplayViewModel)
+    fun inject(baseActivity: BaseActivity)
 }

@@ -1,14 +1,14 @@
 package com.utc.donlyconan.media.app.settings
 
 import android.content.Context
+import androidx.preference.PreferenceManager
+import java.util.*
 import javax.inject.Inject
 
 class Settings @Inject constructor(val appContext: Context) {
 
     companion object {
         const val SETTINGS_NAME = "sra-datn"
-        // const of default language
-        const val DEFAULT_LANGUAGE = "en"
         // options of sort by
         const val SORT_BY_NAME = 1
         const val SORT_BY_CREATION = 2
@@ -25,9 +25,16 @@ class Settings @Inject constructor(val appContext: Context) {
         }
     }
 
-    private var preferences = appContext.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE)
-    var language by StringPreferenceDelegate(preferences, "language", DEFAULT_LANGUAGE)
-    var isLoggedIn by BooleanPreferenceDelegate(preferences, "logged_in", false)
+    private var preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
+    var language by StringPreferenceDelegate(preferences, "language",
+        if(Locale.getDefault().language == "vn" || Locale.getDefault().language == "en")
+            Locale.getDefault().language else "en")
+    var isWellcome by BooleanPreferenceDelegate(preferences, "wellcome_to_app", false)
     var sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_BY_NAME)
+    var deleteFromStorage by BooleanPreferenceDelegate(preferences, "delete_from_storage", false)
+    var autoRemove by BooleanPreferenceDelegate(preferences, "auto_remove", false)
+    var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)
+    var autoRotate by BooleanPreferenceDelegate(preferences, "auto_rotate", true)
+    var restoreState by BooleanPreferenceDelegate(preferences, "restore_state", true)
 
 }

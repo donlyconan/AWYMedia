@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.utc.donlyconan.media.R
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: ")

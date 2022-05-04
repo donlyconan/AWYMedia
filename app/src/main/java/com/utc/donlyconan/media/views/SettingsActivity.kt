@@ -1,14 +1,45 @@
 package com.utc.donlyconan.media.views
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.utc.donlyconan.media.R;
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.ListPreference
+import androidx.preference.PreferenceFragmentCompat
+import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.databinding.FragmentSettingsBinding
+import com.utc.donlyconan.media.extension.widgets.setLocale
+import com.utc.donlyconan.media.views.fragments.SettingsFragment
+import javax.inject.Inject
 
-class SettingsActivity : AppCompatActivity() {
+/**
+ * This class is Settings screen
+ */
+class SettingsActivity : BaseActivity() {
+
+    val binding by lazy { FragmentSettingsBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        setTheme(R.style.Theme_Settings)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        setTitle(R.string.settings)
+        binding.toolbar.setNavigationOnClickListener { finish() }
+    }
+
+    class SettingsScreen : PreferenceFragmentCompat() {
+
+        val listLanguage by lazy { findPreference<ListPreference>("language") }
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            addPreferencesFromResource(R.xml.preferences)
+        }
+
+    }
+
+    companion object {
+        val TAG = SettingsFragment::class.simpleName
     }
 
 }

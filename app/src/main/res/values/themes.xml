@@ -20,4 +20,24 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textColorPrimary">@android:color/white</item>
     </style>
+
+
+    <style name="Theme.Settings" parent="Theme.AWYMedia">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/gray</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+        <!-- Status bar color. -->
+        <!-- Customize your theme here. -->
+        <item name="android:statusBarColor">?colorPrimary</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:itemBackground">@color/recycler_color</item>
+        <item name="android:popupBackground">@color/recycler_color</item>
+        <item name="android:windowBackground">@color/recycler_color</item>
+        <item name="android:background">@color/recycler_color</item>
+        <item name="android:textColorSecondary">@color/white_50</item>
+        <item name="textColorAlertDialogListItem">@color/white</item>
+    </style>
 </resources>

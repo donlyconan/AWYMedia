@@ -1,9 +1,11 @@
 package com.utc.donlyconan.media.views
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
@@ -22,6 +24,14 @@ open class BaseFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val icdLoading = view.findViewById<View>(R.id.icd_loading)
+        if(icdLoading != null) {
+            lBinding = LoadingDataScreenBinding.bind(icdLoading)
+        }
     }
 
     fun showLoadingScreen() {
