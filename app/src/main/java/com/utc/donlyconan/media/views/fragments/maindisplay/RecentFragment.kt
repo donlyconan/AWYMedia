@@ -60,7 +60,7 @@ class RecentFragment : ListVideoFragment() {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), video, true)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -92,7 +92,7 @@ class RecentFragment : ListVideoFragment() {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), video, true)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
             startActivity(intent)
         }
     }

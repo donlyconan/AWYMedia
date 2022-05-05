@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="15dp"
@@ -27,15 +28,6 @@
         style="@style/BottomMenuItem"
         />
 
-    <TextView
-        android:id="@+id/exo_subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/outline_subtitles_24"
-        android:text="Phụ đề"
-        style="@style/BottomMenuItem"
-        />
-
 
     <TextView
         android:id="@+id/exo_loop"
@@ -43,6 +35,15 @@
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/bg_button_loop"
         android:text="Lặp lại"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/exo_prev"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_baseline_skip_previous_24"
+        android:text="Quay lại"
         style="@style/BottomMenuItem"
         />
 

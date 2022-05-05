@@ -41,7 +41,7 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) {
                 when (v.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), video)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -73,7 +73,7 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), video)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
             startActivity(intent)
         }
     }

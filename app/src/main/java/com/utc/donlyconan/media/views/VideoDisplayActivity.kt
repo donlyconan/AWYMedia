@@ -6,23 +6,22 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.MediaMetadataRetriever
-import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT
-import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH
 import android.net.Uri
-import android.os.*
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
-import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
@@ -31,7 +30,6 @@ import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
-import javax.inject.Inject
 
 
 /**
@@ -64,13 +62,16 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             .bind(bindingOverlay.layoutPlayerControlView.rootView)
         initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
 
-        viewModel.video.observe(this) { video ->
+        viewModel.currentWindowIndex.observe(this) { index ->
+            val video = viewModel.playlist[index]
             beView.headerTv.text = video.title
             initializePlayer(video)
         }
-        viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
         if(viewModel.isInitial) {
             viewModel.playWhenReady = settings.autoPlay
+            viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
+            viewModel.currentWindowIndex.value = intent.getIntExtra(EXTRA_POSITION, 0)
+            viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST)!!
         }
         if (!viewModel.isContinue && viewModel.isInitial) {
             // Show dialog to restore state of video when restoreState from setting equals true
@@ -80,26 +81,24 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     .setView(binding.root)
                     .create()
                 binding.btnNo.setOnClickListener {
-                    viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_VIDEO)?.apply {
+                    viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_POSITION)?.apply {
                         playedTime = 0L
                     }
                     dialog.dismiss()
                 }
                 binding.btnYes.setOnClickListener {
-                    viewModel.video.value = intent.getParcelableExtra(EXTRA_VIDEO)
+                    viewModel.video.value = intent.getParcelableExtra(EXTRA_POSITION)
                     dialog.dismiss()
                 }
                 dialog.show()
             } else {
-                viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_VIDEO)?.apply {
+                viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_POSITION)?.apply {
                     playedTime = 0L
                 }
             }
             viewModel.isContinue = true
         } else {
-            viewModel.video.value = if(viewModel.video.value == null)
-                intent.getParcelableExtra(EXTRA_VIDEO)
-             else viewModel.video.value?.copy(updatedAt = System.currentTimeMillis())
+            viewModel.currentWindowIndex.value = intent.getIntExtra(EXTRA_POSITION, 0)
         }
     }
 
@@ -108,7 +107,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         if (isLScreen) {
             beView.exoLoop?.setOnClickListener(this)
             beView.exoLock?.setOnClickListener(this)
-            beView.exoSubtitle?.setOnClickListener(this)
+            beView.exoPrev?.setOnClickListener(this)
             beView.exoPlaybackSpeed?.setOnClickListener(this)
             beView.exoNext?.setOnClickListener(this)
         } else {
@@ -182,7 +181,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 }
                 R.id.exo_option -> {
                     val enabled = player?.repeatMode != ExoPlayer.REPEAT_MODE_OFF
-                    VideoMenuMoreFragment.newInstance(this@VideoDisplayActivity, enabled)
+                    val hasNext = player!!.hasNextMediaItem()
+                    val hasPrev = player!!.hasPreviousMediaItem()
+                    VideoMenuMoreFragment.newInstance(enabled, hasNext, hasPrev) { v ->
+                        this.sendEmptyMessage(v.id)
+                    }
                         .show(supportFragmentManager, TAG)
                 }
                 R.id.exo_loop -> {
@@ -201,9 +204,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     ).show(supportFragmentManager, TAG)
                 }
                 R.id.exo_next -> {
-                    releasePlayer()
-                    val video = viewModel.getNext()
-                    player?.seekToNextWindow()
+                    player?.seekToNextMediaItem()
+                }
+                R.id.exo_prev -> {
+                    player?.seekToPreviousMediaItem()
                 }
                 else -> {
                     Log.d(TAG, "onClick: not found ${msg.what}")
@@ -249,15 +253,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             .build()
             .also { exoPlayer ->
                 binding.videoView.player = exoPlayer
-                val mediaItem = MediaItem.fromUri(Uri.parse(video.path))
-                exoPlayer.setMediaItem(mediaItem, false)
-                val nextVideo = viewModel.getNext()
-                Log.d(TAG, "initializePlayer() called with: nextVideo = $nextVideo")
-                if (nextVideo != null) {
-                    val item = MediaItem.fromUri(Uri.parse(nextVideo.path))
-                    exoPlayer.addMediaItem(item)
-                }
-                exoPlayer.seekTo(video.playedTime)
+                exoPlayer.addMediaItems(
+                    viewModel
+                    .playlist
+                    .map { v -> MediaItem.fromUri(Uri.parse(v.path)) }
+                )
+                exoPlayer.seekTo(viewModel.currentWindowIndex.value!!, video.playedTime)
                 exoPlayer.prepare()
                 exoPlayer.playWhenReady = viewModel.playWhenReady
             }
@@ -300,14 +301,16 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         }
 
     companion object {
-        const val EXTRA_VIDEO = "EXTRA_VIDEO"
+        const val EXTRA_POSITION = "EXTRA_POSITION"
         const val EXTRA_CONTINUE = "EXTRA_CONTINUE"
+        const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
 
-        fun newIntent(context: Context, video: Video, isContinue: Boolean = false) =
+        fun newIntent(context: Context, position: Int, playlist: ArrayList<Video>, isContinue: Boolean = false) =
             Intent(context, VideoDisplayActivity::class.java).apply {
-                putExtra(EXTRA_VIDEO, video)
+                putExtra(EXTRA_POSITION, position)
                 putExtra(EXTRA_CONTINUE, isContinue)
+                putExtra(EXTRA_PLAYLIST, playlist)
             }
     }
 }

@@ -243,19 +243,6 @@
             </LinearLayout>
 
 
-            <LinearLayout
-                style="@style/ExoPlayerExtendedFunctionLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/exo_subtitle"
-                    style="@style/ExoPlayerExtendedFunction"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/outline_subtitles_24"
-                    android:text="Phụ đề" />
-            </LinearLayout>
 
             <LinearLayout
                 style="@style/ExoPlayerExtendedFunctionLayout"
@@ -271,6 +258,20 @@
                     android:text="Lặp lại" />
             </LinearLayout>
 
+            <LinearLayout
+                style="@style/ExoPlayerExtendedFunctionLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/exo_prev"
+                    style="@style/ExoPlayerExtendedFunction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_baseline_skip_previous_24"
+                    android:text="Quay lại" />
+            </LinearLayout>
+
 
             <LinearLayout
                 style="@style/ExoPlayerExtendedFunctionLayout"
@@ -282,7 +283,7 @@
                     style="@style/ExoPlayerExtendedFunction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_baseline_skip_next_24"
+                    android:drawableEnd="@drawable/ic_baseline_skip_next_24"
                     android:text="Tiếp theo" />
             </LinearLayout>
 

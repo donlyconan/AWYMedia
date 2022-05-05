@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
-import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentDetailedPlaylistBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
@@ -88,7 +87,7 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), video)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -131,7 +130,7 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), video)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
             startActivity(intent)
         }
     }

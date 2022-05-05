@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.models.Video
@@ -35,7 +34,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), video)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -67,7 +66,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), video)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
             startActivity(intent)
         }
     }

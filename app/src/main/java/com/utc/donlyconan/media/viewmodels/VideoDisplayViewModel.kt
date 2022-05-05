@@ -16,10 +16,12 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
     @Inject lateinit var videoRepo: VideoRepository
     val video: MutableLiveData<Video> = MutableLiveData<Video>()
     val lstVideoRepo = myApp.applicationComponent().getListVideoRepo()
+    var playlist: ArrayList<Video> = arrayListOf()
     var playWhenReady = true
     var isFinished = false
     var isContinue = false
     var isInitial = true
+    var currentWindowIndex = MutableLiveData<Int>(-1)
 
     init {
         myApp.applicationComponent().inject(this)
