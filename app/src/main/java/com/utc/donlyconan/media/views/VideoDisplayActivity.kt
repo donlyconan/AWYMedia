@@ -6,11 +6,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.MediaMetadataRetriever
-import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import android.os.*
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
@@ -62,43 +58,50 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             .bind(bindingOverlay.layoutPlayerControlView.rootView)
         initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
 
-        viewModel.currentWindowIndex.observe(this) { index ->
-            val video = viewModel.playlist[index]
+        viewModel.video.observe(this) { video ->
+            Log.d(TAG, "onCreate: position=${viewModel.position}, video=$video")
             beView.headerTv.text = video.title
+            if(viewModel.isResetPosition) {
+                video.playedTime = 0L
+            }
             initializePlayer(video)
+            viewModel.isResetPosition = false
         }
+        viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
         if(viewModel.isInitial) {
             viewModel.playWhenReady = settings.autoPlay
-            viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
-            viewModel.currentWindowIndex.value = intent.getIntExtra(EXTRA_POSITION, 0)
-            viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST)!!
+            viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST) ?: arrayListOf()
+            viewModel.position = intent.getIntExtra(EXTRA_POSITION, 0)
         }
-        if (!viewModel.isContinue && viewModel.isInitial) {
+        if (viewModel.canShowDialog()) {
             // Show dialog to restore state of video when restoreState from setting equals true
             if(settings.restoreState) {
                 val binding = DialogDisplayAgainBinding.inflate(layoutInflater)
                 val dialog = AlertDialog.Builder(this)
                     .setView(binding.root)
+                    .setCancelable(false)
                     .create()
                 binding.btnNo.setOnClickListener {
-                    viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_POSITION)?.apply {
+                    viewModel.video.value = viewModel.currentVideo().apply {
                         playedTime = 0L
                     }
                     dialog.dismiss()
                 }
                 binding.btnYes.setOnClickListener {
-                    viewModel.video.value = intent.getParcelableExtra(EXTRA_POSITION)
+                    viewModel.video.value = viewModel.currentVideo()
                     dialog.dismiss()
                 }
                 dialog.show()
             } else {
-                viewModel.video.value = intent.getParcelableExtra<Video>(EXTRA_POSITION)?.apply {
+                viewModel.video.value = viewModel.currentVideo().apply {
                     playedTime = 0L
                 }
             }
             viewModel.isContinue = true
         } else {
-            viewModel.currentWindowIndex.value = intent.getIntExtra(EXTRA_POSITION, 0)
+            viewModel.video.value = if(viewModel.video.value == null)
+                viewModel.currentVideo()
+             else viewModel.video.value?.copy(updatedAt = System.currentTimeMillis())
         }
     }
 
@@ -181,10 +184,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 }
                 R.id.exo_option -> {
                     val enabled = player?.repeatMode != ExoPlayer.REPEAT_MODE_OFF
-                    val hasNext = player!!.hasNextMediaItem()
-                    val hasPrev = player!!.hasPreviousMediaItem()
-                    VideoMenuMoreFragment.newInstance(enabled, hasNext, hasPrev) { v ->
-                        this.sendEmptyMessage(v.id)
+                    val hasNext = viewModel.hasNext()
+                    val hasPrev = viewModel.hasPrev()
+                    VideoMenuMoreFragment.newInstance(enabled, hasNext, hasPrev) { v->
+                        sendEmptyMessage(v.id)
                     }
                         .show(supportFragmentManager, TAG)
                 }
@@ -204,10 +207,22 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     ).show(supportFragmentManager, TAG)
                 }
                 R.id.exo_next -> {
-                    player?.seekToNextMediaItem()
+                    releasePlayer()
+                    viewModel.next()
+                    beView.exoPrev?.apply {
+                        isClickable = true
+                        setTextColor(resources.getColor(R.color.white))
+                    }
                 }
                 R.id.exo_prev -> {
-                    player?.seekToPreviousMediaItem()
+                    releasePlayer()
+                    viewModel.previous()
+                    if(!viewModel.hasPrev()) {
+                        beView.exoPrev?.apply {
+                            isClickable = false
+                            setTextColor(resources.getColor(R.color.gray_20))
+                        }
+                    }
                 }
                 else -> {
                     Log.d(TAG, "onClick: not found ${msg.what}")
@@ -231,7 +246,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun initializePlayer(video: Video) {
-        Log.d(TAG, "initializePlayer() called with: video = $video")
+        Log.d(TAG, "initializePlayer() called with: video = $video, playlist=${viewModel.playlist}")
         if (viewModel.isInitial && settings.autoRotate) {
             val retriever = MediaMetadataRetriever()
             retriever.setDataSource(this, video.path.toUri())
@@ -253,12 +268,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             .build()
             .also { exoPlayer ->
                 binding.videoView.player = exoPlayer
-                exoPlayer.addMediaItems(
-                    viewModel
-                    .playlist
-                    .map { v -> MediaItem.fromUri(Uri.parse(v.path)) }
-                )
-                exoPlayer.seekTo(viewModel.currentWindowIndex.value!!, video.playedTime)
+                exoPlayer.addMediaItems(viewModel.playlist.map { video ->  MediaItem.fromUri(video.path) })
+                val index = viewModel.playlist.indexOfFirst { v -> video.videoId == v.videoId }
+                Log.d(TAG, "initializePlayer: index=$index")
+                exoPlayer.seekTo(index, video.playedTime)
                 exoPlayer.prepare()
                 exoPlayer.playWhenReady = viewModel.playWhenReady
             }
@@ -301,9 +314,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         }
 
     companion object {
-        const val EXTRA_POSITION = "EXTRA_POSITION"
+        const val EXTRA_POSITION = "EXTRA_VIDEO"
         const val EXTRA_CONTINUE = "EXTRA_CONTINUE"
-        const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
+        const val EXTRA_PLAYLIST = "EXTRA_CONTINUE"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
 
         fun newIntent(context: Context, position: Int, playlist: ArrayList<Video>, isContinue: Boolean = false) =

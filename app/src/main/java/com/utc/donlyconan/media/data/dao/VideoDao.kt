@@ -33,4 +33,7 @@ interface VideoDao {
     @Query("Select count(video_id) from videos where path=:path")
     fun countPath(path: String): Int
 
+    @Query("Select * from videos where path=:path limit 1")
+    fun getVideoInfo(path: String): Video
+
 }

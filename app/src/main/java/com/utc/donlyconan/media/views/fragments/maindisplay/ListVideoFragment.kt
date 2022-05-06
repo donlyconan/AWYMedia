@@ -5,9 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
@@ -35,6 +33,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                 when (view.id) {
                     R.id.btn_play -> {
                         val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
+                        sharedViewModel.playlist.value = adapter.videoList
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -54,7 +53,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video?.path))
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
                         startActivity(Intent.createChooser(intent, "Share File"))
                     }
@@ -67,6 +66,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
             val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
+            sharedViewModel.playlist.value = adapter.videoList
             startActivity(intent)
         }
     }

@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
+import com.utc.donlyconan.media.viewmodels.SharedViewModel
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
 
 
@@ -20,7 +22,7 @@ open class BaseFragment : Fragment() {
     protected val applicationComponent by lazy { application.applicationComponent() }
     protected val supportFragmentManager by lazy { activity.supportFragmentManager }
     protected var lBinding: LoadingDataScreenBinding? = null
-
+    protected val sharedViewModel by activityViewModels<SharedViewModel>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

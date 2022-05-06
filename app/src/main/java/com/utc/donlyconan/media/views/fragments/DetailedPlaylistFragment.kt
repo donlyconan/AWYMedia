@@ -87,7 +87,7 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), position,  adapter.videoList)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -107,7 +107,7 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video?.path))
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
                         startActivity(Intent.createChooser(intent, "Share File"))
                     }
@@ -131,6 +131,7 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
             val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
+            sharedViewModel.playlist.value = adapter.videoList
             startActivity(intent)
         }
     }

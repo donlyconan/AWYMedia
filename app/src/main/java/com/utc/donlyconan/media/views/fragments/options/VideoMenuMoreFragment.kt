@@ -12,7 +12,6 @@ class VideoMenuMoreFragment : BaseBottomSheetFragment(), View.OnClickListener {
 
     val binding by lazy { FragmentVideoMenuMoreBinding.inflate(layoutInflater) }
     var listener: View.OnClickListener ?= null
-    var canNext = false
     var isSelected = false
     var hasNext = false
     var hasPrev = false
@@ -30,16 +29,15 @@ class VideoMenuMoreFragment : BaseBottomSheetFragment(), View.OnClickListener {
         binding.exoPrev.setOnClickListener(this)
         binding.exoNext.setOnClickListener(this)
         binding.exoPlaybackSpeed.setOnClickListener(this)
-        if(!canNext) {
-            binding.exoNext.isEnabled = false
-        }
         binding.exoLoop.isSelected = isSelected
 
         if(!hasPrev) {
             binding.exoPrev.alpha = 0.3f
+            binding.exoPrev.isClickable = false
         }
         if(!hasNext) {
             binding.exoNext.alpha = 0.3f
+            binding.exoNext.isClickable = false
         }
     }
 

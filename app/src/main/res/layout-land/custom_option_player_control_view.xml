@@ -68,6 +68,7 @@
             android:layout_marginRight="40dp"
             android:src="@drawable/ic_exo_icon_rewind"
             android:visibility="visible"
+            android:background="@drawable/bg_player_button"
             app:layout_constraintBottom_toBottomOf="@id/exo_play"
             app:layout_constraintRight_toLeftOf="@+id/barrier_left"
             app:layout_constraintTop_toTopOf="@id/exo_play" />
@@ -78,6 +79,7 @@
             android:layout_marginLeft="40dp"
             android:src="@drawable/ic_exo_icon_fastforward"
             android:visibility="visible"
+            android:background="@drawable/bg_player_button"
             app:layout_constraintBottom_toBottomOf="@id/exo_play"
             app:layout_constraintLeft_toRightOf="@+id/barrier_right"
             app:layout_constraintTop_toTopOf="@id/exo_play" />
@@ -97,6 +99,7 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:src="@drawable/ic_exo_icon_play"
+            android:background="@drawable/bg_player_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -21,26 +21,48 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
     var isFinished = false
     var isContinue = false
     var isInitial = true
-    var currentWindowIndex = MutableLiveData<Int>(-1)
+    var isLooped = false
+    var position: Int = 0
+    var isResetPosition = false
 
     init {
         myApp.applicationComponent().inject(this)
     }
 
-    fun getNext(): Video {
-        return videoRepo.getNext(video.value!!.videoId)
+    fun hasNext() = position < playlist.size - 1
+
+    fun hasPrev() = position > 0
+
+    private fun getNext(): Video? {
+        if(hasNext()) {
+            return playlist[++position]
+        }
+        return null
     }
 
-    fun getPrevious(): Video {
-        return videoRepo.getPrevious(video.value!!.videoId)
+    private fun getPrevious(): Video? {
+        if(hasPrev()) {
+            return  playlist[--position]
+        }
+        return null
     }
 
-    fun next() {
-        video.value = getNext()
+    fun next(): Boolean {
+        if(hasNext()) {
+            video.value = getNext()
+            isResetPosition = true
+            return true
+        }
+        return false
     }
 
-    fun previous() {
-        video.value = getPrevious()
+    fun previous(): Boolean {
+        if(hasPrev()) {
+            video.value = getPrevious()
+            isResetPosition = true
+            return true
+        }
+        return false
     }
 
     fun endVideo() {
@@ -58,6 +80,14 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
         if(video != null && !isFinished) {
             videoRepo.update(video)
         }
+    }
+
+    fun canShowDialog(): Boolean {
+        return !isContinue && isInitial && currentVideo().playedTime > 0L
+    }
+
+    fun currentVideo(): Video {
+        return playlist[position]
     }
 
     override fun toString(): String {

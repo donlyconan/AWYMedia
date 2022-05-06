@@ -61,6 +61,7 @@ class RecentFragment : ListVideoFragment() {
                 when (view.id) {
                     R.id.btn_play -> {
                         val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
+                        sharedViewModel.playlist.value = adapter.videoList
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -80,7 +81,7 @@ class RecentFragment : ListVideoFragment() {
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video?.path))
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
                         startActivity(Intent.createChooser(intent, "Share File"))
                     }
@@ -93,6 +94,7 @@ class RecentFragment : ListVideoFragment() {
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
             val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
+            sharedViewModel.playlist.value = adapter.videoList
             startActivity(intent)
         }
     }

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -13,23 +12,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.ListFragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.settings.Settings
-import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
-import com.utc.donlyconan.media.views.BaseFragment
-import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -103,28 +94,48 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val intent = result.data
-                intent?.data?.let { data ->
-                    Log.d(TAG, "activityResultLauncher() called with: data = $data")
-                    val videoId = data.toString().let {
-                        it.substring(it.lastIndexOf('A') + 1).toInt()
+                intent?.clipData?.let { listUri ->
+                    val listItems = arrayListOf<String>()
+                    for (i in 0 until listUri.itemCount) {
+                        listItems.add(listUri.getItemAt(i).uri.toString())
                     }
-                    viewModel.viewModelScope.launch {
-                        val video = context?.contentResolver?.getAllVideos(
-                            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                            "${MediaStore.Video.Media._ID}=$videoId"
-                        )?.first()
-                        if (video != null) {
-                            Log.d(TAG, "activityResultLauncher() called video=$video")
-                            if (viewModel.hasVideo(video.path)) {
-                                context?.showMessage("Video đã tồn tại.")
-                            } else {
-                                viewModel.videoRepo.insert(video)
-                            }
-                        }
-                    }
+                    importData(listItems)
+                }
+                intent?.data?.let { uri ->
+                    importData(arrayListOf(uri.toString()))
                 }
             }
         }
+
+    private fun importData(videoIdStrs: ArrayList<String>) {
+        Log.d(TAG, "importData() called with: videoIds = $videoIdStrs")
+        var count = 0
+        for (idStr in videoIdStrs) {
+            val videoId = idStr.let {
+                val start = it.lastIndexOf('A') + 1
+                var end = it.lastIndexOf(' ')
+                if(end == -1) {
+                    end = it.length
+                }
+                it.substring(start, end).toInt()
+            }
+            val video = context?.contentResolver?.getAllVideos(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                "${MediaStore.Video.Media._ID}=$videoId"
+            )?.first()
+            if (video != null) {
+                Log.d(TAG, "activityResultLauncher() called video=$video")
+                if (viewModel.hasVideo(video.path)) {
+                    count++
+                } else {
+                    viewModel.videoRepo.insert(video)
+                }
+            }
+        }
+        if (count == videoIdStrs.size) {
+            context?.showMessage("Video đã tồn tại.")
+        }
+    }
 
     override fun onClick(v: View) {
         Log.d(TAG, "onClick() called with: v = $v")
@@ -133,6 +144,7 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
                 val intent = Intent(Intent.ACTION_PICK).apply {
                     type = "video/*"
                     action = Intent.ACTION_GET_CONTENT
+                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                 }
                 activityResultLauncher.launch(intent)
             }
