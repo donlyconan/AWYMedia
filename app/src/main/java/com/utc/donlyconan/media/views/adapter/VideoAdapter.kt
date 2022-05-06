@@ -19,7 +19,11 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 
-class VideoAdapter(var context: Context, var videoList: ArrayList<Video>, var showProgress: Boolean = false) :
+class VideoAdapter(
+    var context: Context,
+    var videoList: ArrayList<Video>,
+    var showProgress: Boolean = false
+) :
     RecyclerView.Adapter<VideoAdapter.VideoHolder>(), OnItemClickListener {
 
     var inflater: LayoutInflater = LayoutInflater.from(context)
@@ -38,7 +42,8 @@ class VideoAdapter(var context: Context, var videoList: ArrayList<Video>, var sh
         val item: Video = videoList[position]
         holder.onItemLongClickListener = onItemLongClickListener
         holder.onItemClickListener = onItemClickListener
-        holder.bind(item, position == videoList.size - 1, showProgress)
+        holder.bind(item, showProgress)
+        holder.setLastItem(position == videoList.size - 1)
     }
 
     override fun getItemCount(): Int {
@@ -86,8 +91,8 @@ class VideoAdapter(var context: Context, var videoList: ArrayList<Video>, var sh
             return true
         }
 
-        fun bind(video: Video, isLastItem: Boolean, showProgress: Boolean) {
-            Log.d(TAG, "bind() called with: video = $video, isLastItem = $isLastItem, showProgress = $showProgress")
+        fun bind(video: Video, showProgress: Boolean) {
+            Log.d(TAG, "bind() called with: video = $video, showProgress = $showProgress")
 
             binding.tvTitle.text = video.title
             binding.tvDate.text = DateFormat.getDateInstance().format(video.updatedAt)
@@ -98,18 +103,26 @@ class VideoAdapter(var context: Context, var videoList: ArrayList<Video>, var sh
                 .load(video.path)
                 .into(binding.imgThumbnail)
 
+            if (showProgress) {
+                binding.progress.apply {
+                    visibility = View.VISIBLE
+                    max = video.duration
+                    progress = video.playedTime.toInt()
+                }
+            }
+        }
+
+        fun setLastItem(isLastItem: Boolean) {
+            Log.d(TAG, "applyForLastItem() called")
             if (isLastItem) {
                 binding.container.apply {
                     val paddingBottom =
                         resources.getDimension(R.dimen.list_video_item_margin_bottom).toInt()
                     setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
                 }
-            }
-            if(showProgress) {
-                binding.progress.apply {
-                    visibility = View.VISIBLE
-                    max = video.duration
-                    progress = video.playedTime.toInt()
+            } else if (binding.container.paddingBottom != 0) {
+                binding.container.apply {
+                    setPadding(paddingLeft, paddingTop, paddingRight, 0)
                 }
             }
         }
