@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.services.MusicalService
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
@@ -49,6 +50,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // stop media service
+        (applicationContext as AwyMediaApplication).iMusicalService()
+            ?.release()
+
         setContentView(binding.root)
         (applicationContext as AwyMediaApplication).applicationComponent()
             .inject(this)
@@ -67,11 +73,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             initializePlayer(video)
             viewModel.isResetPosition = false
         }
-        viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
         if(viewModel.isInitial) {
-            viewModel.playWhenReady = settings.autoPlay
             viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST) ?: arrayListOf()
             viewModel.position = intent.getIntExtra(EXTRA_POSITION, 0)
+            viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
+            viewModel.playWhenReady = settings.autoPlay
         }
         if (viewModel.canShowDialog()) {
             // Show dialog to restore state of video when restoreState from setting equals true
@@ -316,14 +322,14 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     companion object {
         const val EXTRA_POSITION = "EXTRA_VIDEO"
         const val EXTRA_CONTINUE = "EXTRA_CONTINUE"
-        const val EXTRA_PLAYLIST = "EXTRA_CONTINUE"
+        const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
 
         fun newIntent(context: Context, position: Int, playlist: ArrayList<Video>, isContinue: Boolean = false) =
             Intent(context, VideoDisplayActivity::class.java).apply {
                 putExtra(EXTRA_POSITION, position)
-                putExtra(EXTRA_CONTINUE, isContinue)
                 putExtra(EXTRA_PLAYLIST, playlist)
+                putExtra(EXTRA_CONTINUE, isContinue)
             }
     }
 }

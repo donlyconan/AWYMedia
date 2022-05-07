@@ -36,5 +36,6 @@ class Settings @Inject constructor(val appContext: Context) {
     var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)
     var autoRotate by BooleanPreferenceDelegate(preferences, "auto_rotate", true)
     var restoreState by BooleanPreferenceDelegate(preferences, "restore_state", true)
+    var autoDownload by BooleanPreferenceDelegate(preferences, "auto_download", true)
 
 }

@@ -13,6 +13,9 @@
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:itemBackground">@color/gray_20</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@null</item>
     </style>
 
     <style name="MyAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">

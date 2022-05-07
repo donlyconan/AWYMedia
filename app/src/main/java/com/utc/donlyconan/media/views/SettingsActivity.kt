@@ -1,6 +1,8 @@
 package com.utc.donlyconan.media.views
 
+import android.graphics.Color
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
@@ -26,6 +28,12 @@ class SettingsActivity : BaseActivity() {
         setSupportActionBar(binding.toolbar)
         setTitle(R.string.settings)
         binding.toolbar.setNavigationOnClickListener { finish() }
+        val tvTitle = binding.toolbar::class.java.getDeclaredField("mTitleTextView")
+            .apply {
+                isAccessible = true
+            }
+            .get(binding.toolbar) as TextView
+        tvTitle.setBackgroundColor(Color.TRANSPARENT)
     }
 
     class SettingsScreen : PreferenceFragmentCompat() {

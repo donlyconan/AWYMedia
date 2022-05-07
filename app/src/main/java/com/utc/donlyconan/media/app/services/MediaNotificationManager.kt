@@ -25,8 +25,8 @@ class MediaNotificationManager(private val service: Service) {
     private val pauseAction: NotificationCompat.Action
     private val nextAction: NotificationCompat.Action
     private val previousAction: NotificationCompat.Action
-    val notificationManager: NotificationManager =
-        service.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationManager: android.app.NotificationManager =
+        service.getSystemService(Service.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
     init {
         playAction = NotificationCompat.Action(

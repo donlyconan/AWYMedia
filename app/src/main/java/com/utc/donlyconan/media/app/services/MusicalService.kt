@@ -8,96 +8,96 @@ import android.net.Uri
 import android.os.IBinder
 import android.util.Log
 import android.widget.RemoteViews
+import androidx.core.net.toUri
 import com.utc.donlyconan.media.IMusicalService
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.data.dao.VideoDao
+import com.utc.donlyconan.media.data.models.Video
 import javax.inject.Inject
 
-class MusicalService: Service() {
+/**
+ * This is service which will play media sound
+ */
+class MusicalService : Service() {
 
     companion object {
-        val TAG: String = MusicalService.javaClass.simpleName
+        val TAG: String = MusicalService::class.java.simpleName
         const val channelId = "musical-service-id"
     }
 
     private val binder = object : IMusicalService.Stub() {
-
-        override fun setVideoId(videoId: Int) {
-            Log.d(TAG, "setVideoId() called with: videoId = $videoId")
-            this@MusicalService.videoId = videoId
+        override fun setPlaylist(position: Int, playlist: MutableList<Video>) {
+            Log.d(TAG,
+                "setPlaylist() called with: position = $position, playlist.size = ${playlist.size}")
+            this@MusicalService.position = position
+            this@MusicalService.playlist = playlist
         }
 
         override fun play() {
-            Log.d(TAG, "play() called")
-            if(videoId != -1) {
-                val video = videoDao.getVideo(videoId)
-                Log.d(TAG, "play: video=$video")
-                player?.apply {
-                    setDataSource(applicationContext, Uri.parse(video.path))
-                    prepare()
-                    start()
-                }
-            } else {
-                release()
+            val video = playlist.get(position)
+            Log.d(TAG, "play() called video=$video")
+            player = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                setDataSource(this@MusicalService, video.path.toUri())
+                prepare()
+                start()
             }
+        }
+
+        override fun next() {
+            Log.d(TAG, "next() called position=$position")
+            if (position < playlist!!.size - 1) {
+                position++
+                release()
+                play()
+            }
+        }
+
+        override fun previous() {
+            Log.d(TAG, "previous() called position=$position")
+            if (position > 0) {
+                position--
+                release()
+                play()
+            }
+        }
+
+        override fun pause() {
+            Log.d(TAG, "pause() called")
+            player?.pause()
         }
 
         override fun release() {
             Log.d(TAG, "release() called")
-            player?.stop()
-            player?.release()
-        }
-
-        override fun next() {
-            Log.d(TAG, "next() called")
-            val video = videoDao.getNextVideo(videoId)
-            videoId = video.videoId
-            play()
-        }
-
-        override fun previous() {
-            Log.d(TAG, "previous() called")
-            Log.d(TAG, "next() called")
-            val video = videoDao.getPreviousVideo(videoId)
-            videoId = video.videoId
-            play()
-        }
-
-        override fun stop() {
-            Log.d(TAG, "stop() called")
-            player?.stop()
-        }
-
-        override fun restart() {
-            Log.d(TAG, "restart() called")
-            player?.start()
+            player?.apply {
+                stop()
+                release()
+            }
+            player = null
         }
 
     }
 
     var videoId: Int = -1
     private var player: MediaPlayer? = null
-    @Inject lateinit var videoDao: VideoDao
+    private var position: Int = 0
+    private var playlist: MutableList<Video> = arrayListOf()
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate() called")
         (applicationContext as AwyMediaApplication).applicationComponent()
             .inject(this)
-        player = MediaPlayer().apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand() called with: intent = $intent, flags = $flags, startId = $startId")
-        val notificationLayout = RemoteViews(packageName, R.layout.notify_media_player_info)
         return Service.START_STICKY
     }
 
@@ -109,7 +109,6 @@ class MusicalService: Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
-        player?.stop()
-        player?.release()
+        binder.release()
     }
 }

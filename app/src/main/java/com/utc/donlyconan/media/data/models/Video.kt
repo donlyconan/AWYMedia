@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.data.models
 
 import android.os.Parcelable
+import androidx.recyclerview.widget.DiffUtil
 import androidx.room.*
 import com.utc.donlyconan.media.app.settings.Settings
 import kotlinx.android.parcel.Parcelize
@@ -53,6 +54,18 @@ data class Video(
     fun toTrash(): Trash {
         return Trash(videoId, title, path, duration, size, type, createdAt,
             updatedAt, System.currentTimeMillis())
+    }
+
+    companion object {
+        val diffUtil = object : DiffUtil.ItemCallback<Video>() {
+            override fun areItemsTheSame(oldItem: Video, newItem: Video): Boolean {
+                return oldItem.videoId == newItem.videoId
+            }
+
+            override fun areContentsTheSame(oldItem: Video, newItem: Video): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 
 }

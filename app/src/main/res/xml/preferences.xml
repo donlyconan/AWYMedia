@@ -13,6 +13,7 @@
             android:entries="@array/language_entries"
             android:entryValues="@array/language_values"
             android:key="language"
+            android:defaultValue="en"
             android:summary="Cài đặt ngôn ngữ sẽ hiển thị trên ứng dụng"
             android:dialogIcon="@drawable/ic_logo"
             android:dialogTitle="Chọn ngôn ngữ"/>
@@ -30,8 +31,12 @@
             android:entries="@array/remove_entries"
             android:entryValues="@array/remove_values"
             android:key="auto_remove"
+            android:defaultValue="30"
             android:dialogIcon="@drawable/ic_logo"
             android:dialogTitle="Thiết lập thời gian xóa"/>
+
+        <Preference android:title="Xoá dữ liệu"
+            android:summary="Xóa tất cả dữ liệu của bạn đang có trong ứng dụng."/>
 
     </PreferenceCategory>
 
@@ -56,6 +61,14 @@
             android:defaultValue="true"
             android:summary="Khôi phục lại trạng thái phát của video theo lần phát trước đó."
             />
+
+        <CheckBoxPreference
+            android:title="Tự động tải"
+            android:key="auto_download"
+            app:defaultValue="true"
+            android:summary="Cho phép ứng dụng truy cập và tải video từ thiết bị."
+            />
+
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -66,7 +66,7 @@ class RecentFragment : ListVideoFragment() {
                     }
                     R.id.btn_play_music -> {
                         application.iMusicalService()?.apply {
-                            setVideoId(video.videoId)
+                            setPlaylist(position, adapter.videoList)
                             play()
                         }
                     }
@@ -94,7 +94,6 @@ class RecentFragment : ListVideoFragment() {
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
             val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
-            sharedViewModel.playlist.value = adapter.videoList
             startActivity(intent)
         }
     }

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.models.Playlist
@@ -17,7 +18,7 @@ import com.utc.donlyconan.media.extension.widgets.TAG
 class PlaylistAdapter(var context: Context,
                       var playlists: ArrayList<Playlist>,
                       private val repository: PlaylistRepository) :
-    RecyclerView.Adapter<PlaylistAdapter.VideoHolder>(), OnItemClickListener {
+    ListAdapter<Playlist, PlaylistAdapter.VideoHolder>(Playlist.diffUtil), OnItemClickListener {
 
     var onItemLongClickListener: OnItemLongClickListener? = null
     var inflater: LayoutInflater = LayoutInflater.from(context)

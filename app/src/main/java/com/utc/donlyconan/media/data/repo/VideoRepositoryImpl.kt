@@ -16,7 +16,7 @@ class VideoRepositoryImpl @Inject constructor(private val videoDao: VideoDao,
         val TAG: String = VideoRepository::class.java.simpleName
     }
 
-    override suspend fun count(): Int = videoDao.count()
+    override fun count(): Int = videoDao.count()
 
     override fun insert(vararg videos: Video) = videoDao.insert(*videos)
 

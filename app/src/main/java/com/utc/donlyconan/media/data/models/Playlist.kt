@@ -1,5 +1,6 @@
 package com.utc.donlyconan.media.data.models
 
+import androidx.recyclerview.widget.DiffUtil
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -18,4 +19,19 @@ data class Playlist(
 ) {
     @Ignore
     var itemSize: Int = 0
+
+    companion object {
+
+        var diffUtil =  object : DiffUtil.ItemCallback<Playlist>() {
+
+            override fun areItemsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
+                return oldItem.playlistId == newItem.playlistId
+            }
+
+            override fun areContentsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
+                return oldItem == newItem
+            }
+
+        }
+    }
 }

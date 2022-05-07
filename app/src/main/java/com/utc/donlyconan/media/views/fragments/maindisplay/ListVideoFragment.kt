@@ -38,7 +38,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                     }
                     R.id.btn_play_music -> {
                         application.iMusicalService()?.apply {
-                            setVideoId(video.videoId)
+                            setPlaylist(position, adapter.videoList)
                             play()
                         }
                     }

@@ -7,7 +7,7 @@ import com.utc.donlyconan.media.data.models.Video
  */
 interface VideoRepository {
 
-    suspend fun count(): Int
+    fun count(): Int
 
     fun insert(vararg videos: Video)
 

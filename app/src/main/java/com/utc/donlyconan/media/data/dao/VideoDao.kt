@@ -10,7 +10,7 @@ interface VideoDao {
      * Returns number of records available
      */
     @Query("Select count(video_id) from videos")
-    suspend fun count(): Int
+    fun count(): Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(vararg videos: Video)

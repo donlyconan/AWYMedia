@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
@@ -23,8 +24,7 @@ class VideoAdapter(
     var context: Context,
     var videoList: ArrayList<Video>,
     var showProgress: Boolean = false
-) :
-    RecyclerView.Adapter<VideoAdapter.VideoHolder>(), OnItemClickListener {
+) : ListAdapter<Video, VideoAdapter.VideoHolder>(Video.diffUtil), OnItemClickListener {
 
     var inflater: LayoutInflater = LayoutInflater.from(context)
     var onItemClickListener: OnItemClickListener? = null
