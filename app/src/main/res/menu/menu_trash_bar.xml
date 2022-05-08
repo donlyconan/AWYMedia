@@ -4,7 +4,7 @@
 
     <item android:id="@+id/it_trash"
         android:icon="@drawable/ic_baseline_delete_24"
-        android:title="Remove all"
+        android:title="@string/remove_all"
         app:showAsAction="always"/>
 
 </menu>

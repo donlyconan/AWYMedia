@@ -206,7 +206,7 @@
             android:layout_marginBottom="70dp"
             android:padding="6dp"
             android:drawableStart="@drawable/outline_screen_rotation_24"
-            android:text="Xoay màn hình"
+            android:text="@string/rotate_screen"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

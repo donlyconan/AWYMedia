@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout_drawer"
+    android:id="@+id/layout_content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/recycler_color"
-    android:theme="@style/Theme.Settings"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical"
+    tools:context=".views.SettingsActivity">
 
   <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
-      android:layout_height="@dimen/action_bar_size"
-      android:background="@color/gray"
-      android:baselineAligned="false"
-      android:gravity="start|center"
-      android:theme="@style/MenuStylle"
-      app:titleTextColor="@android:color/white"
-      app:title="@string/settings"
-      app:navigationIcon="@drawable/ic_baseline_arrow_back_24"/>
+      android:layout_height="?actionBarSize"
+      android:background="?colorPrimary"
+      app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+      app:titleTextColor="@color/white"
+      android:title="@string/settings"/>
 
+  <fragment
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      class="com.utc.donlyconan.media.views.SettingsActivity$SettingsScreen"/>
 
-</RelativeLayout>
+</LinearLayout>

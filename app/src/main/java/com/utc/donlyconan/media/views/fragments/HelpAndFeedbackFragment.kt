@@ -32,17 +32,17 @@ class HelpAndFeedbackFragment : BaseFragment() {
         Log.d(TAG, "onViewCreated: ")
         binding.btnSubmit.setOnClickListener {
             if(binding.ratingBar.rating == 0f) {
-                context?.showMessage("Bạn chưa đánh giá.")
+                context?.showMessage(R.string.you_have_not_rated)
             } else if(binding.ipComment.text.isEmpty() || binding.ipComment.text.isBlank()) {
-                context?.showMessage("Hãy nhập gì đó")
+                context?.showMessage(R.string.please_enter_something)
             } else {
-                val content = "Rating: ${binding.ratingBar.rating}\n${binding.ipComment.text}"
+                val content = "${getString(R.string.rating)}: ${binding.ratingBar.rating}\n${binding.ipComment.text}"
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse("mailto:")
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("awydeveloper@gmail.com"))
                 intent.putExtra(Intent.EXTRA_SUBJECT,"Help & Feedback")
                 intent.putExtra(Intent.EXTRA_TEXT, content)
-                startActivity(Intent.createChooser(intent, "Send email"))
+                startActivity(Intent.createChooser(intent, getString(R.string.send_email)))
             }
         }
         binding.toolbar.setNavigationOnClickListener {

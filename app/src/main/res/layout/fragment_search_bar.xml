@@ -23,7 +23,7 @@
             android:background="?colorPrimary"
             app:closeIcon="@drawable/ic_baseline_close"
             app:iconifiedByDefault="false"
-            app:queryHint="Nhập nội dung tìm kiếm..."
+            app:queryHint="@string/enter_the_content_what_you_find"
             app:searchIcon="@drawable/ic_baseline_arrow_back_24" />
 
         <androidx.recyclerview.widget.RecyclerView

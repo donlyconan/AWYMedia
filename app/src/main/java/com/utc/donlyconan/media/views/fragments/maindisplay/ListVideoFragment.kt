@@ -33,7 +33,6 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                 when (view.id) {
                     R.id.btn_play -> {
                         val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
-                        sharedViewModel.playlist.value = adapter.videoList
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -66,7 +65,6 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
             val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
-            sharedViewModel.playlist.value = adapter.videoList
             startActivity(intent)
         }
     }

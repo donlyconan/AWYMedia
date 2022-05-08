@@ -53,7 +53,6 @@ interface ApplicationComponent {
     fun inject(fragment: ExpendedPlaylistFragment)
     fun inject(fragment: FavoriteFragment)
     fun inject(fragment: MainDisplayFragment)
-    fun inject(fragment: MusicalFragment)
     fun inject(fragment: PlaylistFragment)
     fun inject(fragment: RecentFragment)
     fun inject(fragment: SearchBarFragment)

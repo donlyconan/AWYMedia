@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_speed_24"
-        android:text="Tốc độ"
+        android:text="@string/speed"
         style="@style/BottomMenuItem"
         />
 
@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_lock_24"
-        android:text="Khóa"
+        android:text="@string/lock"
         style="@style/BottomMenuItem"
         />
 
@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/bg_button_loop"
-        android:text="Lặp lại"
+        android:text="@string/repeat"
         style="@style/BottomMenuItem"
         />
 
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_baseline_skip_previous_24"
-        android:text="Quay lại"
+        android:text="@string/previous"
         style="@style/BottomMenuItem"
         />
 
@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_baseline_skip_next_24"
-        android:text="Tiếp theo"
+        android:text="@string/next"
         style="@style/BottomMenuItem"
         />
 

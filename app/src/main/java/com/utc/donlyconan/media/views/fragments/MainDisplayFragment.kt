@@ -119,7 +119,7 @@ class MainDisplayFragment : BaseFragment() {
                 val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)
                         as? PersonalVideoFragment
                 fragment?.let { frag ->
-                    MenuMoreOptionFragment.newInstance(R.layout.fragment_sorted_video_option, frag)
+                    MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
                         .show(supportFragmentManager, TAG)
                 }
             }

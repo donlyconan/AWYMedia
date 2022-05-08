@@ -32,7 +32,6 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
     val binding by lazy { FragmentTrashBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<TrashViewModel>()
     private lateinit var adapter: TrashAdapter
-    @Inject lateinit var settings: Settings
     @Inject lateinit var trashRepo: TrashRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,11 +111,11 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
             R.id.it_trash -> {
                 if(adapter.itemCount == 0) {
                     Log.d(TAG, "onOptionsItemSelected: video list is empty!")
-                    requireContext().showMessage("The list files is empty!")
+                    requireContext().showMessage(R.string.empty_list_des)
                     return false
                 }
                 AlertDialogManager.createDeleteAlertDialog(
-                    requireContext(), "Deleting file", "Do you want to remove all files?") {
+                    requireContext(), getString(R.string.delete_file), getString(R.string.confirm_to_delete)) {
                     viewModel.clearAll(adapter.trashes)
                 }.show()
             }

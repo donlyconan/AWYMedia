@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:drawablePadding="5dp"
         android:drawableLeft="@drawable/outline_playlist_add_24"
-        android:text="Add playlist"
+        android:text="@string/add_playlist"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
@@ -25,7 +25,7 @@
         android:inputType="textPersonName"
         android:textSize="14sp"
         android:textColor="@android:color/white"
-        android:hint="Enter playlist name..."
+        android:hint="@string/enter_playlist_name"
         android:textColorHint="@color/text_color_hint"
         android:layout_marginTop="10dp"/>
 
@@ -41,13 +41,13 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_dialog_button"
-            android:text="Ok"
+            android:text="@string/ok"
             android:layout_marginEnd="10dp"/>
 
         <Button
             android:id="@+id/btn_cancel"
             android:layout_width="100dp"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:background="@drawable/bg_dialog_button"
             android:layout_height="wrap_content"/>
 

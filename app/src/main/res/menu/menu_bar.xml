@@ -11,14 +11,14 @@
     <item
         android:id="@+id/it_sort_by"
         android:icon="@drawable/ic_baseline_sort_24"
-        android:title="Sort by"
+        android:title="@string/sort_by"
         app:showAsAction="always"/>
 
 
     <item
         android:id="@+id/it_settings"
         android:icon="@drawable/outline_settings_24"
-        android:title="Settings" />
+        android:title="@string/settings" />
 
 
 <!--    <item-->
@@ -29,18 +29,18 @@
     <item
         android:id="@+id/it_trash"
         android:icon="@drawable/outline_delete_24"
-        android:title="Trash" />
+        android:title="@string/trash" />
 
 
     <item
         android:id="@+id/it_help"
         android:icon="@drawable/ic_help_white_24dp"
-        android:title="@string/nav_drawer_help_and_feedback" />
+        android:title="@string/help_amp_feedback" />
 
     <item
         android:id="@+id/it_about"
         android:icon="@drawable/ic_info_white_24dp"
-        android:title="@string/nav_drawer_about" />
+        android:title="@string/about" />
 
 
 

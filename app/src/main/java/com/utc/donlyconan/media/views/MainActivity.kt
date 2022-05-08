@@ -1,15 +1,15 @@
 package com.utc.donlyconan.media.views
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import com.utc.donlyconan.media.R
+import java.util.*
 
 
 class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "onCreate: ")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }

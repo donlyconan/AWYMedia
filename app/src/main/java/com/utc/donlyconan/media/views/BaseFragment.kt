@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.views
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,8 +10,9 @@ import androidx.fragment.app.activityViewModels
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.viewmodels.SharedViewModel
+import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
+import java.util.*
 
 
 /**
@@ -22,7 +24,7 @@ open class BaseFragment : Fragment() {
     protected val applicationComponent by lazy { application.applicationComponent() }
     protected val supportFragmentManager by lazy { activity.supportFragmentManager }
     protected var lBinding: LoadingDataScreenBinding? = null
-    protected val sharedViewModel by activityViewModels<SharedViewModel>()
+    protected val settings by lazy { applicationComponent.getSettings() }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -37,7 +39,7 @@ open class BaseFragment : Fragment() {
     }
 
     fun showLoadingScreen() {
-        Log.d(ListVideoFragment.TAG, "showLoadingScreen() called")
+        Log.d(MainDisplayFragment.TAG, "showLoadingScreen() called")
         lBinding?.apply {
             llLoading.visibility = View.VISIBLE
             tvNoData.visibility = View.INVISIBLE

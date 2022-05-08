@@ -31,7 +31,6 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
-    @Inject lateinit var settings: Settings
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -133,7 +132,7 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
             }
         }
         if (count == videoIdStrs.size) {
-            context?.showMessage("Video đã tồn tại.")
+            context?.showMessage(R.string.video_exist_des)
         }
     }
 

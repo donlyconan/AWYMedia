@@ -34,7 +34,6 @@ class SplashScreenFragment : BaseFragment() {
     val binding by lazy { FragmentSplashScreenBinding.inflate(layoutInflater) }
     @Inject lateinit var videoRepo: VideoRepository
     @Inject lateinit var listVideoRepo: ListVideoRepository
-    @Inject lateinit var settings: Settings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

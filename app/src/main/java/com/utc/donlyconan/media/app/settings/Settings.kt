@@ -25,7 +25,8 @@ class Settings @Inject constructor(val appContext: Context) {
         }
     }
 
-    private var preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
+    var preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
+        private set
     var language by StringPreferenceDelegate(preferences, "language",
         if(Locale.getDefault().language == "vn" || Locale.getDefault().language == "en")
             Locale.getDefault().language else "en")

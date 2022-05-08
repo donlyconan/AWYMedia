@@ -25,7 +25,6 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
 
     abstract val recyclerView: RecyclerView
     abstract val adapter: VideoAdapter
-    @Inject lateinit var settings: Settings
     @Inject lateinit var videoRepo: VideoRepository
 
 

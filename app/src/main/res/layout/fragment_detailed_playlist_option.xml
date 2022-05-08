@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_play_circle_24"
-        android:text="Xem" />
+        android:text="@string/view" />
 
     <TextView
         android:id="@+id/btn_play_music"
@@ -25,14 +25,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_audiotrack_24"
-        android:text="Phát âm thanh" />
+        android:text="@string/play_sound" />
 
     <TextView
         android:id="@+id/btn_favorite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_favorite"
-        android:text="Yêu thích"
+        android:text="@string/favorite"
         style="@style/BottomMenuItem"
         />
 
@@ -41,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_delete_24"
-        android:text="Xóa khởi danh sách phát"
+        android:text="@string/remove_from_play_list"
         style="@style/BottomMenuItem"
         />
 
@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_share_24"
-        android:text="Chia sẻ"
+        android:text="@string/share"
         style="@style/BottomMenuItem"
         />
 

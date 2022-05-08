@@ -25,7 +25,7 @@
         android:inputType="textPersonName"
         android:textSize="14sp"
         android:textColor="@android:color/white"
-        android:hint="Do you want to continue playing this video?"
+        android:hint="@string/do_you_want_to_continue_playing_this_video"
         android:textColorHint="@color/text_color_hint"
         android:layout_marginTop="10dp"/>
 
@@ -39,7 +39,7 @@
         <Button
             android:id="@+id/btn_no"
             android:layout_width="100dp"
-            android:text="No"
+            android:text="@string/no"
             android:background="@drawable/bg_dialog_button"
             android:layout_height="wrap_content"/>
 
@@ -49,7 +49,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:background="@drawable/bg_dialog_button"
-            android:text="Yes" />
+            android:text="@string/yes" />
 
     </LinearLayout>
 

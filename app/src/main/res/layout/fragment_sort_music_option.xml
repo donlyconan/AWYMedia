@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Sắp xếp theo"
-        android:textSize="18sp" />
+        android:text="@string/sort_by"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:id="@+id/container"
@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Tên" />
+            android:text="@string/name" />
 
 
         <TextView
@@ -36,21 +36,21 @@
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Thời lượng" />
+            android:text="@string/duration" />
 
         <TextView
             android:id="@+id/btn_sort_by_creation"
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ngày tạo" />
+            android:text="@string/created_at" />
 
         <TextView
             android:id="@+id/btn_sort_by_recent"
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gần đây" />
+            android:text="@string/recent" />
 
     </LinearLayout>
 

@@ -27,7 +27,7 @@
             android:layout_marginStart="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đang tải dữ liệu..."
+            android:text="@string/loading_data"
             android:textSize="16sp"
             android:fontFamily="sans-serif"/>
 
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        android:text="Không có dữ liệu"
+        android:text="@string/no_data"
         android:fontFamily="sans-serif"
         android:layout_gravity="center"
         android:drawablePadding="@dimen/spacing_8"

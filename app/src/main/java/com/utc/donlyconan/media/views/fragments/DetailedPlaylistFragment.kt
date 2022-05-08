@@ -131,7 +131,6 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
             val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
-            sharedViewModel.playlist.value = adapter.videoList
             startActivity(intent)
         }
     }

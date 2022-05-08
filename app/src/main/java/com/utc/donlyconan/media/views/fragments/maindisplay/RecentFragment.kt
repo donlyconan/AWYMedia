@@ -61,7 +61,6 @@ class RecentFragment : ListVideoFragment() {
                 when (view.id) {
                     R.id.btn_play -> {
                         val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
-                        sharedViewModel.playlist.value = adapter.videoList
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {

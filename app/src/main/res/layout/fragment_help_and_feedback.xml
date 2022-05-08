@@ -20,7 +20,7 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Help &amp; Feedback"
+            android:text="@string/help_amp_feedback"
             android:textSize="18sp" />
 
     </androidx.appcompat.widget.Toolbar>
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:paddingLeft="5dp"
-        android:text="Rating"
+        android:text="@string/rating"
         android:gravity="center_vertical"
         android:drawableLeft="@drawable/ic_baseline_star"
         android:textSize="16sp"
@@ -58,7 +58,7 @@
         android:layout_margin="5dp"
         android:background="@drawable/bg_feedback"
         android:gravity="start|top"
-        android:hint="Enter your question or feedback..."
+        android:hint="@string/feedback_hint"
         android:inputType="textMultiLine"
         android:padding="8dp"
         android:textColor="@android:color/white"
@@ -73,7 +73,7 @@
         android:id="@+id/btn_submit"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="Submit"
+        android:text="@string/submit"
         android:background="@drawable/bg_dialog_button"
         app:layout_constraintBottom_toBottomOf="parent" />
 
