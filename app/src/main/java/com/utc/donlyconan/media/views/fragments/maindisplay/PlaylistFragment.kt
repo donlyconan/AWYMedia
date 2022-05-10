@@ -139,6 +139,9 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     context.showMessage("Playlist name is invalid!")
                 }
             }
+            binding.btnCancel.setOnClickListener {
+                dismiss()
+            }
         }
     }
 }

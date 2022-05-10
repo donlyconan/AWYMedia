@@ -89,7 +89,11 @@
     <string name="auto_download">Auto loading</string>
     <string name="auto_download_des">Allows the app to access and download videos from the device.</string>
     <string name="erase_cycle_summary">Set cycle delete video.</string>
-
+    <string name="video_exist_des">" Video already exists."</string>
+    <string name="email_developer" translatable="false">awydeveloper@gmail.com</string>
+    <string name="email">Email</string>
+    <string name="locked_des">The screen is locked</string>
+    <string name="locked_intro">Tap to unlock</string>
 
     <string-array name="language_entries">
         <item>English</item>
@@ -113,7 +117,4 @@
         <item>30</item>
         <item>365</item>
     </string-array>
-    <string name="video_exist_des">" Video already exists."</string>
-
-
 </resources>

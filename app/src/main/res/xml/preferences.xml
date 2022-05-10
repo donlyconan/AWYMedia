@@ -79,5 +79,9 @@
             android:title="@string/copy_right"
             android:summary="Donly Conan"/>
 
+        <Preference
+            android:title="@string/email"
+            android:summary="@string/email_developer"/>
+
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

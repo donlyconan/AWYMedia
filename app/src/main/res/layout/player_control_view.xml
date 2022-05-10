@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:gravity="center"
-            android:text="Màn hình đã khóa"
+            android:text="@string/locked_des"
             android:textSize="18sp"
             android:textStyle="bold" />
         <TextView
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="Nhấn để mở khóa"
+            android:text="@string/locked_intro"
             android:textSize="12sp" />
 
     </LinearLayout>

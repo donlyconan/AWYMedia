@@ -39,7 +39,7 @@ class HelpAndFeedbackFragment : BaseFragment() {
                 val content = "${getString(R.string.rating)}: ${binding.ratingBar.rating}\n${binding.ipComment.text}"
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse("mailto:")
-                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("awydeveloper@gmail.com"))
+                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.email_developer)))
                 intent.putExtra(Intent.EXTRA_SUBJECT,"Help & Feedback")
                 intent.putExtra(Intent.EXTRA_TEXT, content)
                 startActivity(Intent.createChooser(intent, getString(R.string.send_email)))

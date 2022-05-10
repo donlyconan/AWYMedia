@@ -87,5 +87,8 @@
         <item>Hàng tháng</item>
         <item>Hàng năm</item>
     </string-array>
+    <string name="email">Email</string>
+    <string name="locked_des">Màn hình đã khóa</string>
+    <string name="locked_intro">Nhấn để mở khóa</string>
 
 </resources>
