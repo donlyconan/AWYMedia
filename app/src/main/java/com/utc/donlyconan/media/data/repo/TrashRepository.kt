@@ -11,7 +11,11 @@ interface TrashRepository {
 
     fun update(vararg trash: Trash)
 
+    fun find(videoId: Int): Trash?
+
     fun getTrashes(): LiveData<List<Trash>>
+
+    suspend fun getAllTrashes(): List<Trash>
 
     fun removeAll()
 

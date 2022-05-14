@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.viewmodels
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ class TrashViewModel(val app: Application) : BaseAndroidViewModel(app) {
     private val videoRepo = myApp.applicationComponent().getVideoRepo()
     private val playlistRepo = myApp.applicationComponent().getPlaylistRepo()
     private val settings = myApp.applicationComponent().getSettings()
+    private val contentResolver = app.contentResolver
     val videoList = trashRepo.getTrashes()
 
     fun restore(trash: Trash) {
@@ -27,11 +29,10 @@ class TrashViewModel(val app: Application) : BaseAndroidViewModel(app) {
         Log.d(TAG, "delete() called with: trash = $trash")
         trashRepo.delete(trash)
         viewModelScope.launch {
-            trashRepo.removeAll()
             playlistRepo.removeVideoFromPlaylist(trash.videoId)
             Log.d(TAG, "clearAll: deleteFromStorage=" + settings.deleteFromStorage)
             if(settings.deleteFromStorage) {
-                File(trash.path).delete()
+                contentResolver.delete(Uri.parse(trash.path), null, null)
             }
             Log.d(TAG, "clearAll: Done!")
         }
@@ -40,14 +41,14 @@ class TrashViewModel(val app: Application) : BaseAndroidViewModel(app) {
     fun clearAll(trashes: List<Trash>) {
         Log.d(TAG, "clearAll() called size=${trashes.size}")
         viewModelScope.launch {
-            trashRepo.removeAll()
-            trashes.forEach { e ->
-                playlistRepo.removeVideoFromPlaylist(e.videoId)
+            trashes.forEach { trash ->
+                playlistRepo.removeVideoFromPlaylist(trash.videoId)
                 Log.d(TAG, "clearAll: deleteFromStorage=" + settings.deleteFromStorage)
                 if(settings.deleteFromStorage) {
-                    File(e.path).delete()
+                    contentResolver.delete(Uri.parse(trash.path), null, null)
                 }
             }
+            trashRepo.removeAll()
             Log.d(TAG, "clearAll: Done!")
         }
     }

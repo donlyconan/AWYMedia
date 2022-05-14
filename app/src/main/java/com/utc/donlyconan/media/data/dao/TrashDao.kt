@@ -19,7 +19,13 @@ interface TrashDao {
     @Query("Select * from trashes")
     fun getTrashes(): LiveData<List<Trash>>
 
+    @Query("Select * from trashes")
+    suspend fun getAllTrashes(): List<Trash>
+
     @Query("Delete from trashes")
     fun removeAll()
+
+    @Query("Select * from trashes where video_id=:videoId")
+    fun find(videoId: Int): Trash?
 
 }

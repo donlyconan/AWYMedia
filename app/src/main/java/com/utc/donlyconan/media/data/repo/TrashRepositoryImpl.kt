@@ -18,6 +18,10 @@ class TrashRepositoryImpl @Inject constructor(val dao: TrashDao) : TrashReposito
 
     override fun getTrashes(): LiveData<List<Trash>> = dao.getTrashes()
 
+    override fun find(videoId: Int): Trash? = dao.find(videoId)
+
+    override suspend fun getAllTrashes(): List<Trash> = dao.getAllTrashes()
+
     override fun removeAll() = dao.removeAll()
 
 }

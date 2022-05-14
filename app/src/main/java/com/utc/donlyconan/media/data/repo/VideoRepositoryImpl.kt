@@ -18,7 +18,9 @@ class VideoRepositoryImpl @Inject constructor(private val videoDao: VideoDao,
 
     override fun count(): Int = videoDao.count()
 
-    override fun insert(vararg videos: Video) = videoDao.insert(*videos)
+    override fun insert(vararg videos: Video) {
+        videoDao.insert(*videos)
+    }
 
     override fun update(video: Video): Int {
         video.updatedAt = System.currentTimeMillis()
