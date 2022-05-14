@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.repo.VideoRepository
-import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity

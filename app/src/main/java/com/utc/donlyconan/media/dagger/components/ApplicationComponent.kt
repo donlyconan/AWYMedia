@@ -1,6 +1,6 @@
 package com.utc.donlyconan.media.dagger.components
 
-import com.utc.donlyconan.media.app.services.MusicalService
+import com.utc.donlyconan.media.app.services.MusicService
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
@@ -13,7 +13,6 @@ import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.BaseActivity
-import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.*
 import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
@@ -59,7 +58,7 @@ interface ApplicationComponent {
     fun inject(fragment: SplashScreenFragment)
     fun inject(fragment: TrashFragment)
     fun inject(fragment: ListVideoDisplayFragment)
-    fun inject(fragment: MusicalService)
+    fun inject(fragment: MusicService)
     fun inject(fragment: VideoDisplayActivity)
     fun inject(fragment: PlaylistViewModel)
     fun inject(videoDisplayViewModel: VideoDisplayViewModel)

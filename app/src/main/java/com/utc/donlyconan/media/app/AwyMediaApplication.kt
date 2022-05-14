@@ -7,8 +7,8 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import com.utc.donlyconan.media.IMusicalService
-import com.utc.donlyconan.media.app.services.MusicalService
+import com.utc.donlyconan.media.IMusicService
+import com.utc.donlyconan.media.app.services.MusicService
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
@@ -18,7 +18,7 @@ import com.utc.donlyconan.media.dagger.modules.ApplicationModule
  */
 class AwyMediaApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
-    private var iMusicalService: IMusicalService? = null
+    private var iMusicalService: IMusicService? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -30,7 +30,7 @@ class AwyMediaApplication: Application() {
             .build()
 
         // Start musical service
-        val intent = Intent(this, MusicalService::class.java)
+        val intent = Intent(this, MusicService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
@@ -38,7 +38,7 @@ class AwyMediaApplication: Application() {
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder) {
             Log.d(TAG, "onServiceConnected() called with: name = $name, service = $service")
-            iMusicalService = IMusicalService.Stub.asInterface(service)
+            iMusicalService = IMusicService.Stub.asInterface(service)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -53,7 +53,7 @@ class AwyMediaApplication: Application() {
         return appComponent
     }
 
-    fun iMusicalService(): IMusicalService? {
+    fun iMusicalService(): IMusicService? {
         return iMusicalService
     }
 

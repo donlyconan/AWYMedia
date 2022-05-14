@@ -267,6 +267,20 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/exo_play_music"
+                    style="@style/ExoPlayerExtendedFunction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/headset_mic_48px"
+                    android:text="@string/play_music" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/ExoPlayerExtendedFunctionLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
                     android:id="@+id/exo_prev"
                     style="@style/ExoPlayerExtendedFunction"
                     android:layout_width="wrap_content"

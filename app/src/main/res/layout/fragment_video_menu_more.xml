@@ -39,6 +39,16 @@
         />
 
     <TextView
+        android:id="@+id/exo_play_music"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/headset_mic_48px"
+        android:text="@string/play_music"
+        />
+
+
+    <TextView
         android:id="@+id/exo_prev"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

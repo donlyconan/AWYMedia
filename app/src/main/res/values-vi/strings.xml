@@ -90,5 +90,6 @@
     <string name="email">Email</string>
     <string name="locked_des">Màn hình đã khóa</string>
     <string name="locked_intro">Nhấn để mở khóa</string>
+    <string name="play_music">Phát nhạc</string>
 
 </resources>

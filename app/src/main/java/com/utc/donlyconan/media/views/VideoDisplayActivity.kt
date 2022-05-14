@@ -18,7 +18,6 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
-import com.utc.donlyconan.media.app.services.MusicalService
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
@@ -73,11 +72,26 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             initializePlayer(video)
             viewModel.isResetPosition = false
         }
+        loadingVideo()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d(TAG, "onNewIntent: ")
+        viewModel.isInitial = false
+        loadingVideo()
+    }
+
+    fun loadingVideo() {
+        Log.d(TAG, "loadingVideo() called isInit = ${viewModel.isInitial}")
         if(viewModel.isInitial) {
             viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST) ?: arrayListOf()
             viewModel.position = intent.getIntExtra(EXTRA_POSITION, 0)
             viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
             viewModel.playWhenReady = settings.autoPlay
+            Log.d(TAG, "loadingVideo: playlist.size=${viewModel.playlist.size}" +
+                    ", position=${viewModel.position}" +
+                    ", isContinue=${viewModel.isContinue}")
         }
         if (viewModel.canShowDialog()) {
             // Show dialog to restore state of video when restoreState from setting equals true
@@ -107,7 +121,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         } else {
             viewModel.video.value = if(viewModel.video.value == null)
                 viewModel.currentVideo()
-             else viewModel.video.value?.copy(updatedAt = System.currentTimeMillis())
+            else viewModel.video.value?.copy(updatedAt = System.currentTimeMillis())
         }
     }
 
@@ -119,6 +133,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             beView.exoPrev?.setOnClickListener(this)
             beView.exoPlaybackSpeed?.setOnClickListener(this)
             beView.exoNext?.setOnClickListener(this)
+            beView.exoPlayMusic?.setOnClickListener(this)
         } else {
             beView.exoOption?.setOnClickListener(this)
         }
@@ -194,8 +209,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     val hasPrev = viewModel.hasPrev()
                     VideoMenuMoreFragment.newInstance(enabled, hasNext, hasPrev) { v->
                         sendEmptyMessage(v.id)
-                    }
-                        .show(supportFragmentManager, TAG)
+                    }.show(supportFragmentManager, TAG)
                 }
                 R.id.exo_loop -> {
                     val enabled = !(beView.exoLoop?.isSelected ?: true)
@@ -228,6 +242,16 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                             isClickable = false
                             setTextColor(resources.getColor(R.color.gray_20))
                         }
+                    }
+                }
+                R.id.exo_play_music -> {
+                    val application = application as AwyMediaApplication
+                    viewModel.currentVideo().playedTime = player?.currentPosition ?: 0L
+                    application.iMusicalService()?.apply {
+                        setPlaylist(viewModel.position, viewModel.playlist)
+                        setKeepPlaying(true)
+                        play()
+                        finish()
                     }
                 }
                 else -> {
@@ -320,16 +344,20 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         }
 
     companion object {
-        const val EXTRA_POSITION = "EXTRA_VIDEO"
-        const val EXTRA_CONTINUE = "EXTRA_CONTINUE"
-        const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
+        const val EXTRA_POSITION = "com.utc.donlyconan.media.EXTRA_POSITION"
+        const val EXTRA_CONTINUE = "com.utc.donlyconan.media.EXTRA_CONTINUE"
+        const val EXTRA_PLAYLIST = "com.utc.donlyconan.media.EXTRA_PLAYLIST"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
 
-        fun newIntent(context: Context, position: Int, playlist: ArrayList<Video>, isContinue: Boolean = false) =
-            Intent(context, VideoDisplayActivity::class.java).apply {
+        fun newIntent(context: Context, position: Int, playlist: ArrayList<Video>,
+                      isContinue: Boolean = false, isOpenFromNotification: Boolean = false): Intent {
+            Log.d(TAG, "newIntent() called with: context = $context, position = $position, playlist = $playlist, isContinue = $isContinue")
+            return Intent(context, VideoDisplayActivity::class.java).apply {
                 putExtra(EXTRA_POSITION, position)
                 putExtra(EXTRA_PLAYLIST, playlist)
                 putExtra(EXTRA_CONTINUE, isContinue)
             }
+        }
+
     }
 }

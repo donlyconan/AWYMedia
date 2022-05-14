@@ -21,7 +21,6 @@ class StringPreferenceDelegate(
   }
 }
 
-
 class StringSetPreferenceDelegate(
   private val sharedPreferences: SharedPreferences,
   private val key: String,
