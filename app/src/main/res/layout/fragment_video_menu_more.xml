@@ -44,9 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/headset_mic_48px"
-        android:text="@string/play_music"
-        />
-
+        android:text="@string/play_music" />
 
     <TextView
         android:id="@+id/exo_prev"

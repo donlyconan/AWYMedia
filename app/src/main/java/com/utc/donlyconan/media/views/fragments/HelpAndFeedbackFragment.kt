@@ -14,7 +14,9 @@ import com.utc.donlyconan.media.databinding.FragmentHelpAndFeedbackBinding
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.views.BaseFragment
 
-
+/**
+ * This is Feedback screen
+ */
 class HelpAndFeedbackFragment : BaseFragment() {
 
     val binding by lazy { FragmentHelpAndFeedbackBinding.inflate(layoutInflater) }

@@ -28,6 +28,7 @@ class VideoMenuMoreFragment : BaseBottomSheetFragment(), View.OnClickListener {
         binding.exoLoop.setOnClickListener(this)
         binding.exoPrev.setOnClickListener(this)
         binding.exoNext.setOnClickListener(this)
+        binding.exoPlayMusic.setOnClickListener(this)
         binding.exoPlaybackSpeed.setOnClickListener(this)
         binding.exoLoop.isSelected = isSelected
 
