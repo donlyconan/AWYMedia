@@ -15,6 +15,7 @@ class PlaylistRepositoryImpl @Inject constructor(val playlistDao: PlaylistDao,
     }
 
     override fun update(vararg playlists: Playlist) {
+        playlists.forEach { pl -> pl.updatedAt = System.currentTimeMillis() }
         playlistDao.update(*playlists)
     }
 

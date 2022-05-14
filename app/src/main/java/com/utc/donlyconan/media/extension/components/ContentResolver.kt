@@ -39,12 +39,15 @@ fun ContentResolver.getAllVideos(uri: Uri, selection: String? = null, sortOrder:
             val videoId = cursor.getLong(idColumn)
             val title = cursor.getString(titleColumn)
             val duration = cursor.getInt(durationColumn)
-            val createdAt = cursor.getLong(createdAtColumn)
+            var createdAt = cursor.getLong(createdAtColumn)
             val updatedAt = cursor.getLong(updatedAtColumn)
             val size = cursor.getLong(sizeColumn)
             val type = title.split('.').last()
             val data =
                 ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, videoId)
+            if(createdAt == 0L){
+                createdAt = System.currentTimeMillis()
+            }
             videoList += Video(videoId.toInt(), title, data.toString(), duration, size, type, 0L,
                 createdAt, updatedAt)
         }

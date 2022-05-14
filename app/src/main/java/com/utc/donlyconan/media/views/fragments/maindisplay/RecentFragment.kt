@@ -49,6 +49,7 @@ class RecentFragment : ListVideoFragment() {
             } else {
                 hideLoading()
             }
+            videos.sortedWith { u, v -> (v.updatedAt - u.updatedAt).toInt() }
             adapter.submit(videos)
         }
     }
