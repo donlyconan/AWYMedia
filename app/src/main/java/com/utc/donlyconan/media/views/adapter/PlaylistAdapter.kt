@@ -86,6 +86,10 @@ class PlaylistAdapter(var context: Context,
                         resources.getDimension(R.dimen.list_video_item_margin_bottom).toInt()
                     setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
                 }
+            } else if (binding.container.paddingBottom != 0) {
+                binding.container.apply {
+                    setPadding(paddingLeft, paddingTop, paddingRight, 0)
+                }
             }
         }
     }
