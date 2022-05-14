@@ -14,6 +14,10 @@ class PlaylistRepositoryImpl @Inject constructor(val playlistDao: PlaylistDao,
         playlistDao.insert(*playlist)
     }
 
+    override fun update(vararg playlists: Playlist) {
+        playlistDao.update(*playlists)
+    }
+
     override fun delete(vararg playlists: Playlist) {
         playlistDao.delete(*playlists)
     }

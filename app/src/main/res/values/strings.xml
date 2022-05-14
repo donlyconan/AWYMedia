@@ -95,6 +95,7 @@
     <string name="locked_des">The screen is locked</string>
     <string name="locked_intro">Tap to unlock</string>
     <string name="play_music">Play music</string>
+    <string name="rename">Rename</string>
 
     <string-array name="language_entries">
         <item>English</item>

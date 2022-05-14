@@ -11,6 +11,8 @@ interface PlaylistRepository {
 
     fun insert(vararg playlist: Playlist)
 
+    fun update(vararg playlists: Playlist)
+
     fun delete(vararg playlists: Playlist)
 
     fun countVideos(playlistId: Int): Int

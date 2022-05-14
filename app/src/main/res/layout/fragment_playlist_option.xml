@@ -29,6 +29,14 @@
 
 
     <TextView
+        android:id="@+id/btn_rename"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/drive_file_rename_outline_24px"
+        android:text="@string/rename" />
+
+    <TextView
         android:id="@+id/btn_delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

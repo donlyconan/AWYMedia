@@ -10,6 +10,9 @@ interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(vararg playlist: Playlist)
 
+    @Update
+    fun update(vararg playlist: Playlist)
+
     @Delete
     fun delete(vararg playlists: Playlist)
 

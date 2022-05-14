@@ -96,14 +96,20 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     playlistRepo.delete(item)
                     playlistRepo.removePlaylist(item.playlistId!!)
                 }
+                R.id.btn_rename -> {
+                    AddedPlaylistDialog(requireContext(), true) { text, _ ->
+                        val item2 = Playlist(item.playlistId, text)
+                        viewModel.playlistRepo.update(item2)
+                    }.show()
+                }
             }
         }.show(supportFragmentManager, TAG)
     }
 
     override fun onClick(v: View?) {
         Log.d(TAG, "onClick: ")
-        if(v?.id == R.id.fab) {
-            AddedPlaylistDialog(requireContext()) { text ->
+        if (v?.id == R.id.fab) {
+            AddedPlaylistDialog(requireContext(), false) { text, _ ->
                 val item = Playlist(null, text)
                 viewModel.playlistRepo.insert(item)
             }.show()
@@ -121,19 +127,24 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     }
 
 
-    class AddedPlaylistDialog(context: Context, val listener: (text: String) -> Unit) : Dialog(context) {
+    inner class AddedPlaylistDialog(context: Context, isEditMode: Boolean,
+                                    val listener: (text: String, isEditMode: Boolean) -> Unit) : Dialog(context) {
 
         private val binding by lazy { DialogAddPlaylistBinding.inflate(layoutInflater) }
 
         init {
+            if(isEditMode){
+                binding.title.setText(R.string.rename)
+            }
             setContentView(binding.root)
             window?.apply {
                 val width = (context.resources.displayMetrics.widthPixels * 0.90).toInt()
                 setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
             }
             binding.btnOk.setOnClickListener {
-                if(binding.ipName.textSize > 0){
-                    listener(binding.ipName.text.toString())
+                val tvName = binding.ipName
+                if(tvName.text.toString().trim().isNotEmpty()){
+                    listener(binding.ipName.text.toString(), isEditMode)
                     dismiss()
                 } else {
                     context.showMessage("Playlist name is invalid!")
