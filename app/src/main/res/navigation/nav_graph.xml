@@ -60,6 +60,9 @@
         tools:layout="@layout/fragment_search_bar" >
         <argument android:name="directFrom"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_searchBarFragment_to_detailedPlaylistFragment"
+            app:destination="@id/detailedPlaylistFragment" />
     </fragment>
 
     <fragment

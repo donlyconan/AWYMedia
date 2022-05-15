@@ -39,4 +39,6 @@ class PlaylistRepositoryImpl @Inject constructor(val playlistDao: PlaylistDao,
 
     override fun removePlaylist(playlistId: Int) = playlistDao.removePlaylist(playlistId)
 
+    override fun findAll(keyword: String): LiveData<List<Playlist>> = playlistDao.findAll(keyword)
+
 }

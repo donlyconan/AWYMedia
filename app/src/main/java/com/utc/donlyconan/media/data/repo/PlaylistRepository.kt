@@ -27,4 +27,6 @@ interface PlaylistRepository {
 
     fun removePlaylist(playlistId: Int)
 
+    fun findAll(keyword: String): LiveData<List<Playlist>>
+
 }

@@ -122,7 +122,7 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
                         Log.d(TAG, "onInitial() called with: v = $v")
                         v.findViewById<TextView>(R.id.btn_delete)
                             .apply {
-                                text = "Xoá khỏi danh sách phát"
+                                text = getString(R.string.remove_from_play_list)
                             }
                     }
 

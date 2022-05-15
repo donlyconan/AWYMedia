@@ -68,7 +68,7 @@ class SplashScreenFragment : BaseFragment() {
             }
 
             // Delete all video in trash
-            if(true) {
+            if(false) {
                 deletingData()
             }
 

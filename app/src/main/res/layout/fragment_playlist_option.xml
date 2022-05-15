@@ -41,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/outline_delete_24"
-        android:text="@string/remove_from_play_list"
+        android:text="@string/remove"
         style="@style/BottomMenuItem"
         />
 

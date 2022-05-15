@@ -28,4 +28,7 @@ interface PlaylistDao {
     @Query("Delete from video_playlist where playlist_id=:playlistId")
     fun removePlaylist(playlistId: Int)
 
+    @Query("Select * from playlist where title like :keyword")
+    fun findAll(keyword: String): LiveData<List<Playlist>>
+
 }
