@@ -96,6 +96,8 @@
     <string name="locked_intro">Tap to unlock</string>
     <string name="play_music">Play music</string>
     <string name="rename">Rename</string>
+    <string name="save">Save</string>
+    <string name="data_synchronization">Sync data</string>
 
     <string-array name="language_entries">
         <item>English</item>

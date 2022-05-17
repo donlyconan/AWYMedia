@@ -1,17 +1,24 @@
 package com.utc.donlyconan.media.views.fragments
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.data.repo.ListVideoRepository
+import com.utc.donlyconan.media.data.repo.TrashRepository
+import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.DialogAboutBinding
 import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
 import com.utc.donlyconan.media.views.BaseFragment
@@ -19,6 +26,8 @@ import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Represent for Main Screen where will info as Navigation and Base View
@@ -29,6 +38,15 @@ class MainDisplayFragment : BaseFragment() {
     lateinit var mainDisplayAdapter: MainDisplayAdapter
     var sortedMenu: MenuItem? = null
     private val args by navArgs<MainDisplayFragmentArgs>()
+    @Inject lateinit var listVideoRepo: ListVideoRepository
+    @Inject lateinit var trashRepo: TrashRepository
+    @Inject lateinit var videoRepo: VideoRepository
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate: ")
+        applicationComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -114,6 +132,18 @@ class MainDisplayFragment : BaseFragment() {
                 val action = MainDisplayFragmentDirections
                     .actionMainDisplayFragmentToSearchBarFragment(binding.viewPager2.currentItem)
                 findNavController().navigate(action)
+            }
+            R.id.it_sync_data -> {
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                    lifecycleScope.launch {
+                        val videoList = listVideoRepo.loadAllVideos().filter { video ->
+                            trashRepo.find(video.videoId) == null
+                        }
+                        Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
+                        videoRepo.insert(*videoList.toTypedArray())
+                    }
+                }
             }
             R.id.it_sort_by -> {
                 val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)

@@ -92,5 +92,7 @@
     <string name="locked_intro">Nhấn để mở khóa</string>
     <string name="play_music">Phát nhạc</string>
     <string name="rename">Đổi tên</string>
+    <string name="save">Lưu</string>
+    <string name="data_synchronization">Đồng bộ hóa dữ liệu</string>
 
 </resources>

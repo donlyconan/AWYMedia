@@ -31,6 +31,10 @@
         android:icon="@drawable/outline_delete_24"
         android:title="@string/trash" />
 
+    <item
+        android:id="@+id/it_sync_data"
+        android:icon="@drawable/ic_baseline_sync_24"
+        android:title="@string/data_synchronization" />
 
     <item
         android:id="@+id/it_help"
