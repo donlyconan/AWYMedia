@@ -98,10 +98,20 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
                     for (i in 0 until listUri.itemCount) {
                         listItems.add(listUri.getItemAt(i).uri.toString())
                     }
-                    importData(listItems)
+                    try {
+                        importData(listItems)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        context?.showMessage(e.message.toString())
+                    }
                 }
                 intent?.data?.let { uri ->
-                    importData(arrayListOf(uri.toString()))
+                    try {
+                        importData(arrayListOf(uri.toString()))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        context?.showMessage(e.message.toString())
+                    }
                 }
             }
         }

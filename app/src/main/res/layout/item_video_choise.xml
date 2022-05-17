@@ -47,10 +47,10 @@
 
             <ProgressBar
                 android:id="@+id/progress"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_gravity="bottom"
                 style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_gravity="bottom"
                 android:progress="20"
                 android:progressDrawable="@drawable/video_play_progress"
                 android:visibility="invisible"/>

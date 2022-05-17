@@ -61,7 +61,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         bindingOverlay = PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
         beView = CustomOptionPlayerControlViewBinding
             .bind(bindingOverlay.layoutPlayerControlView.rootView)
-        initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
 
         viewModel.video.observe(this) { video ->
             Log.d(TAG, "onCreate: position=${viewModel.position}, video=$video")
@@ -72,7 +71,17 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             initializePlayer(video)
             viewModel.isResetPosition = false
         }
+        viewModel.speed.observe(this){ speed ->
+            Log.d(TAG, "onCreate() called with: speed = $speed")
+            player?.setPlaybackSpeed(speed)
+        }
+        viewModel.repeatMode.observe(this){ mode ->
+            Log.d(TAG, "onCreate() called with: mode = $mode")
+            player?.repeatMode = mode
+            beView.exoLoop?.isSelected = mode == ExoPlayer.REPEAT_MODE_ONE
+        }
         loadingVideo()
+        initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -88,7 +97,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST) ?: arrayListOf()
             viewModel.position = intent.getIntExtra(EXTRA_POSITION, 0)
             viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
-            viewModel.playWhenReady = settings.autoPlay
+            viewModel.speed.value = intent.getFloatExtra(EXTRA_SPEED, 1.0f)
+            viewModel.repeatMode.value = intent.getIntExtra(EXTRA_REPEAT_MODE, ExoPlayer.REPEAT_MODE_OFF)
+            viewModel.playWhenReady.value = settings.autoPlay
             Log.d(TAG, "loadingVideo: playlist.size=${viewModel.playlist.size}" +
                     ", position=${viewModel.position}" +
                     ", isContinue=${viewModel.isContinue}")
@@ -212,16 +223,19 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     }.show(supportFragmentManager, TAG)
                 }
                 R.id.exo_loop -> {
-                    val enabled = !(beView.exoLoop?.isSelected ?: true)
-                    beView.exoLoop?.isSelected = enabled
-                    player?.repeatMode = ExoPlayer.REPEAT_MODE_ONE
+                    val status = player?.repeatMode == ExoPlayer.REPEAT_MODE_ONE
+                    if(!status) {
+                        viewModel.repeatMode.value = ExoPlayer.REPEAT_MODE_ONE
+                    } else {
+                        viewModel.repeatMode.value = ExoPlayer.REPEAT_MODE_OFF
+                    }
                 }
                 R.id.exo_playback_speed -> {
                     SpeedOptionFragment.newInstance(player?.playbackParameters?.speed ?: 1f,
                         object : SpeedOptionFragment.OnSelectedSpeedChangeListener {
                             override fun onSelectedSpeedChanged(speed: Float) {
                                 Log.d(TAG, "onSelectedSpeedChanged() called with: speed = $speed")
-                                player?.setPlaybackSpeed(speed)
+                                viewModel.speed.value = speed
                             }
                         }
                     ).show(supportFragmentManager, TAG)
@@ -250,6 +264,8 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     application.iMusicalService()?.apply {
                         setPlaylist(viewModel.position, viewModel.playlist)
                         setKeepPlaying(true)
+                        setSpeed(viewModel.speed.value!!)
+                        setRepeat(viewModel.repeatMode.value!!)
                         play()
                         finish()
                     }
@@ -263,13 +279,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     private val listener = object : Player.Listener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            Log.d(
-                TAG, "onPlayerStateChanged() called with: playWhenReady = $playWhenReady, " +
-                        "playbackState = $playbackState"
-            )
-            if (playbackState == Player.STATE_ENDED) {
+            Log.d(TAG, "onPlayerStateChanged() called with: playWhenReady = $playWhenReady, " +
+                        "playbackState = $playbackState")
+            if (playbackState == ExoPlayer.STATE_ENDED) {
                 viewModel.endVideo()
-            } else if (playbackState == Player.STATE_READY) {
+            } else if (playbackState == ExoPlayer.STATE_READY) {
                 viewModel.isFinished = false
             }
         }
@@ -303,11 +317,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 Log.d(TAG, "initializePlayer: index=$index")
                 exoPlayer.seekTo(index, video.playedTime)
                 exoPlayer.prepare()
-                exoPlayer.playWhenReady = viewModel.playWhenReady
+                exoPlayer.addListener(listener)
             }
-        player?.addListener(listener)
-        viewModel.isContinue = true
-        viewModel.isInitial = false
+        viewModel.apply {
+            isContinue = true
+            isInitial = false
+        }
     }
 
     private fun releasePlayer() {
@@ -347,15 +362,19 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         const val EXTRA_POSITION = "com.utc.donlyconan.media.EXTRA_POSITION"
         const val EXTRA_CONTINUE = "com.utc.donlyconan.media.EXTRA_CONTINUE"
         const val EXTRA_PLAYLIST = "com.utc.donlyconan.media.EXTRA_PLAYLIST"
+        const val EXTRA_REPEAT_MODE = "com.utc.donlyconan.media.EXTRA_REPEAT_MODE"
+        const val EXTRA_SPEED = "com.utc.donlyconan.media.EXTRA_SPEED"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
 
         fun newIntent(context: Context, position: Int, playlist: ArrayList<Video>,
-                      isContinue: Boolean = false, isOpenFromNotification: Boolean = false): Intent {
+                      isContinue: Boolean = false, speed: Float = 1.0f, repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF): Intent {
             Log.d(TAG, "newIntent() called with: context = $context, position = $position, playlist = $playlist, isContinue = $isContinue")
             return Intent(context, VideoDisplayActivity::class.java).apply {
                 putExtra(EXTRA_POSITION, position)
                 putExtra(EXTRA_PLAYLIST, playlist)
                 putExtra(EXTRA_CONTINUE, isContinue)
+                putExtra(EXTRA_REPEAT_MODE, repeatMode)
+                putExtra(EXTRA_SPEED, speed)
             }
         }
 

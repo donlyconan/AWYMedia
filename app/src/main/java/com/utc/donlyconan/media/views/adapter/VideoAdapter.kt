@@ -117,7 +117,7 @@ class VideoAdapter(
             if (isLastItem) {
                 binding.container.apply {
                     val paddingBottom =
-                        resources.getDimension(R.dimen.list_video_item_margin_bottom).toInt()
+                        resources.getDimension(R.dimen.list_video_item_height).toInt()
                     setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
                 }
             } else if (binding.container.paddingBottom != 0) {

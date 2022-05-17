@@ -15,5 +15,6 @@
     <dimen name="list_video_item_margin_bottom">5dp</dimen>
     <dimen name="dialog_layout_width">300dp</dimen>
     <dimen name="dialog_layout_height">200dp</dimen>
+    <dimen name="list_video_item_height">86dp</dimen>
     <item name="scrim_opacity" type="dimen" format="float">0.3</item>
 </resources>

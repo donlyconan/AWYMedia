@@ -8,6 +8,10 @@ interface IMusicService {
 
    void setPlaylist(in int position, in List<Video> playlist);
 
+   void setSpeed(in float speed);
+
+   void setRepeat(in int repeatMode);
+
    void setKeepPlaying(in boolean isKeepPlaying);
 
    void play();

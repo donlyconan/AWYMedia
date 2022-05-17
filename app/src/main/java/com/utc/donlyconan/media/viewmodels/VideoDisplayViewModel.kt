@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
+import com.google.android.exoplayer2.ExoPlayer
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.dao.ListVideoDao
 import com.utc.donlyconan.media.data.dao.VideoDao
@@ -17,7 +18,9 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
     val video: MutableLiveData<Video> = MutableLiveData<Video>()
     val lstVideoRepo = myApp.applicationComponent().getListVideoRepo()
     var playlist: ArrayList<Video> = arrayListOf()
-    var playWhenReady = true
+    var playWhenReady = MutableLiveData(true)
+    var speed = MutableLiveData(1.0f)
+    var repeatMode = MutableLiveData(ExoPlayer.REPEAT_MODE_OFF)
     var isFinished = false
     var isContinue = false
     var isInitial = true

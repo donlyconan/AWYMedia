@@ -44,6 +44,8 @@ class MusicService : Service() {
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var notificationManager: AWYNotificationManager
     private var isKeepPlaying: Boolean = false
+    private var speed = 1.0f
+    private var repeatMode = Player.REPEAT_MODE_OFF
 
     private val binder = MusicServiceBinderImpl()
     private val audioAttributes = AudioAttributes.Builder()
@@ -93,7 +95,8 @@ class MusicService : Service() {
             player?.let { player ->
                 val index = player.currentWindowIndex
                 playlist[index].playedTime = player.currentPosition
-                val intent = VideoDisplayActivity.newIntent(this@MusicService, index, playlist, true)
+                val intent = VideoDisplayActivity.newIntent(this@MusicService, index, playlist,
+                    true, player.playbackParameters.speed, player.repeatMode)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }
@@ -164,6 +167,18 @@ class MusicService : Service() {
                 "setPlaylist() called with: position = $position, playlist.size = ${playlist.size}")
             service.position = position
             service.playlist = ArrayList(playlist)
+            speed = 1.0f
+            repeatMode = Player.REPEAT_MODE_OFF
+        }
+
+        override fun setSpeed(speed: Float) {
+            Log.d(TAG, "setSpeed() called with: speed = $speed")
+            service.speed = speed
+        }
+
+        override fun setRepeat(repeatMode: Int) {
+            Log.d(TAG, "setRepeat() called with: repeatMode = $repeatMode")
+            service.repeatMode = repeatMode
         }
 
         override fun setKeepPlaying(isKeepPlaying: Boolean) {
@@ -172,7 +187,7 @@ class MusicService : Service() {
         }
 
         override fun play() {
-            Log.d(TAG, "play() called")
+            Log.d(TAG, "play() called speed=$speed, repeate=$repeatMode")
             release()
             createPlayer()
             player?.apply {
@@ -187,6 +202,8 @@ class MusicService : Service() {
                 prepare()
                 playWhenReady = true
                 notificationManager.showNotificationForPlayer(this, playlist)
+                setPlaybackSpeed(speed)
+                repeatMode = this@MusicService.repeatMode
             }
         }
 
