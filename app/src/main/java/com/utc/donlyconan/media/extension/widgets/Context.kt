@@ -14,7 +14,7 @@ fun Context.showMessage(msg: Int, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, msg, duration).show()
 }
 
-fun Context.showMessage(msg: String, duration: Int = Toast.LENGTH_SHORT) {
+fun Context.showMessage(msg: String?, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, msg, duration).show()
 }
 

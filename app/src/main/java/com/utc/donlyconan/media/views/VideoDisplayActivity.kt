@@ -23,6 +23,7 @@ import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
 import com.utc.donlyconan.media.databinding.DialogDisplayAgainBinding
 import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
+import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
@@ -57,7 +58,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         setContentView(binding.root)
         (applicationContext as AwyMediaApplication).applicationComponent()
             .inject(this)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         bindingOverlay = PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
         beView = CustomOptionPlayerControlViewBinding
             .bind(bindingOverlay.layoutPlayerControlView.rootView)
@@ -68,8 +68,13 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             if(viewModel.isResetPosition) {
                 video.playedTime = 0L
             }
-            initializePlayer(video)
-            viewModel.isResetPosition = false
+            try {
+                initializePlayer(video)
+                viewModel.isResetPosition = false
+            } catch (e: Exception) {
+                showMessage(e.message)
+                e.printStackTrace()
+            }
         }
         viewModel.speed.observe(this){ speed ->
             Log.d(TAG, "onCreate() called with: speed = $speed")
@@ -79,6 +84,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             Log.d(TAG, "onCreate() called with: mode = $mode")
             player?.repeatMode = mode
             beView.exoLoop?.isSelected = mode == ExoPlayer.REPEAT_MODE_ONE
+        }
+        viewModel.playWhenReady.observe(this) { enabled ->
+            Log.d(TAG, "onCreate() called with: enabled = $enabled")
+            player?.playWhenReady = enabled
         }
         loadingVideo()
         initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
@@ -114,7 +123,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     .create()
                 binding.btnNo.setOnClickListener {
                     viewModel.video.value = viewModel.currentVideo().apply {
-                        playedTime = 0L
+                        playedTime = -1L
                     }
                     dialog.dismiss()
                 }
@@ -125,7 +134,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 dialog.show()
             } else {
                 viewModel.video.value = viewModel.currentVideo().apply {
-                    playedTime = 0L
+                    playedTime = -1L
                 }
             }
             viewModel.isContinue = true
@@ -167,7 +176,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "onResume() called")
-        player?.play()
     }
 
     override fun onPause() {
@@ -278,12 +286,34 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     }
 
     private val listener = object : Player.Listener {
+
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            Log.d(TAG, "onMediaItemTransition: mediaItem=$mediaItem")
+            with(viewModel) {
+                playWhenReady.value = false
+                updatePosition(player!!.currentMediaItemIndex)
+                val lastIndex = player!!.currentMediaItemIndex - 1
+                if(lastIndex >= 0) {
+                    val video = playlist[lastIndex]
+                    video.playedTime = -1L
+                    videoRepo.update(video)
+                }
+            }
+            super.onMediaItemTransition(mediaItem, reason)
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+            Log.d(TAG, "onIsPlayingChanged() called with: isPlaying = $isPlaying")
+            binding.videoView.keepScreenOn = isPlaying
+        }
+
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             Log.d(TAG, "onPlayerStateChanged() called with: playWhenReady = $playWhenReady, " +
                         "playbackState = $playbackState")
-            if (playbackState == ExoPlayer.STATE_ENDED) {
+            if (playbackState == Player.STATE_BUFFERING) {
                 viewModel.endVideo()
-            } else if (playbackState == ExoPlayer.STATE_READY) {
+            } else if (playbackState == Player.STATE_READY) {
                 viewModel.isFinished = false
             }
         }
@@ -314,7 +344,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 binding.videoView.player = exoPlayer
                 exoPlayer.addMediaItems(viewModel.playlist.map { video ->  MediaItem.fromUri(video.path) })
                 val index = viewModel.playlist.indexOfFirst { v -> video.videoId == v.videoId }
-                Log.d(TAG, "initializePlayer: index=$index")
+                exoPlayer.playWhenReady = viewModel.playWhenReady.value ?: settings.autoPlay
                 exoPlayer.seekTo(index, video.playedTime)
                 exoPlayer.prepare()
                 exoPlayer.addListener(listener)
@@ -328,12 +358,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     private fun releasePlayer() {
         player?.run {
             viewModel.video.value?.playedTime = currentPosition
-            playWhenReady = this.playWhenReady
-            try {
-                stop()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            removeListener(listener)
             release()
             binding.videoView.player = null
             Log.d(TAG, "releasePlayer() called video=${viewModel.video.value}")

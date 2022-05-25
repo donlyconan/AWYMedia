@@ -18,7 +18,7 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
     val video: MutableLiveData<Video> = MutableLiveData<Video>()
     val lstVideoRepo = myApp.applicationComponent().getListVideoRepo()
     var playlist: ArrayList<Video> = arrayListOf()
-    var playWhenReady = MutableLiveData(true)
+    var playWhenReady = MutableLiveData(false)
     var speed = MutableLiveData(1.0f)
     var repeatMode = MutableLiveData(ExoPlayer.REPEAT_MODE_OFF)
     var isFinished = false
@@ -75,6 +75,12 @@ class VideoDisplayViewModel(app: Application) : BaseAndroidViewModel(app) {
             video.playedTime = 0
             videoRepo.update(video)
         }
+    }
+
+    fun updatePosition(position: Int) {
+        Log.d(TAG, "updatePosition() called with: position = $position")
+        this.position = position
+        video.value = playlist[position]
     }
 
     fun save() {
