@@ -11,6 +11,7 @@ import android.view.WindowManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.DialogAddPlaylistBinding
@@ -108,11 +109,28 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
 
     override fun onClick(v: View?) {
         Log.d(TAG, "onClick: ")
-        if (v?.id == R.id.fab) {
-            AddedPlaylistDialog(requireContext(), false) { text, _ ->
-                val item = Playlist(null, text)
-                viewModel.playlistRepo.insert(item)
-            }.show()
+        when(v?.id) {
+            R.id.fab -> {
+                AddedPlaylistDialog(requireContext(), false) { text, _ ->
+                    val item = Playlist(null, text)
+                    viewModel.playlistRepo.insert(item)
+                }.show()
+            }
+            R.id.btn_sort_by_name -> {
+                settings.playlistSortBy = Settings.SORT_BY_NAME
+                adapter.playlists.sortWith { u, v -> u.compareTo(v, settings.playlistSortBy) }
+                adapter.notifyDataSetChanged()
+            }
+            R.id.btn_sort_by_creation -> {
+                settings.playlistSortBy = Settings.SORT_BY_CREATION
+                adapter.playlists.sortWith { u, v -> u.compareTo(v, settings.playlistSortBy) }
+                adapter.notifyDataSetChanged()
+            }
+            R.id.btn_sort_by_recent -> {
+                settings.playlistSortBy = Settings.SORT_BY_RECENT
+                adapter.playlists.sortWith { u, v -> u.compareTo(v, settings.playlistSortBy) }
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 

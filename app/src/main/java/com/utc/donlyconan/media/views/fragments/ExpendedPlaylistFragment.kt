@@ -33,6 +33,7 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
     lateinit var adapter: VideoChoiceAdapter
     @Inject lateinit var listVideoRepo: ListVideoRepository
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
+    @Inject lateinit var playlistRepo: PlaylistRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,6 +118,10 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
 
         val videoCross = VideoPlaylistCrossRef(video.videoId, args.playlistId)
         playlistWithVideosDao.insert(videoCross)
+        playlistRepo.findById(args.playlistId)?.let { pl ->
+            pl.updatedAt = System.currentTimeMillis()
+            playlistRepo.update(pl)
+        }
         adapter.notifyItemRemoved(position)
         adapter.notifyItemRangeChanged(position, adapter.videos.size)
     }

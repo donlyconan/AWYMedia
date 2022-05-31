@@ -2,6 +2,7 @@ package com.utc.donlyconan.media.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.PlaylistWithVideos
 import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 

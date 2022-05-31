@@ -29,4 +29,6 @@ interface PlaylistRepository {
 
     fun findAll(keyword: String): LiveData<List<Playlist>>
 
+    fun findById(playlistId: Int): Playlist
+
 }

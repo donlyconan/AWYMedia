@@ -28,7 +28,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="@string/name" />
+            android:text="@string/name"
+            android:drawableStart="@drawable/sort_by_alpha"
+            android:drawableEnd="@drawable/ic_up"/>
+
 
 
         <TextView
@@ -36,21 +39,27 @@
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/duration" />
+            android:text="@string/duration"
+            android:drawableStart="@drawable/timelapse"
+            android:drawableEnd="@drawable/ic_up"/>
 
         <TextView
             android:id="@+id/btn_sort_by_creation"
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/created_at" />
+            android:text="@string/created_at"
+            android:drawableStart="@drawable/ic_creation"
+            android:drawableEnd="@drawable/ic_up"/>
 
         <TextView
             android:id="@+id/btn_sort_by_recent"
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/recent" />
+            android:text="@string/recent"
+            android:drawableStart="@drawable/ic_recent"
+            android:drawableEnd="@drawable/ic_up"/>
 
     </LinearLayout>
 

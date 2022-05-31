@@ -18,6 +18,7 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
     private val layoutId by lazy { arguments!!.getInt(EXTRA_LAYOUT_ID) }
     private val map by lazy { HashMap<Int, Boolean>() }
     private var onInitialView: OnInitialView? = null
+    private var viewGones = ArrayList<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,9 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
             container.getChildAt(i)?.let { view ->
                 view.setOnClickListener(this)
                 view.isSelected = map[view.id] ?: false
+                if(viewGones.contains(view.id)) {
+                    view.visibility = View.GONE
+                }
             }
         }
         onInitialView?.onInitial(view)
@@ -48,6 +52,12 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
 
     fun setOnInitialView(listener: OnInitialView): MenuMoreOptionFragment {
         onInitialView = listener
+        return this
+    }
+
+    fun setVisibility(viewId: Int): MenuMoreOptionFragment {
+        Log.d(TAG, "setVisibility() called with: viewId = $viewId")
+        viewGones.add(viewId)
         return this
     }
 

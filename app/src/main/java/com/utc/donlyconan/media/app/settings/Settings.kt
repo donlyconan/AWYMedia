@@ -32,6 +32,7 @@ class Settings @Inject constructor(val appContext: Context) {
             Locale.getDefault().language else "en")
     var isWellcome by BooleanPreferenceDelegate(preferences, "wellcome_to_app", false)
     var sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_BY_NAME)
+    var playlistSortBy by IntPreferenceDelegate(preferences, "playlist_sort_by", SORT_BY_NAME)
     var deleteFromStorage by BooleanPreferenceDelegate(preferences, "delete_from_storage", false)
     var autoRemove by BooleanPreferenceDelegate(preferences, "auto_remove", false)
     var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)

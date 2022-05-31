@@ -31,4 +31,7 @@ interface PlaylistDao {
     @Query("Select * from playlist where title like :keyword")
     fun findAll(keyword: String): LiveData<List<Playlist>>
 
+    @Query("Select * from playlist where playlist_id=:playlistId")
+    fun findById(playlistId: Int): Playlist
+
 }

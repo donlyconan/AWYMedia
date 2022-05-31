@@ -41,4 +41,8 @@ class PlaylistRepositoryImpl @Inject constructor(val playlistDao: PlaylistDao,
 
     override fun findAll(keyword: String): LiveData<List<Playlist>> = playlistDao.findAll(keyword)
 
+    override fun findById(playlistId: Int): Playlist {
+        return playlistDao.findById(playlistId)
+    }
+
 }

@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.utc.donlyconan.media.app.settings.Settings
 
 @Entity(tableName = "playlist")
 data class Playlist(
@@ -19,6 +20,20 @@ data class Playlist(
 ) {
     @Ignore
     var itemSize: Int = 0
+
+    fun compareTo(v: Playlist, sortBy: Int) = when (sortBy) {
+        Settings.SORT_BY_CREATION -> {
+            (createdAt - v.createdAt).toInt()
+        }
+        Settings.SORT_BY_RECENT -> {
+            (updatedAt - v.updatedAt).toInt()
+        }
+        else -> {
+            val fch = title.first()
+            val sch = v.title.first()
+            fch.toInt() - sch.toInt()
+        }
+    }
 
     companion object {
 

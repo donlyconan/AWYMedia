@@ -25,6 +25,7 @@ import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.PlaylistFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -82,7 +83,7 @@ class MainDisplayFragment : BaseFragment() {
 
     private val mappingFunc = hashMapOf(
         R.id.nav_personal to 0, R.id.nav_recent to 1,
-        R.id.nav_shared to 2, R.id.nav_favorite to 3,
+        R.id.nav_playlist to 2, R.id.nav_favorite to 3,
     )
 
     private val onPageChangedCallBackListener = object : ViewPager2.OnPageChangeCallback() {
@@ -94,7 +95,7 @@ class MainDisplayFragment : BaseFragment() {
             } ?: 0
             Log.d(TAG, "onPageSelected() called with: position = $position, navItem=$navItem")
             binding.navBar.selectedItemId = navItem
-            sortedMenu?.isVisible = navItem == R.id.nav_personal
+            sortedMenu?.isVisible = (navItem == R.id.nav_personal || navItem == R.id.nav_playlist)
         }
     }
 
@@ -147,11 +148,18 @@ class MainDisplayFragment : BaseFragment() {
             }
             R.id.it_sort_by -> {
                 val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)
-                        as? PersonalVideoFragment
-                fragment?.let { frag ->
-                    MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
-                        .show(supportFragmentManager, TAG)
-                }
+               if(fragment is PersonalVideoFragment) {
+                   fragment.let { frag ->
+                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
+                           .show(supportFragmentManager, TAG)
+                   }
+               } else if(fragment is PlaylistFragment) {
+                   fragment.let { frag ->
+                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
+                           .setVisibility(R.id.btn_sort_by_duration)
+                           .show(supportFragmentManager, TAG)
+                   }
+               }
             }
             R.id.it_trash -> {
                 val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToTrashFragment()
