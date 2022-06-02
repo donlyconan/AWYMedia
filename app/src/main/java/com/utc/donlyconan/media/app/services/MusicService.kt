@@ -232,7 +232,6 @@ class MusicService : Service() {
         override fun release() {
             Log.d(TAG, "release() called")
             player?.release()
-            mediaSession.release()
             notificationManager.hideNotification()
         }
 
