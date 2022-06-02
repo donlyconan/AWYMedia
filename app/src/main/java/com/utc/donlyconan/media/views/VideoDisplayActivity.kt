@@ -158,8 +158,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             beView.exoOption?.setOnClickListener(this)
         }
         bindingOverlay.exoUnlock.setOnClickListener(this)
+        beView.autoPlay.isChecked = settings.autoPlayMode
         beView.exoRotate.setOnClickListener(this)
         beView.exoBack.setOnClickListener(this)
+        beView.autoPlay.setOnCheckedChangeListener { buttonView, isChecked ->
+            settings.autoPlayMode = isChecked
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -290,7 +294,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             Log.d(TAG, "onMediaItemTransition: mediaItem=$mediaItem")
             with(viewModel) {
-                playWhenReady.value = false
+                player?.stop()
+                playWhenReady.value = beView.autoPlay.isChecked
+                viewModel.isResetPosition = true
                 updatePosition(player!!.currentMediaItemIndex)
                 val lastIndex = player!!.currentMediaItemIndex - 1
                 if(lastIndex >= 0) {

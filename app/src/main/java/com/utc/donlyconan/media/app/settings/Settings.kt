@@ -39,4 +39,9 @@ class Settings @Inject constructor(val appContext: Context) {
     var autoRotate by BooleanPreferenceDelegate(preferences, "auto_rotate", true)
     var restoreState by BooleanPreferenceDelegate(preferences, "restore_state", true)
     var autoDownload by BooleanPreferenceDelegate(preferences, "auto_download", true)
+
+    /**
+     * It represent for Auto Play Mode on Video Screen
+     */
+    var autoPlayMode by BooleanPreferenceDelegate(preferences, "auto_play_mode", true)
 }
