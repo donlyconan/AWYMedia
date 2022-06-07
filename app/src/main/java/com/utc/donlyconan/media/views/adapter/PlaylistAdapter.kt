@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.models.Playlist
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
@@ -35,7 +37,7 @@ class PlaylistAdapter(var context: Context,
         val item = playlists[position]
         item.itemSize = repository.countVideos(item.playlistId!!)
         holder.onItemLongClickListener = onItemLongClickListener
-        holder.bind(item, this, position == itemCount - 1)
+        holder.bind(item, repository.getFirstVideo(item.playlistId!!), this, position == itemCount - 1)
     }
 
     override fun getItemCount(): Int {
@@ -74,12 +76,19 @@ class PlaylistAdapter(var context: Context,
             onItemClickListener?.onItemClick(v, adapterPosition)
         }
 
-        fun bind(playlist: Playlist, listener: OnItemClickListener?, isLastItem: Boolean) {
+        fun bind(playlist: Playlist, video: Video?, listener: OnItemClickListener?, isLastItem: Boolean) {
             Log.d(TAG, "bind() called with: video = $playlist, listener = $listener, " +
                         "isLastItem = $isLastItem")
             binding.tvTitle.text = playlist.title
             onItemClickListener = listener
             binding.tvNumber.text = "${playlist.itemSize} videos"
+
+            Glide.with(itemView.context)
+                .load(video?.path)
+                .error(R.drawable.outline_playlist_play_24)
+                .circleCrop()
+                .into(binding.thumbnailCard)
+
             if (isLastItem) {
                 binding.container.apply {
                     val paddingBottom =

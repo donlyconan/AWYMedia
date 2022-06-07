@@ -5,6 +5,7 @@ import com.utc.donlyconan.media.data.dao.PlaylistDao
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.PlaylistWithVideos
+import com.utc.donlyconan.media.data.models.Video
 import javax.inject.Inject
 
 class PlaylistRepositoryImpl @Inject constructor(val playlistDao: PlaylistDao,
@@ -43,6 +44,10 @@ class PlaylistRepositoryImpl @Inject constructor(val playlistDao: PlaylistDao,
 
     override fun findById(playlistId: Int): Playlist {
         return playlistDao.findById(playlistId)
+    }
+
+    override fun getFirstVideo(playlistId: Int): Video? {
+        return playlistWithVideosDao.getFirstVideo(playlistId)
     }
 
 }
