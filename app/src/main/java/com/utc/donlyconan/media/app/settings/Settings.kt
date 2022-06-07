@@ -1,24 +1,47 @@
-package com.donly.sradatn.app.settings
+package com.utc.donlyconan.media.app.settings
 
 import android.content.Context
-import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
+import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class Settings @Inject constructor(context: Context) {
+class Settings @Inject constructor(val appContext: Context) {
+
     companion object {
         const val SETTINGS_NAME = "sra-datn"
+        // options of sort by
+        const val SORT_BY_NAME = 1
+        const val SORT_BY_CREATION = 2
+        const val SORT_BY_RECENT = 3
+        const val SORT_BY_DURATION = 4
 
-        // const of default language
-        const val DEFAULT_LANGUAGE = "en"
+        private var instance: Settings? = null
 
-        // const of key
-        const val KEY_LANGUAGE = "keys.language"
+        fun getInstance(appContext: Context) = synchronized(Settings::class.java) {
+            if(instance == null){
+                instance = Settings(appContext)
+            }
+            instance!!
+        }
     }
 
-    var preferences: SharedPreferences =
-        context.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE)
-    val language by StringPreferenceDelegate(preferences, KEY_LANGUAGE, DEFAULT_LANGUAGE)
+    var preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
+        private set
+    var language by StringPreferenceDelegate(preferences, "language",
+        if(Locale.getDefault().language == "vn" || Locale.getDefault().language == "en")
+            Locale.getDefault().language else "en")
+    var isWellcome by BooleanPreferenceDelegate(preferences, "wellcome_to_app", false)
+    var sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_BY_NAME)
+    var playlistSortBy by IntPreferenceDelegate(preferences, "playlist_sort_by", SORT_BY_NAME)
+    var deleteFromStorage by BooleanPreferenceDelegate(preferences, "delete_from_storage", false)
+    var autoRemove by BooleanPreferenceDelegate(preferences, "auto_remove", false)
+    var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)
+    var autoRotate by BooleanPreferenceDelegate(preferences, "auto_rotate", true)
+    var restoreState by BooleanPreferenceDelegate(preferences, "restore_state", true)
+    var autoDownload by BooleanPreferenceDelegate(preferences, "auto_download", true)
 
+    /**
+     * It represent for Auto Play Mode on Video Screen
+     */
+    var autoPlayMode by BooleanPreferenceDelegate(preferences, "auto_play_mode", true)
 }

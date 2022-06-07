@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_content_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        tools:itemCount="10"
+        tools:listitem="@layout/item_video_single_mode" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:backgroundTint="@color/white_gray"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/outline_file_upload_24"
+        app:fabSize="normal"
+        app:maxImageSize="25dp"
+        app:useCompatPadding="false" />
+
+    <include
+        android:id="@+id/icd_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/loading_data_screen"
+        android:layout_gravity="center"
+        />
+
+</FrameLayout>

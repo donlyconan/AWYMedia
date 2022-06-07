@@ -7,4 +7,50 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="search_bar">#f1f4fb</color>
+    <color name="add_button">#c3e7ff</color>
+    <color name="selected_item">#011d35</color>
+    <color name="normal_item">#43474a</color>
+    <color name="text_color">#454746</color>
+    <color name="search_bar_text">#454746</color>
+    <color name="selected_text">#0b57cf</color>
+    <color name="icon_color">#1f1f1f</color>
+    <color name="text_navigation_bottom">#454746</color>
+    <color name="primary">@color/blue_500</color>
+    <color name="primaryDark">@color/blue_700</color>
+    <color name="textPrimary">@color/text_black_primary</color>
+    <color name="colorToolBarIcon">#FFDF8A</color>
+    <color name="blue_300">#3E5B9A</color>
+    <color name="search_bar_hint">#CACACA</color>
+
+    <!-- Text -->
+    <color name="text_black_primary">@color/black_87</color>
+
+    <color name="text_white_primary">@color/white</color>
+
+    <!-- Blue -->
+    <color name="blue_500">#2196f3</color>
+    <color name="blue_700">#1976D2</color>
+
+    <!-- Black and White -->
+    <color name="black_alpha_40">#66000000</color>
+    <color name="black_alpha_60">#99000000</color>
+
+    <color name="black_87">#DE000000</color>
+    <color name="white_gray">#44474C</color>
+    <color name="white_gray_30">#686E78</color>
+    <color name="black_gray">#383A3E</color>
+    <color name="recycler_color">#1f2123</color>
+    <color name="gray">#383C40</color>
+    <color name="gray_20">#515559</color>
+
+    <color name="white_50">#80FFFFFF</color>
+    <color name="white_20">#33FFFFFF</color>
+    <color name="transparent">#00000000</color>
+    <color name="black_50">#80000000</color>
+    <color name="live_red">#FF3144</color>
+    <color name="color_checked">#3ABDCD</color>
+    <color name="text_color_hint">#C5C8C8</color>
+    <color name="gray_10_per">#46484C</color>
+
 </resources>

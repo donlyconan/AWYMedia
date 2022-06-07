@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_notification"
+    android:padding="10dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/circleImageView"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/header_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="10dp"
+            android:layout_centerInParent="true"
+            android:layout_toEndOf="@+id/circleImageView"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:maxLines="2"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ic_video"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/video_play_demo" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tv_title_play"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:text="Đang phát video"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_video_name"
+            app:layout_constraintStart_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_video_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="5dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#DCDAD9D9"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toStartOf="@+id/exo_prev"
+            app:layout_constraintStart_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title_play"
+            tool:text="Tiêu đề của video demo lan sang dòng thứ 2 line line" />
+
+        <ImageButton
+            android:id="@+id/exo_prev"
+            style="@style/ExoMediaButton.Rewind"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_toStartOf="@+id/exo_play"
+            android:src="@drawable/ic_baseline_skip_previous_24"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/exo_play"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/exo_next"
+            style="@style/ExoMediaButton.FastForward"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_toEndOf="@+id/exo_play"
+            android:src="@drawable/ic_baseline_skip_next_24"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/exo_play"
+            style="@style/ExoMediaButton.Play"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_baseline_play_arrow_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/exo_next"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/exo_pause"
+            style="@style/ExoMediaButton.Pause"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_baseline_pause_24"
+            app:layout_constraintBottom_toBottomOf="@+id/exo_play"
+            app:layout_constraintEnd_toStartOf="@+id/exo_next"
+            app:layout_constraintStart_toEndOf="@+id/exo_prev" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/videoTimeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/exo_go_live"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_round_rect_white_50"
+            android:gravity="center"
+            android:minWidth="50dp"
+            android:minHeight="25dp"
+            android:minEms="4"
+            android:paddingLeft="15dp"
+            android:paddingTop="6dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

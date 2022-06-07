@@ -1,5 +1,124 @@
 <resources>
-    <string name="app_name">AWYMedia</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">Video Player</string>
+
+    <string name="toolbar_title_home">Home</string>
+    <string name="toolbar_title_explore">Explore</string>
+    <string name="toolbar_title_about">About</string>
+    <string name="toolbar_title_account">Account</string>
+    <string name="toolbar_title_help_and_feedback">Help&amp;Feedback</string>
+
+    <!-- Navigation Drawer -->
+    <string name="nav_drawer_item_home" translatable="false">Home</string>
+    <string name="nav_drawer_item_explore" translatable="false">Explore</string>
+    <string name="nav_drawer_help_and_feedback" translatable="false"><![CDATA[Help & feedback]]></string>
+    <string name="nav_drawer_about" translatable="false">About</string>
+    <string name="tools_text_account_information_username" translatable="false">Sotti</string>
+    <string name="tools_text_account_information_email" translatable="false">sotti@sottocorp.com</string>
+    <string name="video_demo_title" translatable="false">Video demo title</string>
+    <string name="notification_channel" translatable="false">notification_channel</string>
+    <string name="notification_channel_description" translatable="false">notification_channel_description</string>
+
+    <string name="settings">Settings</string>
+    <string name="personal">Personal</string>
+    <string name="recent">Recent</string>
+    <string name="shared">Shared</string>
+    <string name="favorite">Favorite</string>
+    <string name="share">Share</string>
+    <string name="upload">Upload</string>
+    <string name="copy">Copy</string>
+    <string name="print">Print</string>
+    <string name="restore">Restore</string>
+    <string name="delete">Delete</string>
+    <string name="done">Done</string>
+    <string name="language">Language</string>
+    <string name="language_des">The language setting will show up on the app.</string>
+    <string name="remove_video_from_devices">Delete video from device</string>
+    <string name="remove_video_from_devices_des">Allows the application to delete the video on the device when performing a delete operation on the application.</string>
+    <string name="erasure_cycle">Erase cycle</string>
+    <string name="erasure_cycle_des">Set erasure time</string>
+    <string name="auto_play">Autoplay</string>
+    <string name="auto_play_des">Allows the application to play the video as soon as the video is opened.</string>
+    <string name="auto_rotate">Auto rotate</string>
+    <string name="auto_rotate_des">Allows to align the screen horizontally or vertically to match the format of the video.</string>
+    <string name="restore_state">Restore state</string>
+    <string name="restore_state_des">Restore the playing state of the video according to the previous play.</string>
+    <string name="info">Infomation</string>
+    <string name="about">Version</string>
+    <string name="copy_right">Copyright</string>
+    <string name="rotate_screen">Rotate the screen</string>
+    <string name="speed_xx">Speed</string>
+    <string name="lock">Lock</string>
+    <string name="repeat">Repeat</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="app_version">Version: 1.0.0</string>
+    <string name="author_donly_conan">Author: Donly Conan</string>
+    <string name="add_playlist">Add playlist</string>
+    <string name="enter_playlist_name">Enter playlist name...</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="do_you_want_to_continue_playing_this_video">Do you want to continue playing this video?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="view">Watch</string>
+    <string name="play_sound">Play music</string>
+    <string name="remove_from_play_list">Remove from playlist</string>
+    <string name="enter_the_content_what_you_find">Enter search text...</string>
+    <string name="rating">Rating</string>
+    <string name="help_amp_feedback"><![CDATA[Help & Feedback]]></string>
+    <string name="feedback_hint">Enter your question or feedback...</string>
+    <string name="submit">Submit</string>
+    <string name="remove">Remove</string>
+    <string name="add_video">Add Video</string>
+    <string name="sort_by">Sort by</string>
+    <string name="name">Name</string>
+    <string name="created_at">Creatiton</string>
+    <string name="trash">Trash</string>
+    <string name="speed">Speed</string>
+    <string name="loading_data">Loading...</string>
+    <string name="no_data">No data found</string>
+    <string name="playlist">Playlist</string>
+    <string name="remove_all">Remove all</string>
+    <string name="you_have_not_rated">You have not rated</string>
+    <string name="send_email">Send email</string>
+    <string name="please_enter_something">Please enter something</string>
+    <string name="empty_list_des">The list files is empty!</string>
+    <string name="delete_file">Deleting file</string>
+    <string name="confirm_to_delete">Do you want to remove all files?</string>
+    <string name="duration">Duration</string>
+    <string name="auto_download">Auto loading</string>
+    <string name="auto_download_des">Allows the app to access and download videos from the device.</string>
+    <string name="erase_cycle_summary">Set cycle delete video.</string>
+    <string name="video_exist_des">" Video already exists."</string>
+    <string name="email_developer" translatable="false">awydeveloper@gmail.com</string>
+    <string name="email">Email</string>
+    <string name="locked_des">The screen is locked</string>
+    <string name="locked_intro">Tap to unlock</string>
+    <string name="play_music">Play music</string>
+    <string name="rename">Rename</string>
+    <string name="save">Save</string>
+    <string name="data_synchronization">Sync data</string>
+
+    <string-array name="language_entries">
+        <item>English</item>
+        <item>Việt Nam</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>en</item>
+        <item>vi</item>
+    </string-array>
+
+    <string-array name="remove_entries">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Annually</item>
+    </string-array>
+
+    <string-array name="remove_values">
+        <item>1</item>
+        <item>7</item>
+        <item>30</item>
+        <item>365</item>
+    </string-array>
 </resources>

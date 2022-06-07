@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/bg_bottom_sheet_fragment"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/sort_by"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/btn_sort_by_name"
+            style="@style/BottomMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/name"
+            android:drawableStart="@drawable/sort_by_alpha"
+            android:drawableEnd="@drawable/ic_up"/>
+
+
+
+        <TextView
+            android:id="@+id/btn_sort_by_duration"
+            style="@style/BottomMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/duration"
+            android:drawableStart="@drawable/timelapse"
+            android:drawableEnd="@drawable/ic_up"/>
+
+        <TextView
+            android:id="@+id/btn_sort_by_creation"
+            style="@style/BottomMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/created_at"
+            android:drawableStart="@drawable/ic_creation"
+            android:drawableEnd="@drawable/ic_up"/>
+
+        <TextView
+            android:id="@+id/btn_sort_by_recent"
+            style="@style/BottomMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/recent"
+            android:drawableStart="@drawable/ic_recent"
+            android:drawableEnd="@drawable/ic_up"/>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,16 +1,11 @@
-package com.donly.sradatn.app.settings
+package com.utc.donlyconan.media.app.settings
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import java.io.File
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-
-fun File.test() {
-
-}
 
 class StringPreferenceDelegate(
   private val sharedPreferences: SharedPreferences,
@@ -25,7 +20,6 @@ class StringPreferenceDelegate(
     return sharedPreferences.getString(key, defaultValue) ?: defaultValue
   }
 }
-
 
 class StringSetPreferenceDelegate(
   private val sharedPreferences: SharedPreferences,

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:icon="@drawable/ic_logo"
+    android:title="@string/settings"
+    android:fragment="com.utc.donlyconan.media.views.SettingsActivity$SettingsScreen">
+
+    <PreferenceCategory android:title="Cài đặt chung">
+
+        <ListPreference
+            android:title="@string/language"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:key="language"
+            android:defaultValue="en"
+            android:summary="@string/language_des"
+            android:dialogIcon="@drawable/ic_logo"
+            android:dialogTitle="Chọn ngôn ngữ"/>
+
+        <CheckBoxPreference
+            android:title="@string/remove_video_from_devices"
+            android:key="delete_from_storage"
+            app:defaultValue="false"
+            android:summary="@string/remove_video_from_devices_des"
+            />
+
+        <ListPreference
+            android:title="@string/erasure_cycle"
+            android:summary="@string/erase_cycle_summary"
+            android:entries="@array/remove_entries"
+            android:entryValues="@array/remove_values"
+            android:key="auto_remove"
+            android:defaultValue="30"
+            android:dialogIcon="@drawable/ic_logo"
+            android:dialogTitle="@string/erasure_cycle_des"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Video">
+        <SwitchPreference
+            android:title="@string/auto_play"
+            android:key="auto_play"
+            android:defaultValue="true"
+            android:summary="@string/auto_play_des"
+            />
+
+        <SwitchPreference
+            android:title="@string/auto_rotate"
+            android:key="auto_rotate"
+            android:defaultValue="false"
+            android:summary="@string/auto_rotate_des"
+            />
+
+        <SwitchPreference
+            android:title="@string/restore_state"
+            android:key="restore_state"
+            android:defaultValue="false"
+            android:summary="@string/restore_state_des"
+            />
+
+        <CheckBoxPreference
+            android:title="@string/auto_download"
+            android:key="auto_download"
+            app:defaultValue="true"
+            android:summary="@string/auto_download_des"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/info">
+
+        <Preference
+            android:title="@string/about"
+            android:summary="1.0.0"/>
+
+        <Preference
+            android:title="@string/copy_right"
+            android:summary="Donly Conan"/>
+
+        <Preference
+            android:title="@string/email"
+            android:summary="@string/email_developer"/>
+
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>

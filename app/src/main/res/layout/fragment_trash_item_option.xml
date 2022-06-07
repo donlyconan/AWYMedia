@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="15dp"
+    android:id="@+id/container"
+    android:paddingBottom="10dp"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet_fragment">
+
+<!--    <TextView-->
+<!--        android:id="@+id/btn_title"-->
+<!--        style="@style/BottomMenuItem"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:maxLines="1"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textStyle="bold"-->
+<!--        android:drawablePadding="3dp"-->
+<!--        android:padding="4dp"-->
+<!--        android:layout_marginStart="10dp"-->
+<!--        android:layout_marginEnd="10dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_marginBottom="5dp"-->
+<!--        android:drawableStart="@drawable/ic_baseline_insert_drive_file_24"-->
+<!--        android:text="Title demo.mp3" />-->
+<!--    -->
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0.5dp"-->
+<!--        android:background="@color/white"/>-->
+
+    <TextView
+        android:id="@+id/btn_restore"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_baseline_restore_24"
+        android:text="@string/restore" />
+
+    <TextView
+        android:id="@+id/btn_delete"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_delete_24"
+        android:text="@string/delete" />
+
+
+</LinearLayout>

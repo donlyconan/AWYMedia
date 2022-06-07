@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/container"
+    android:paddingTop="15dp"
+    android:paddingBottom="10dp"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet_fragment">
+
+
+    <TextView
+        android:id="@+id/btn_play"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_play_circle_24"
+        android:text="@string/view" />
+
+    <TextView
+        android:id="@+id/btn_play_music"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_audiotrack_24"
+        android:text="@string/play_sound" />
+
+    <TextView
+        android:id="@+id/btn_favorite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_favorite"
+        android:text="@string/favorite"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_delete_24"
+        android:text="@string/remove"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/btn_share"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_share_24"
+        android:text="@string/share"
+        style="@style/BottomMenuItem"
+        />
+
+</LinearLayout>

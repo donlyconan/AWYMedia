@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Video Player</string>
+    <string name="toolbar_title_explore">Khám phá</string>
+    <string name="toolbar_title_about">Phiên bản</string>
+    <string name="toolbar_title_account">Tài khoản</string>
+    <string name="toolbar_title_help_and_feedback">Giúp đỡ &amp; Phản hồi</string>
+    <string name="remove_all">Xoá tất cả</string>
+    <string name="playlist">Danh sách phát</string>
+    <string name="no_data">Không có dữ liệu</string>
+    <string name="loading_data">Đang tải dữ liệu...</string>
+    <string name="speed">Tốc độ</string>
+    <string name="created_at">Ngày tạo</string>
+    <string name="duration">Thời lượng</string>
+    <string name="name">Tên</string>
+    <string name="sort_by">Sắp xếp theo</string>
+    <string name="add_video">Thêm video</string>
+    <string name="remove">Xóa</string>
+    <string name="feedback_hint">Nhập câu hỏi hoặc cảm nhận của bạn...</string>
+    <string name="trash">Thùng rác</string>
+    <string name="rating">Đánh giá</string>
+    <string name="view">Xem</string>
+    <string name="play_sound">Phát âm thanh</string>
+    <string name="remove_from_play_list">Xóa khỏi danh sách phát</string>
+    <string name="enter_the_content_what_you_find">Nhập nội dung tìm kiếm...</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+    <string name="do_you_want_to_continue_playing_this_video">Bạn có muôn tiếp tục phát video này không?</string>
+    <string name="cancel">Hủy bỏ</string>
+    <string name="ok">Đồng ý</string>
+    <string name="enter_playlist_name">Nhập tên danh sách phát...</string>
+    <string name="add_playlist">Thêm danh sách phát</string>
+    <string name="app_version">Phiên bản: 1.0.0</string>
+    <string name="author_donly_conan">Tác giả: Donly Conan</string>
+    <string name="next">Tiếp theo</string>
+    <string name="repeat">Lặp lại</string>
+    <string name="previous">Quay lại</string>
+    <string name="lock">Khóa</string>
+    <string name="speed_xx">Tốc độ</string>
+    <string name="rotate_screen">Xoay màn hình</string>
+    <string name="copy_right">Bản quyền</string>
+    <string name="about">Phiên bản</string>
+    <string name="info">Thông tin</string>
+    <string name="restore_state_des">Khôi phục lại trạng thái phát của video theo lần phát trước đó.</string>
+    <string name="restore_state">Khôi phục trạng thái</string>
+    <string name="auto_rotate_des">Cho phép căn chỉnh màn hình theo chiều ngang hoặc dọc để phù hợp với định dạng của video.</string>
+    <string name="auto_rotate">Tự động xoay</string>
+    <string name="auto_play_des">Cho phép ứng dụng phát video ngay sau khi video được mở.</string>
+    <string name="auto_play">Tự động phát</string>
+    <string name="erasure_cycle_des">Thiết lập thời gian xóa</string>
+    <string name="erasure_cycle">Chu kỳ xóa</string>
+    <string name="remove_video_from_devices_des">Cho phép ứng dụng xóa video trên thiết bị khi thực hiện thao tác xóa trên ứng dụng.</string>
+    <string name="remove_video_from_devices">Xóa video từ thiết bị</string>
+    <string name="language_des">Cài đặt ngôn ngữ sẽ hiển thị trên ứng dụng.</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="toolbar_title_home">Trang chủ</string>
+    <string name="personal">Cá nhân</string>
+    <string name="recent">Gần đây</string>
+    <string name="shared">Được chia sẻ</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="share">Chia sẻ</string>
+    <string name="upload">Tải lên</string>
+    <string name="copy">Sao chép</string>
+    <string name="print">In</string>
+    <string name="restore">Khôi phục</string>
+    <string name="delete">Xóa</string>
+    <string name="done">Hoàn thành</string>
+    <string name="settings">Cài đặt</string>
+    <string name="you_have_not_rated">Bạn chưa đánh giá.</string>
+    <string name="send_email">Giử tin email</string>
+    <string name="please_enter_something">Hãy nhập gì đó</string>
+    <string name="delete_file">Xóa tệp tin</string>
+    <string name="confirm_to_delete">Bạn có muốn xóa tất cả video hiện có</string>
+    <string name="empty_list_des">Danh sách tệp tin trống!</string>
+    <string name="submit">Gửi đi</string>
+    <string name="help_amp_feedback"><![CDATA[Trợ giúp & Phản hồi]]></string>
+    <string name="auto_download">Tự động tải</string>
+    <string name="auto_download_des">Cho phép ứng dụng truy cập và tải video từ thiết bị.</string>
+    <string name="erase_cycle_summary">Thiết lập chu kỳ xóa video.</string>
+    <string name="video_exist_des">Video đã tồn tại.</string>
+
+
+
+    <string-array name="remove_entries">
+        <item>Hàng ngày</item>
+        <item>Hàng ngày</item>
+        <item>Hàng tháng</item>
+        <item>Hàng năm</item>
+    </string-array>
+    <string name="email">Email</string>
+    <string name="locked_des">Màn hình đã khóa</string>
+    <string name="locked_intro">Nhấn để mở khóa</string>
+    <string name="play_music">Phát nhạc</string>
+    <string name="rename">Đổi tên</string>
+    <string name="save">Lưu</string>
+    <string name="data_synchronization">Đồng bộ hóa dữ liệu</string>
+
+</resources>

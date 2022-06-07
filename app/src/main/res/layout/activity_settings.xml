@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_content_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/recycler_color"
+    android:orientation="vertical"
+    tools:context=".views.SettingsActivity">
+
+  <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="?actionBarSize"
+      android:background="?colorPrimary"
+      app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+      app:titleTextColor="@color/white"
+      android:title="@string/settings"/>
+
+  <fragment
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      class="com.utc.donlyconan.media.views.SettingsActivity$SettingsScreen"/>
+
+</LinearLayout>

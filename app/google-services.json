@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "813317754055",
+    "project_id": "awymedia-38247",
+    "storage_bucket": "awymedia-38247.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813317754055:android:ab19eb4bc8831040ea82e2",
+        "android_client_info": {
+          "package_name": "com.utc.donlyconan.media"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813317754055-02860v6i733lsp7pp65cpm4jj7ee2vgu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8w7cfu_1mcNlXWLOT3paJy8GF2Gbz_4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813317754055-02860v6i733lsp7pp65cpm4jj7ee2vgu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

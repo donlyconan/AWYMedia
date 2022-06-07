@@ -1,28 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.utc.donlyconan.media">
+package="com.utc.donlyconan.media">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.AWYMedia">
-        <activity android:name=".views.MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+<application
+    android:name=".app.AwyMediaApplication"
+    android:allowBackup="true"
+    android:icon="@drawable/ic_logo"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true"
+    android:theme="@style/Theme.AWYMedia">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
+    <activity
+        android:name=".views.MainActivity"
+        android:exported="true"
+        android:launchMode="singleTop">
+        <nav-graph android:value="@navigation/nav_graph" />
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
 
+    <activity
+        android:name=".views.VideoDisplayActivity"
+        android:exported="true"
+        android:launchMode="singleInstance" />
+
+    <activity
+        android:name=".views.SettingsActivity"
+        android:exported="true"
+        android:launchMode="singleTop" />
+
+    <service
+        android:name=".app.services.MusicService"
+        android:exported="false" />
+
+
+    <meta-data
+        android:name="preloaded_fonts"
+        android:resource="@array/preloaded_fonts" />
+
+</application>
 
 
 </manifest>

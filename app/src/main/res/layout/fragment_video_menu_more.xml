@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="15dp"
+    android:paddingBottom="10dp"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet_fragment">
+
+    <TextView
+        android:id="@+id/exo_playback_speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_speed_24"
+        android:text="@string/speed"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/exo_lock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_lock_24"
+        android:text="@string/lock"
+        style="@style/BottomMenuItem"
+        />
+
+
+    <TextView
+        android:id="@+id/exo_loop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/bg_button_loop"
+        android:text="@string/repeat"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/exo_play_music"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/headset_mic_48px"
+        android:text="@string/play_music" />
+
+    <TextView
+        android:id="@+id/exo_prev"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_baseline_skip_previous_24"
+        android:text="@string/previous"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/exo_next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_baseline_skip_next_24"
+        android:text="@string/next"
+        style="@style/BottomMenuItem"
+        />
+
+</LinearLayout>

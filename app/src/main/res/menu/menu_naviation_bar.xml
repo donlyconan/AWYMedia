@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_personal"
+        android:icon="@drawable/bg_personal_item"
+        android:title="@string/personal"
+        android:checked="true"/>
+
+    <item
+        android:id="@+id/nav_recent"
+        android:icon="@drawable/bg_recent_item"
+        android:title="@string/recent" />
+
+    <item
+        android:id="@+id/nav_playlist"
+        android:icon="@drawable/bg_playlist_item"
+        android:title="@string/playlist" />
+
+    <item
+        android:id="@+id/nav_favorite"
+        android:icon="@drawable/bg_favorite_item"
+        android:title="@string/favorite" />
+
+</menu>
