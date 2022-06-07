@@ -34,6 +34,7 @@ class SettingsActivity : BaseActivity() {
             .get(binding.toolbar) as TextView
         tvTitle.setBackgroundColor(Color.TRANSPARENT)
         settings.preferences.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
+            Log.d(TAG, "OnSharedPreferenceChangeListener: key=$key")
             if (key == "language") {
                 Log.d(TAG, "onSharedPreferenceChanged: recreate this activity!")
                 val intent = Intent(this, MainActivity::class.java)

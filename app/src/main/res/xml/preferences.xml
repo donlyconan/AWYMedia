@@ -48,14 +48,14 @@
         <SwitchPreference
             android:title="@string/auto_rotate"
             android:key="auto_rotate"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/auto_rotate_des"
             />
 
         <SwitchPreference
             android:title="@string/restore_state"
             android:key="restore_state"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/restore_state_des"
             />
 

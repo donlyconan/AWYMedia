@@ -68,7 +68,7 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
                 onQueryTextListener.onQueryTextChange(binding.searchBar.query.toString())
             }
         } else {
-            videoAdapter = VideoAdapter(requireContext(), arrayListOf())
+            videoAdapter = VideoAdapter(requireContext(), arrayListOf(), showOptionMenu = false)
             videoAdapter?.onItemClickListener = this
             binding.recyclerView.adapter = videoAdapter
         }

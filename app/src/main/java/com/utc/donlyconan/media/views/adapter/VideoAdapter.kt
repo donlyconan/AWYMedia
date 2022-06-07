@@ -23,7 +23,8 @@ import java.text.SimpleDateFormat
 class VideoAdapter(
     var context: Context,
     var videoList: ArrayList<Video>,
-    var showProgress: Boolean = false
+    var showProgress: Boolean = false,
+    var showOptionMenu: Boolean = true
 ) : ListAdapter<Video, VideoAdapter.VideoHolder>(Video.diffUtil), OnItemClickListener {
 
     var inflater: LayoutInflater = LayoutInflater.from(context)
@@ -42,7 +43,7 @@ class VideoAdapter(
         val item: Video = videoList[position]
         holder.onItemLongClickListener = onItemLongClickListener
         holder.onItemClickListener = onItemClickListener
-        holder.bind(item, showProgress)
+        holder.bind(item, showProgress, showOptionMenu)
         holder.setLastItem(position == videoList.size - 1)
     }
 
@@ -91,13 +92,19 @@ class VideoAdapter(
             return true
         }
 
-        fun bind(video: Video, showProgress: Boolean) {
+        fun bind(video: Video, showProgress: Boolean, showOptionMenu: Boolean) {
             Log.d(TAG, "bind() called with: video = $video, showProgress = $showProgress")
 
             binding.tvTitle.text = video.title
             binding.tvDate.text = DateFormat.getDateInstance().format(video.updatedAt)
             binding.tvSize.text = video.size.convertToStorageData()
             binding.tvDuration.text = (video.duration / 1000).toShortTime()
+            if(!showOptionMenu) {
+                with(binding.imgMenuMore) {
+                    layoutParams.width = 0
+                    requestLayout()
+                }
+            }
 
             Glide.with(itemView.context)
                 .load(video.path)
