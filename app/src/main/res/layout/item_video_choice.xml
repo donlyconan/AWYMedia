@@ -62,24 +62,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginStart="10dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="5dp"
-            android:layout_toStartOf="@+id/cb_selected"
             android:layout_toEndOf="@+id/thumbnail_card"
             android:ellipsize="end"
             android:maxLines="2"
             android:text="Video title\nLine 2"
             android:textColor="@android:color/white" />
 
-        <CheckBox
-            android:id="@+id/cb_selected"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:checked="true" />
+        <TextView
+            android:id="@+id/tv_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@+id/thumbnail_card"
+            android:text="457 MB"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
 
     </RelativeLayout>
 </FrameLayout>
