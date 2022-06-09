@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.AwyMediaApplication
 import com.utc.donlyconan.media.databinding.ActivitySettingsBinding
 
 /**
@@ -33,27 +34,25 @@ class SettingsActivity : BaseActivity() {
             }
             .get(binding.toolbar) as TextView
         tvTitle.setBackgroundColor(Color.TRANSPARENT)
-        settings.preferences.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
-            Log.d(TAG, "OnSharedPreferenceChangeListener: key=$key")
-            if (key == "language") {
-                Log.d(TAG, "onSharedPreferenceChanged: recreate this activity!")
-                val intent = Intent(this, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            }
-        }
     }
 
     class SettingsScreen : PreferenceFragmentCompat() {
 
-        val listLanguage by lazy { findPreference<ListPreference>("language") }
+        private val listLanguage by lazy { findPreference<ListPreference>("language") }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             Log.d(TAG, "onCreatePreferences: ")
             addPreferencesFromResource(R.xml.preferences)
+            val settings = (context?.applicationContext as? AwyMediaApplication)
+                ?.applicationComponent()?.getSettings()
 
             listLanguage?.setOnPreferenceChangeListener { preference, newValue ->
                 Log.d(TAG, "onCreatePreferences() called with: preference = $preference, newValue = $newValue")
+                if(newValue != settings?.language) {
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                }
                 true
             }
         }

@@ -103,6 +103,7 @@
         <item>English</item>
         <item>Việt Nam</item>
     </string-array>
+
     <string-array name="language_values">
         <item>en</item>
         <item>vi</item>
@@ -113,6 +114,7 @@
         <item>Weekly</item>
         <item>Monthly</item>
         <item>Annually</item>
+        <item>Disable</item>
     </string-array>
 
     <string-array name="remove_values">
@@ -120,5 +122,6 @@
         <item>7</item>
         <item>30</item>
         <item>365</item>
+        <item>0</item>
     </string-array>
 </resources>

@@ -30,7 +30,7 @@
             android:summary="@string/erase_cycle_summary"
             android:entries="@array/remove_entries"
             android:entryValues="@array/remove_values"
-            android:key="auto_remove"
+            android:key="erasure_cycle"
             android:defaultValue="30"
             android:dialogIcon="@drawable/ic_logo"
             android:dialogTitle="@string/erasure_cycle_des"/>

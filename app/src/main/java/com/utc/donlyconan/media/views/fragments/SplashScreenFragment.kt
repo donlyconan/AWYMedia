@@ -4,33 +4,29 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
-import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.FragmentSplashScreenBinding
 import com.utc.donlyconan.media.views.BaseFragment
-import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 
+/**
+ * This represent for First screen when starting app until displayed app
+ */
 class SplashScreenFragment : BaseFragment() {
 
     val binding by lazy { FragmentSplashScreenBinding.inflate(layoutInflater) }
@@ -62,14 +58,19 @@ class SplashScreenFragment : BaseFragment() {
         super.onResume()
         lifecycleScope.launch {
             val startPoint = System.currentTimeMillis()
-            // Load all data from the device
-            if (settings.autoDownload) {
-                loadingData()
-            }
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                // Load all data from the device
+                if (settings.autoDownload) {
+                    loadingData()
+                }
 
-            // Delete all video in trash
-            if(false) {
-                deletingData()
+                // Delete all video in trash
+                if(settings.erasureCycle != "0") {
+                    deleteDataIfNeed()
+                }
             }
 
             val currentTime = System.currentTimeMillis()
@@ -91,19 +92,28 @@ class SplashScreenFragment : BaseFragment() {
         }
     }
 
-    private suspend fun loadingData() {
-        Log.d(TAG, "loadingData: loading[${settings.autoDownload}]...")
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-            == PackageManager.PERMISSION_GRANTED) {
-            val videoList = listVideoRepo.loadAllVideos().filter { video ->
-                trashRepo.find(video.videoId) == null
-            }
-            Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
-            videoRepo.insert(*videoList.toTypedArray())
+    private suspend fun deleteDataIfNeed() {
+        Log.d(TAG, "deleteDataIfNeed() called with erasureCycle=${settings.erasureCycle}")
+        val deleteTimePeriod = System.currentTimeMillis() - settings.previousDeletionDate
+        // convert to date
+        val numberDay = deleteTimePeriod / 86400000.0
+        Log.d(TAG, "deleteDataIfNeed: deleteTimePeriod=$deleteTimePeriod, numberDay=$numberDay")
+        if (numberDay >= settings.erasureCycle.toDouble()) {
+            deleteData()
+            settings.previousDeletionDate = System.currentTimeMillis()
         }
     }
 
-    private suspend fun deletingData() {
+    private suspend fun loadingData() {
+        Log.d(TAG, "loadingData: loading autoDownload=[${settings.autoDownload}]...")
+        val videoList = listVideoRepo.loadAllVideos().filter { video ->
+            trashRepo.find(video.videoId) == null
+        }
+        Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
+        videoRepo.insert(*videoList.toTypedArray())
+    }
+
+    private suspend fun deleteData() {
         Log.d(TAG, "deletingData() called deleteFromStorage=${settings.deleteFromStorage}")
         val trashes = trashRepo.getAllTrashes()
         val contentResolver = application.contentResolver
