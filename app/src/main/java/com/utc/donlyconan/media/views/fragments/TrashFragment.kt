@@ -8,9 +8,9 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.AwyMediaApplication
-import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
@@ -70,6 +70,25 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
                 hideLoading()
             }
             adapter.submit(videos)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(settings.erasureCycle != "0") {
+            val deleteTimePeriod = System.currentTimeMillis() - settings.previousDeletionDate
+            // convert to date
+            val numberHour = (settings.erasureCycle.toInt() * 24 - deleteTimePeriod / 3600000.0).toInt()
+            Log.d(TAG, "onResume: numberHour=$numberHour")
+            if (numberHour >= 24) {
+                val text = String.format(getString(R.string.trash_clean_des),  numberHour / 24, getString(R.string.days))
+                Snackbar.make(binding.root, text, Snackbar.LENGTH_SHORT)
+                    .show()
+            } else if (numberHour > 0) {
+                val text = String.format(getString(R.string.trash_clean_des),  numberHour, getString(R.string.hours))
+                Snackbar.make(binding.root, text, Snackbar.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 

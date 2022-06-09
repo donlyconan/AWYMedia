@@ -93,5 +93,9 @@
         <item>Hàng năm</item>
         <item>Vô hiệu hóa</item>
     </string-array>
+    <string name="understood">Đã hiểu</string>
+    <string name="trash_clean_des">Thùng rác sẽ được làm sạch sau %s %s</string>
+    <string name="days">ngày</string>
+    <string name="hours">giờ</string>
 
 </resources>

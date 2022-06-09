@@ -98,6 +98,10 @@
     <string name="rename">Rename</string>
     <string name="save">Save</string>
     <string name="data_synchronization">Sync data</string>
+    <string name="understood">OK</string>
+    <string name="trash_clean_des">Trash bin will be emptied after %s %s</string>
+    <string name="days">days</string>
+    <string name="hours">hours</string>
 
     <string-array name="language_entries">
         <item>English</item>
