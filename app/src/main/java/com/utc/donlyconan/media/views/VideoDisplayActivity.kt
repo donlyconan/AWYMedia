@@ -39,6 +39,8 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     private lateinit var bindingOverlay: PlayerControlViewBinding
     private lateinit var beView: CustomOptionPlayerControlViewBinding
     private var player: ExoPlayer? = null
+    // tell us that we will prevent playing change listener
+    private var flagPlayingChanged = false
 
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
@@ -66,6 +68,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             Log.d(TAG, "onCreate: position=${viewModel.position}, video=$video")
             beView.headerTv.text = video.title
             if(viewModel.isResetPosition) {
+                Log.d(TAG, "onCreate: reset position")
                 video.playedTime = 0L
             }
             try {
@@ -102,35 +105,43 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     fun loadingVideo() {
         Log.d(TAG, "loadingVideo() called isInit = ${viewModel.isInitial}")
-        if(viewModel.isInitial) {
-            viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST) ?: arrayListOf()
-            viewModel.position = intent.getIntExtra(EXTRA_POSITION, 0)
-            viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
-            viewModel.speed.value = intent.getFloatExtra(EXTRA_SPEED, 1.0f)
-            viewModel.repeatMode.value = intent.getIntExtra(EXTRA_REPEAT_MODE, ExoPlayer.REPEAT_MODE_OFF)
-            viewModel.playWhenReady.value = settings.autoPlay
-            Log.d(TAG, "loadingVideo: playlist.size=${viewModel.playlist.size}" +
-                    ", position=${viewModel.position}" +
-                    ", isContinue=${viewModel.isContinue}")
+        if (!viewModel.isInitial) {
+            Log.d(TAG, "loadingVideo: video is loaded!")
+            return
         }
+        viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST) ?: arrayListOf()
+        viewModel.position = intent.getIntExtra(EXTRA_POSITION, 0)
+        viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
+        viewModel.speed.value = intent.getFloatExtra(EXTRA_SPEED, 1.0f)
+        viewModel.repeatMode.value =
+            intent.getIntExtra(EXTRA_REPEAT_MODE, ExoPlayer.REPEAT_MODE_OFF)
+        viewModel.playWhenReady.value = settings.autoPlay
         if (viewModel.canShowDialog()) {
             // Show dialog to restore state of video when restoreState from setting equals true
             if(settings.restoreState) {
                 val binding = DialogDisplayAgainBinding.inflate(layoutInflater)
                 val dialog = AlertDialog.Builder(this)
                     .setView(binding.root)
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .create()
+                // Reset position of video time down to zero and save the current position of video
+                val video = viewModel.currentVideo()
+                val playedTime = video.playedTime
+                viewModel.video.value = video.apply {
+                    this.playedTime = 0
+                }
                 binding.btnNo.setOnClickListener {
-                    viewModel.video.value = viewModel.currentVideo().apply {
-                        playedTime = -1L
-                    }
                     dialog.dismiss()
                 }
                 binding.btnYes.setOnClickListener {
-                    viewModel.video.value = viewModel.currentVideo()
+                    Log.d(TAG, "loadingVideo() playedTime=${playedTime}")
+                    flagPlayingChanged = true
+                    player?.seekTo(playedTime)
+                    flagPlayingChanged = false
                     dialog.dismiss()
                 }
+                dialog.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 dialog.show()
             } else {
                 viewModel.video.value = viewModel.currentVideo().apply {
@@ -217,6 +228,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
                             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                         else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    flagPlayingChanged = true
                 }
                 R.id.exo_unlock -> {
                     bindingOverlay.layoutPlayerControlView.rootView.visibility = View.VISIBLE
@@ -311,7 +323,13 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             Log.d(TAG, "onIsPlayingChanged() called with: isPlaying = $isPlaying")
-            binding.videoView.keepScreenOn = isPlaying
+            if(!flagPlayingChanged) {
+                viewModel.playWhenReady.value = isPlaying
+                binding.videoView.keepScreenOn = isPlaying
+                if(!isPlaying) {
+                    window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+            }
         }
 
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {

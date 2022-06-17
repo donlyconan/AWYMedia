@@ -54,6 +54,7 @@ internal class AWYNotificationManager(
             setUseRewindAction(false)
             setUseFastForwardAction(false)
             setUseNextAction(true)
+            setUseChronometer(true)
             setUsePreviousAction(true)
             setPriority(NotificationCompat.PRIORITY_HIGH)
         }
