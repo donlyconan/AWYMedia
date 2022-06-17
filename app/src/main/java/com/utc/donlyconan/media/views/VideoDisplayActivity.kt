@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.media.MediaMetadataRetriever
 import android.os.*
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.viewModels
@@ -299,6 +300,13 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 }
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        flagPlayingChanged = true
+        val value = super.dispatchTouchEvent(ev)
+        flagPlayingChanged = false
+        return value
     }
 
     private val listener = object : Player.Listener {
