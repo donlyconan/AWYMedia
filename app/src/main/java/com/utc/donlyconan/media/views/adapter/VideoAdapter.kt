@@ -108,6 +108,8 @@ class VideoAdapter(
 
             Glide.with(itemView.context)
                 .load(video.path)
+                .centerCrop()
+                .error(R.drawable.ic_baseline_error_24)
                 .into(binding.imgThumbnail)
 
             if (showProgress) {

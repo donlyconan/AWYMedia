@@ -2,8 +2,8 @@ package com.utc.donlyconan.media.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.PlaylistWithVideos
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 
 @Dao
@@ -26,4 +26,7 @@ interface PlaylistWithVideosDao {
     @Query("Select * from playlist where playlist_id = :playlistId")
     fun getPlaylist(playlistId: Int): LiveData<PlaylistWithVideos>
 
+    @Query("Select * from videos where " +
+            "video_id=(Select video_id from video_playlist where playlist_id=:playlistId limit 1)")
+    fun getFirstVideo(playlistId: Int): Video?
 }

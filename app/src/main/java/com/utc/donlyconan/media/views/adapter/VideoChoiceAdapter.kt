@@ -8,8 +8,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.data.models.Video
-import com.utc.donlyconan.media.databinding.ItemVideoChoiseBinding
+import com.utc.donlyconan.media.databinding.ItemVideoChoiceBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
@@ -26,7 +27,7 @@ class VideoChoiceAdapter(var context: Context, var videos: ArrayList<Video>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
         Log.d(TAG, "onCreateViewHolder: ")
-        val binding: ItemVideoChoiseBinding = ItemVideoChoiseBinding.inflate(inflater)
+        val binding: ItemVideoChoiceBinding = ItemVideoChoiceBinding.inflate(inflater)
         return VideoHolder(binding)
     }
 
@@ -55,7 +56,7 @@ class VideoChoiceAdapter(var context: Context, var videos: ArrayList<Video>) :
     }
 
 
-    class VideoHolder(val binding: ItemVideoChoiseBinding) :
+    class VideoHolder(val binding: ItemVideoChoiceBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnLongClickListener {
         var onItemClickListener: OnItemClickListener? = null
         var onItemLongClickListener: OnItemLongClickListener? = null
@@ -77,13 +78,10 @@ class VideoChoiceAdapter(var context: Context, var videos: ArrayList<Video>) :
         fun bind(video: Video, isLastItem: Boolean) {
             Log.d(TAG, "bind() called with: video = $video, isLastItem = $isLastItem")
             binding.tvTitle.text = video.title
+            binding.tvSize.text = video.size.convertToStorageData()
             Glide.with(itemView.context)
                 .load(video.path)
                 .into(binding.imgThumbnail)
-            binding.cbSelected.isChecked = video.isSelected
-            binding.cbSelected.setOnCheckedChangeListener { v, isChecked ->
-                video.isSelected = isChecked
-            }
             if (isLastItem) {
                 binding.container.apply {
                     val paddingBottom =

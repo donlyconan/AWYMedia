@@ -78,15 +78,6 @@
     <string name="auto_download_des">Cho phép ứng dụng truy cập và tải video từ thiết bị.</string>
     <string name="erase_cycle_summary">Thiết lập chu kỳ xóa video.</string>
     <string name="video_exist_des">Video đã tồn tại.</string>
-
-
-
-    <string-array name="remove_entries">
-        <item>Hàng ngày</item>
-        <item>Hàng ngày</item>
-        <item>Hàng tháng</item>
-        <item>Hàng năm</item>
-    </string-array>
     <string name="email">Email</string>
     <string name="locked_des">Màn hình đã khóa</string>
     <string name="locked_intro">Nhấn để mở khóa</string>
@@ -94,5 +85,17 @@
     <string name="rename">Đổi tên</string>
     <string name="save">Lưu</string>
     <string name="data_synchronization">Đồng bộ hóa dữ liệu</string>
+
+    <string-array name="remove_entries">
+        <item>Hàng ngày</item>
+        <item>Hàng tuần</item>
+        <item>Hàng tháng</item>
+        <item>Hàng năm</item>
+        <item>Vô hiệu hóa</item>
+    </string-array>
+    <string name="understood">Đã hiểu</string>
+    <string name="trash_clean_des">Thùng rác sẽ được làm sạch sau %s %s</string>
+    <string name="days">ngày</string>
+    <string name="hours">giờ</string>
 
 </resources>

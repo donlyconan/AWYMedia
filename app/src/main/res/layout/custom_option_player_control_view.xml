@@ -51,10 +51,10 @@
             <Switch
                 android:id="@+id/autoPlay"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="20dp"
                 android:layout_weight="0"
                 android:checked="true"
-                android:layout_marginEnd="2dp"
+                android:layout_marginEnd="5dp"
                 android:layout_gravity="top"
                 android:thumbTint="@color/white"
                 android:trackTint="@color/white" />

@@ -31,4 +31,5 @@ interface PlaylistRepository {
 
     fun findById(playlistId: Int): Playlist
 
+    fun getFirstVideo(playlistId: Int): Video?
 }

@@ -28,6 +28,9 @@ import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import javax.inject.Inject
 
 
+/**
+ * Represent for Playlist screen where we will manage all playlist and video in each playlist
+ */
 class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListener ,
     OnItemLongClickListener {
 
