@@ -97,5 +97,8 @@
     <string name="trash_clean_des">Thùng rác sẽ được làm sạch sau %s %s</string>
     <string name="days">ngày</string>
     <string name="hours">giờ</string>
+    <string name="general_settings">Cài đặt chung</string>
+    <string name="select_language">Chọn ngôn ngữ</string>
+    <string name="author">Donly Conan</string>
 
 </resources>

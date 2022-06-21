@@ -6,7 +6,7 @@
     android:title="@string/settings"
     android:fragment="com.utc.donlyconan.media.views.SettingsActivity$SettingsScreen">
 
-    <PreferenceCategory android:title="Cài đặt chung">
+    <PreferenceCategory android:title="@string/general_settings">
 
         <ListPreference
             android:title="@string/language"
@@ -16,7 +16,7 @@
             android:defaultValue="en"
             android:summary="@string/language_des"
             android:dialogIcon="@drawable/ic_logo"
-            android:dialogTitle="Chọn ngôn ngữ"/>
+            android:dialogTitle="@string/select_language"/>
 
         <CheckBoxPreference
             android:title="@string/remove_video_from_devices"
@@ -77,7 +77,7 @@
 
         <Preference
             android:title="@string/copy_right"
-            android:summary="Donly Conan"/>
+            android:summary="@string/author"/>
 
         <Preference
             android:title="@string/email"
