@@ -91,7 +91,7 @@ class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
-                        application.iMusicalService()?.apply {
+                        application.getMusicalService()?.apply {
                             setPlaylist(position, adapter.videoList)
                             play()
                         }
