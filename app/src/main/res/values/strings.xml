@@ -102,6 +102,9 @@
     <string name="trash_clean_des">Trash bin will be emptied after %s %s</string>
     <string name="days">days</string>
     <string name="hours">hours</string>
+    <string name="general_settings">General settings</string>
+    <string name="select_language">Select language</string>
+    <string name="author">Donly Conan</string>
 
     <string-array name="language_entries">
         <item>English</item>
