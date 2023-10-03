@@ -7,19 +7,18 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import androidx.annotation.MainThread
+import com.utc.donlyconan.media.IMusicService
 import com.utc.donlyconan.media.app.services.MusicService
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 
 /**
- * Represent a application of AWYMedia that provides all app's dependencies. It also provides
- * a MusicService's connection that handles all logic of media
+ * Represent a application of AWYMedia that provides all app's dependencies
  */
 class AwyMediaApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
-    private lateinit var service: MusicService
+    private var iMusicalService: IMusicService? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -39,7 +38,7 @@ class AwyMediaApplication: Application() {
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder) {
             Log.d(TAG, "onServiceConnected() called with: name = $name, service = $service")
-            this@AwyMediaApplication.service = (service as MusicService.MusicBinder).getMusicService()
+            iMusicalService = IMusicService.Stub.asInterface(service)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -54,17 +53,21 @@ class AwyMediaApplication: Application() {
         return appComponent
     }
 
-    fun getMusicalService(): MusicService {
-        return service
+    fun iMusicalService(): IMusicService? {
+        return iMusicalService
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        Log.d(TAG, "onTerminate() called")
     }
 
     companion object {
         val TAG: String = AwyMediaApplication.javaClass.simpleName
-        @Volatile
+
         private lateinit var instance: AwyMediaApplication
 
         // Save instance of Application
-        @MainThread
         fun getInstance() = instance
     }
 }
