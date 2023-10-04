@@ -9,13 +9,13 @@ plugins {
 
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion '30.0.3'
 
     defaultConfig {
         applicationId "com.utc.donlyconan.media"
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
@@ -41,12 +41,6 @@ android {
         }
     }
 
-    packagingOptions {
-        resources.excludes.add("META-INF/*")
-    }
-//    packagingOptions {
-//        exclude 'META-INF/atomicfu.kotlin_module'
-//    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -54,13 +48,17 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    sourceSets {
+        main {
+            aidl.srcDirs = ['src/main/aidl']
+        }
+    }
 }
 
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-//    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-//    implementation 'com.google.android.material:material:1.4.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.core:core-ktx:$kotlincore_version"
     implementation 'androidx.appcompat:appcompat:1.4.1'
