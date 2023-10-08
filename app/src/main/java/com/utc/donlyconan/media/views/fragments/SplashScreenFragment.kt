@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
@@ -37,7 +37,7 @@ class SplashScreenFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
-        (context?.applicationContext as AwyMediaApplication).applicationComponent()
+        (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
     }
 
@@ -62,6 +62,7 @@ class SplashScreenFragment : BaseFragment() {
                     == PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "onResume: Check conditions for loading process.")
                 // Load all data from the device
                 if (settings.autoDownload) {
                     loadingData()

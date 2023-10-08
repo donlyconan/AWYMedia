@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Video Player</string>
+    <string name="app_name" translatable="false">Easy Guard Player</string>
 
     <string name="toolbar_title_home">Home</string>
     <string name="toolbar_title_explore">Explore</string>

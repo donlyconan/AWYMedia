@@ -16,7 +16,7 @@ import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 /**
  * Represent a application of AWYMedia that provides all app's dependencies
  */
-class AwyMediaApplication: Application() {
+class EGMApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
     private var iMusicalService: IMusicService? = null
 
@@ -63,9 +63,9 @@ class AwyMediaApplication: Application() {
     }
 
     companion object {
-        val TAG: String = AwyMediaApplication.javaClass.simpleName
+        val TAG: String = EGMApplication.javaClass.simpleName
 
-        private lateinit var instance: AwyMediaApplication
+        private lateinit var instance: EGMApplication
 
         // Save instance of Application
         fun getInstance() = instance

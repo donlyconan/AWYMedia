@@ -3,7 +3,6 @@ package com.utc.donlyconan.media.views.fragments
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +11,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.AwyMediaApplication
-import com.utc.donlyconan.media.data.dao.ListVideoDao
+import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentExpendedPlaylistBinding
-import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.VideoChoiceAdapter
@@ -39,7 +36,7 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
         super.onCreate(savedInstanceState)
         Log.d(DetailedPlaylistFragment.TAG, "onCreate: ")
         setHasOptionsMenu(true)
-        (context?.applicationContext as AwyMediaApplication).applicationComponent()
+        (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
     }
 

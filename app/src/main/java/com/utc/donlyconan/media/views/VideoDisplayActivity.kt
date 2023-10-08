@@ -18,7 +18,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
@@ -55,11 +55,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
 
         // stop media service
-        (applicationContext as AwyMediaApplication).iMusicalService()
+        (applicationContext as EGMApplication).iMusicalService()
             ?.release()
 
         setContentView(binding.root)
-        (applicationContext as AwyMediaApplication).applicationComponent()
+        (applicationContext as EGMApplication).applicationComponent()
             .inject(this)
         bindingOverlay = PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
         beView = CustomOptionPlayerControlViewBinding
@@ -299,7 +299,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     }
                 }
                 R.id.exo_play_music -> {
-                    val application = application as AwyMediaApplication
+                    val application = application as EGMApplication
                     viewModel.getVideo().playedTime = player?.currentPosition ?: 0L
                     application.iMusicalService()?.apply {
                         setPlaylist(viewModel.position, viewModel.playlist)

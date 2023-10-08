@@ -19,7 +19,7 @@ import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 /**
  *  This is Recent screen which will show all video is playing
  */
-class RecentFragment : ListVideoFragment() {
+class RecentFragment : ListVideosFragment() {
     val binding by lazy { FragmentRecentBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<RecentVideoViewModel>()
 

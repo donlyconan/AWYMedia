@@ -13,7 +13,7 @@ import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 
-abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
+abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
     
     protected lateinit var adapter: VideoAdapter
     protected lateinit var videoRepo: VideoRepository
@@ -70,7 +70,7 @@ abstract class ListVideoFragment : BaseFragment(), OnItemClickListener {
 
     companion object {
 
-        val TAG = ListVideoFragment::class.simpleName
+        val TAG = ListVideosFragment::class.simpleName
 
     }
 

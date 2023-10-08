@@ -2,7 +2,7 @@ package com.utc.donlyconan.media.dagger.modules
 
 import android.app.Application
 import com.utc.donlyconan.media.data.dao.*
-import com.utc.donlyconan.media.data.db.AwyMediaDatabase
+import com.utc.donlyconan.media.data.db.EGMDatabase
 import dagger.Module
 import dagger.Provides
 
@@ -10,32 +10,32 @@ import dagger.Provides
 class DatabaseModule {
 
     @Provides
-    fun provideDatabase(application: Application): AwyMediaDatabase  {
-        return AwyMediaDatabase.getInstance(application)
+    fun provideDatabase(application: Application): EGMDatabase  {
+        return EGMDatabase.getInstance(application)
     }
 
     @Provides
-    fun provideVideoDao(database: AwyMediaDatabase): VideoDao {
+    fun provideVideoDao(database: EGMDatabase): VideoDao {
         return database.videoDao()
     }
 
     @Provides
-    fun provideListVideoDao(database: AwyMediaDatabase): ListVideoDao {
+    fun provideListVideoDao(database: EGMDatabase): ListVideoDao {
         return database.listVideoDao()
     }
 
     @Provides
-    fun providePlaylistDao(database: AwyMediaDatabase): PlaylistDao {
+    fun providePlaylistDao(database: EGMDatabase): PlaylistDao {
         return database.playlistDao()
     }
 
     @Provides
-    fun providePlaylistWithVideosDao(database: AwyMediaDatabase): PlaylistWithVideosDao {
+    fun providePlaylistWithVideosDao(database: EGMDatabase): PlaylistWithVideosDao {
         return database.playlistWithVideosDao()
     }
 
     @Provides
-    fun provideTrashDao(database: AwyMediaDatabase): TrashDao {
+    fun provideTrashDao(database: EGMDatabase): TrashDao {
         return database.getTrashDao()
     }
 

@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
@@ -37,7 +37,7 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
-        (context?.applicationContext as AwyMediaApplication).applicationComponent()
+        (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
         setHasOptionsMenu(true)
         val appCompat = activity

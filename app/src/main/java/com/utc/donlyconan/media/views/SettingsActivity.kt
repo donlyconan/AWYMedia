@@ -1,7 +1,6 @@
 package com.utc.donlyconan.media.views
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -9,7 +8,7 @@ import android.widget.TextView
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.databinding.ActivitySettingsBinding
 
 /**
@@ -43,7 +42,7 @@ class SettingsActivity : BaseActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             Log.d(TAG, "onCreatePreferences: ")
             addPreferencesFromResource(R.xml.preferences)
-            val settings = (context?.applicationContext as? AwyMediaApplication)
+            val settings = (context?.applicationContext as? EGMApplication)
                 ?.applicationComponent()?.getSettings()
 
             listLanguage?.setOnPreferenceChangeListener { preference, newValue ->

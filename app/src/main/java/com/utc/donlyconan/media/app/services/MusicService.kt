@@ -1,28 +1,21 @@
 package com.utc.donlyconan.media.app.services
 
 import android.app.Notification
-import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.BitmapFactory
-import android.os.Bundle
+import android.os.Binder
 import android.os.IBinder
-import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.utc.donlyconan.media.IMusicService
-import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.AwyMediaApplication
+import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 
@@ -59,7 +52,7 @@ class MusicService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate() called")
-        (applicationContext as AwyMediaApplication).applicationComponent()
+        (applicationContext as EGMApplication).applicationComponent()
             .inject(this)
         mediaSession = MediaSessionCompat(this, TAG).apply {
             isActive = true
@@ -236,4 +229,21 @@ class MusicService : Service() {
         }
 
     }
+
+    fun isReady() : Boolean {
+        return player != null && player!!.isPlaying
+    }
+
+    inner class EGMBinder : Binder() {
+
+        /** @returns local service */
+        fun getService() : MusicService {
+            return this@MusicService
+        }
+
+    }
+
+    //----------------------------------- implement local functions --------------------------------
+
+
 }

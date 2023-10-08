@@ -1,31 +1,22 @@
 package com.utc.donlyconan.media.views.fragments.maindisplay
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
-import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
-import com.utc.donlyconan.media.extension.widgets.TAG
 import com.utc.donlyconan.media.viewmodels.FavoriteVideoViewModel
-import com.utc.donlyconan.media.views.BaseFragment
-import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.launch
 
 
 /**
  * Represent for screen that will be contains all favorite user files
  */
-class FavoriteFragment : ListVideoFragment(), OnItemClickListener {
+class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentFavoriteBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<FavoriteVideoViewModel>()

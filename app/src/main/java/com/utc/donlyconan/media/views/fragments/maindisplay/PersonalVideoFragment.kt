@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -21,13 +22,12 @@ import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import javax.inject.Inject
 
 
 /**
  * Represent for Main Screen of app where app will shows all video list has on it
  */
-class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
+class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
@@ -72,9 +72,16 @@ class PersonalVideoFragment : ListVideoFragment(), View.OnClickListener {
             viewModel.insertVideoIfNeed()
         } else {
             Log.d(TAG, "onViewCreated: register permission!")
-            requestPermissionResult.launch(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            )
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                requestPermissionResult.launch(
+                    arrayOf(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    )
+                )
+            } else {
+                requestPermissionResult.launch(arrayOf(Manifest.permission.READ_MEDIA_VIDEO))
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.utc.donlyconan.media.data.dao
 
+import android.database.Cursor
 import androidx.room.*
 import com.utc.donlyconan.media.data.models.Video
 
@@ -36,4 +37,7 @@ interface VideoDao {
     @Query("Select * from videos where path=:path limit 1")
     fun getVideoInfo(path: String): Video
 
+
+    @Query("Select * from videos ")
+    fun iterator(): Cursor
 }

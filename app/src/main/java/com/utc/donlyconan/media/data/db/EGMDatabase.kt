@@ -12,16 +12,16 @@ import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 
 @Database(entities = [Video::class, Playlist::class, VideoPlaylistCrossRef::class, Trash::class],
     version = 1, exportSchema = false)
-abstract class AwyMediaDatabase: RoomDatabase() {
+abstract class EGMDatabase: RoomDatabase() {
 
     companion object {
         val DATABASE_NAME = "AWY_Media"
         @Volatile
-        private var instance: AwyMediaDatabase? = null
+        private var instance: EGMDatabase? = null
 
-        fun getInstance(context: Context): AwyMediaDatabase = synchronized(this) {
+        fun getInstance(context: Context): EGMDatabase = synchronized(this) {
             if(instance == null) {
-                instance = Room.databaseBuilder(context, AwyMediaDatabase::class.java, DATABASE_NAME)
+                instance = Room.databaseBuilder(context, EGMDatabase::class.java, DATABASE_NAME)
                     .allowMainThreadQueries()
                     .build()
             }

@@ -18,7 +18,7 @@ import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideoFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import javax.inject.Inject
@@ -27,7 +27,7 @@ import javax.inject.Inject
 /**
  * Show all videos included in the playlist
  */
-class DetailedPlaylistFragment : ListVideoFragment(), OnItemClickListener {
+class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentDetailedPlaylistBinding.inflate(layoutInflater) }
     val args by navArgs<DetailedPlaylistFragmentArgs>()
