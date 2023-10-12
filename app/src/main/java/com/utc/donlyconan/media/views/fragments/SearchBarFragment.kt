@@ -14,13 +14,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentSearchBarBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.viewmodels.SearchViewModel
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.PlaylistAdapter
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import javax.inject.Inject
@@ -40,13 +41,13 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        applicationComponent.inject(this)
+        appComponent.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                 "savedInstanceState = $savedInstanceState")
-        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
+        lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -69,7 +70,7 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
             }
         } else {
             videoAdapter = VideoAdapter(requireContext(), arrayListOf(), showOptionMenu = false)
-            videoAdapter?.onItemClickListener = this
+            videoAdapter?.setOnItemClickListener(this)
             binding.recyclerView.adapter = videoAdapter
         }
     }
@@ -136,8 +137,8 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
             val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.hideSoftInputFromWindow(view!!.windowToken, 0)
             videoAdapter?.let { adapter ->
-                val videoList = adapter.videoList
-                val intent = VideoDisplayActivity.newIntent(requireContext(), position, videoList)
+                val videoList = arrayListOf<Video>()
+                val intent = VideoDisplayActivity.newIntent(requireContext(), position)
                 startActivity(intent)
             }
         }

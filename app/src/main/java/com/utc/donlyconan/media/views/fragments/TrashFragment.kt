@@ -15,10 +15,10 @@ import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.BaseFragment
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.TrashAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.launch
@@ -52,7 +52,7 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView: ")
-        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
+        lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return  binding.root
     }
 

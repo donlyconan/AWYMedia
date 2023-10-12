@@ -13,8 +13,6 @@ import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
-import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 
 class PlaylistAdapter(var context: Context,

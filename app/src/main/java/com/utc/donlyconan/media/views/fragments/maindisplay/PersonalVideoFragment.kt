@@ -21,13 +21,14 @@ import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 
 
 /**
  * Represent for Main Screen of app where app will shows all video list has on it
  */
-class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener {
+class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItemClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>()
@@ -38,8 +39,8 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener {
     ): View {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                     "savedInstanceState = $savedInstanceState")
-        applicationComponent.inject(this)
-        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
+        appComponent.inject(this)
+        lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -48,20 +49,23 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener {
                     "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
         adapter = VideoAdapter(requireContext(), arrayListOf())
-        adapter.onItemClickListener = this
+        adapter.setOnItemClickListener(this)
         binding.recyclerView.adapter = adapter
         binding.fab.setOnClickListener(this)
         showLoadingScreen()
         viewModel.lstVideos.observe(this) { videos ->
+            Log.d(TAG, "onViewCreated() called with: video size = ${videos.size}")
             if(videos.isEmpty()) {
                 showNoDataScreen()
-                adapter.submit(videos)
+                val data = viewModel.sortedByTime(videos)
+                adapter.submit(data)
             } else {
                 val sortedVideos = ArrayList(videos).apply {
                     sortWith { u, v -> u.compareTo(v, settings.sortBy) }
                 }
                 hideLoading()
-                adapter.submit(sortedVideos)
+                val data = viewModel.sortedByTime(sortedVideos)
+                adapter.submit(data)
             }
         }
 
@@ -166,22 +170,22 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener {
             }
             R.id.btn_sort_by_name -> {
                 settings.sortBy = Settings.SORT_BY_NAME
-                adapter.videoList.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
+//                adapter.getData().sortWith { u, v -> u.compareTo(v, settings.sortBy) }
                 adapter.notifyDataSetChanged()
             }
             R.id.btn_sort_by_creation -> {
                 settings.sortBy = Settings.SORT_BY_CREATION
-                adapter.videoList.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
+//                adapter.videos.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
                 adapter.notifyDataSetChanged()
             }
             R.id.btn_sort_by_recent -> {
                 settings.sortBy = Settings.SORT_BY_RECENT
-                adapter.videoList.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
+//                adapter.videos.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
                 adapter.notifyDataSetChanged()
             }
             R.id.btn_sort_by_duration -> {
                 settings.sortBy = Settings.SORT_BY_DURATION
-                adapter.videoList.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
+//                adapter.videos.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
                 adapter.notifyDataSetChanged()
             }
         }

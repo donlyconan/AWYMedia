@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentRecentBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.RecentVideoViewModel
@@ -31,7 +32,7 @@ class RecentFragment : ListVideosFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView: ")
-        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
+        lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -40,7 +41,7 @@ class RecentFragment : ListVideosFragment() {
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
         adapter = VideoAdapter(context!!, arrayListOf(), true)
-        adapter.onItemClickListener = this
+        adapter.setOnItemClickListener(this)
         binding.recyclerView.adapter = adapter
         showLoadingScreen()
         viewModel.lstVideos.observe(this) { videos ->
@@ -61,14 +62,14 @@ class RecentFragment : ListVideosFragment() {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, continued = true)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
-                        application.iMusicalService()?.apply {
-                            setPlaylist(position, adapter.videoList)
-                            play()
-                        }
+//                        application.iMusicalService()?.apply {
+//                            setPlaylist(position, arrayListOf<Video>())
+//                            play()
+//                        }
                     }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
@@ -93,7 +94,7 @@ class RecentFragment : ListVideosFragment() {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList, true)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), position, continued = true)
             startActivity(intent)
         }
     }

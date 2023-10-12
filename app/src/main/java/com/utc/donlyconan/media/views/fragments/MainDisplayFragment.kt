@@ -46,7 +46,7 @@ class MainDisplayFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
-        applicationComponent.inject(this)
+        appComponent.inject(this)
     }
 
     override fun onCreateView(
@@ -151,13 +151,13 @@ class MainDisplayFragment : BaseFragment() {
                if(fragment is PersonalVideoFragment) {
                    fragment.let { frag ->
                        MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
-                           .show(supportFragmentManager, TAG)
+                           .show(sfManager, TAG)
                    }
                } else if(fragment is PlaylistFragment) {
                    fragment.let { frag ->
                        MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
                            .setVisibility(R.id.btn_sort_by_duration)
-                           .show(supportFragmentManager, TAG)
+                           .show(sfManager, TAG)
                    }
                }
             }

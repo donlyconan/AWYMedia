@@ -8,6 +8,7 @@ package="com.utc.donlyconan.media">
     android:maxSdkVersion="32" />
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+<uses-permission android:name="android.permission.android.permission.WAKE_LOCK" />
 
 <application
     android:name=".app.EGMApplication"
@@ -40,7 +41,7 @@ package="com.utc.donlyconan.media">
         android:launchMode="singleTop" />
 
     <service
-        android:name=".app.services.MusicService"
+        android:name=".app.services.EGMService"
         android:exported="false" />
 
 

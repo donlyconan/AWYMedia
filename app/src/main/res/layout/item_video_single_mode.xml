@@ -9,19 +9,19 @@
     <RelativeLayout
         android:id="@+id/rootLayout"
         android:layout_width="match_parent"
-        android:layout_height="86dp"
-        android:foreground="?attr/selectableItemBackground"
-        android:background="@drawable/bg_rv_item"
-        android:orientation="horizontal"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
+        android:layout_height="95dp"
         android:layout_marginStart="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/bg_rv_item"
+        android:foreground="?attr/selectableItemBackground"
+        android:orientation="horizontal"
         android:padding="8dp">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/thumbnail_card"
             android:layout_width="124dp"
-            android:layout_height="70dp"
+            android:layout_height="match_parent"
             app:cardCornerRadius="3dp">
 
             <ImageView
@@ -36,24 +36,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                android:alpha="0.8"
+                android:background="@drawable/bg_video_time"
                 android:padding="3dp"
                 android:text="02:04:12"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:alpha="0.8"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="2dp"
-                android:background="@drawable/bg_video_time"/>
+                android:textSize="12sp" />
 
             <ProgressBar
                 android:id="@+id/progress"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_gravity="bottom"
-                style="?android:attr/progressBarStyleHorizontal"
                 android:progress="20"
                 android:progressDrawable="@drawable/video_play_progress"
-                android:visibility="invisible"/>
+                android:visibility="invisible" />
 
         </androidx.cardview.widget.CardView>
 
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="8dp"
             android:layout_toStartOf="@+id/img_menu_more"
@@ -104,11 +104,11 @@
             android:layout_height="35dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:scaleType="centerInside"
             android:background="@android:color/transparent"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_more_event"
-            android:padding="5dp"/>
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_more_event" />
 
     </RelativeLayout>
 </FrameLayout>

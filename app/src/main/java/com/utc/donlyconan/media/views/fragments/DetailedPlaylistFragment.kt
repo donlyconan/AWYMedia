@@ -12,10 +12,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentDetailedPlaylistBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
@@ -39,7 +40,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
         setHasOptionsMenu(true)
-        applicationComponent.inject(this)
+        appComponent.inject(this)
     }
 
     override fun onCreateView(
@@ -47,7 +48,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
         savedInstanceState: Bundle?
     ): View {
         Log.d(TAG, "onCreateView: ")
-        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
+        lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -63,7 +64,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
         binding.title.text = "Untitled"
 
         adapter = VideoAdapter(requireContext(), arrayListOf())
-        adapter.onItemClickListener = this
+        adapter.setOnItemClickListener(this)
         binding.recyclerView.adapter = adapter
         showLoadingScreen()
         playlistWithVideosDao.getPlaylist(args.playlistId).observe(this) { videoPl ->
@@ -82,19 +83,20 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.getVideo(position)
+        val video = adapter.getItem(position) as Video
+
         if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), position,  adapter.videoList)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, args.playlistId)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
-                        application.iMusicalService()?.apply {
-                            setPlaylist(position, adapter.videoList)
-                            play()
-                        }
+//                        application.iMusicalService()?.apply {
+//                            setPlaylist(position, arrayListOf())
+//                            play()
+//                        }
                     }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
@@ -130,7 +132,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, args.playlistId)
             startActivity(intent)
         }
     }

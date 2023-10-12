@@ -12,8 +12,6 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.databinding.ItemTrashBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
-import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 import java.text.SimpleDateFormat
 

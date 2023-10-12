@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.viewmodels.FavoriteVideoViewModel
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 
 
@@ -30,7 +30,7 @@ class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
                               savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                 "savedInstanceState = $savedInstanceState")
-        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
+        lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -40,7 +40,7 @@ class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
         adapter = VideoAdapter(context!!, arrayListOf(), false)
-        adapter.onItemClickListener = this
+        adapter.setOnItemClickListener(this)
         binding.recyclerView.adapter = adapter
         showLoadingScreen()
         viewModel.lstVideos.observe(this) { videos ->

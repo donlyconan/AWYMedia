@@ -4,12 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import androidx.core.view.marginEnd
-import androidx.core.view.marginStart
 import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.databinding.ItemSpeedOptionBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 
 
 class SpeedOptionAdapter(var context: Context, var speedList: List<Float>):

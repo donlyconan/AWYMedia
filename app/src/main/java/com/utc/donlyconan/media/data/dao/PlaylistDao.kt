@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.utc.donlyconan.media.data.models.Playlist
+import com.utc.donlyconan.media.data.models.Video
 
 @Dao
 interface PlaylistDao {
@@ -16,11 +17,17 @@ interface PlaylistDao {
     @Delete
     fun delete(vararg playlists: Playlist)
 
-    @Query("Select count(video_id) from video_playlist where playlist_id=:playlistId and video_id in (Select video_id from videos)")
-    fun countVideos(playlistId: Int): Int
+    @Query("Select * from playlist where playlist_id=:playlistId")
+    fun get(playlistId: Int): Playlist
 
     @Query("Select * from playlist")
-    fun getAllPlaylist(): LiveData<List<Playlist>>
+    fun getAll(): LiveData<List<Playlist>>
+
+//    @Query("Select * from video_playlist where playlist_id=:playlistId")
+//    fun getAllVideos(playlistId: Int): List<Video>
+
+    @Query("Select count(video_id) from video_playlist where playlist_id=:playlistId and video_id in (Select video_id from videos)")
+    fun countVideos(playlistId: Int): Int
 
     @Query("Delete from video_playlist where video_id=:videoId")
     fun removeVideoFromPlaylist(videoId: Int)

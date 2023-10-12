@@ -41,6 +41,8 @@
     <color name="white_gray_30">#686E78</color>
     <color name="black_gray">#383A3E</color>
     <color name="recycler_color">#1f2123</color>
+    <color name="dark_recycler_color">#151617</color>
+    <color name="transparent_recycler_color">#661F2123</color>
     <color name="gray">#383C40</color>
     <color name="gray_20">#515559</color>
 
@@ -52,5 +54,6 @@
     <color name="color_checked">#3ABDCD</color>
     <color name="text_color_hint">#C5C8C8</color>
     <color name="gray_10_per">#46484C</color>
+    <color name="_303132_tools_bar">#303132</color>
 
 </resources>

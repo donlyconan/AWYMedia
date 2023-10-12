@@ -1,7 +1,6 @@
 package com.utc.donlyconan.media.data.repo
 
 import androidx.lifecycle.LiveData
-import com.utc.donlyconan.media.data.models.PlaylistWithVideos
 import com.utc.donlyconan.media.data.models.Video
 
 interface ListVideoRepository {

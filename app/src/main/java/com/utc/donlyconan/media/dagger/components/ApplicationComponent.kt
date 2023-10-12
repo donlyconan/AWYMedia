@@ -1,6 +1,6 @@
 package com.utc.donlyconan.media.dagger.components
 
-import com.utc.donlyconan.media.app.services.MusicService
+import com.utc.donlyconan.media.app.services.EGMService
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
@@ -19,6 +19,7 @@ import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PlaylistFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.RecentFragment
+import com.utc.donlyconan.media.views.fragments.options.listedvideos.ListedVideosDialog
 import dagger.Component
 import javax.inject.Singleton
 
@@ -58,9 +59,10 @@ interface ApplicationComponent {
     fun inject(fragment: SplashScreenFragment)
     fun inject(fragment: TrashFragment)
     fun inject(fragment: ListVideoDisplayFragment)
-    fun inject(fragment: MusicService)
+    fun inject(fragment: EGMService)
     fun inject(fragment: VideoDisplayActivity)
     fun inject(fragment: PlaylistViewModel)
     fun inject(videoDisplayViewModel: VideoDisplayViewModel)
     fun inject(baseActivity: BaseActivity)
+    fun inject(listedVideosDialog: ListedVideosDialog)
 }

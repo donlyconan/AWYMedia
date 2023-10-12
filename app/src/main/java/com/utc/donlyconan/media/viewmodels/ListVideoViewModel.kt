@@ -16,10 +16,6 @@ open class ListVideoViewModel(app: Application) : BaseAndroidViewModel(app) {
     val videoRepo = myApp.applicationComponent().getVideoRepo()
     val selectedVideo: LiveData<Video> = _selectedVideo
 
-    fun getVideoList(): LiveData<List<Video>> {
-        return listVideoRepo.getAllVideos()
-    }
-
     fun hasVideo(path: String): Boolean {
         return videoRepo.countPath(path) != 0
     }

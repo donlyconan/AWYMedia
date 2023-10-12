@@ -17,8 +17,8 @@ import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentExpendedPlaylistBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoChoiceAdapter
 import javax.inject.Inject
 
@@ -110,7 +110,7 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
         val video = adapter.videos[position]
-        video.isSelected = !video.isSelected
+        video.isChecked = !video.isChecked
         adapter.notifyItemChanged(position)
 
         val videoCross = VideoPlaylistCrossRef(video.videoId, args.playlistId)

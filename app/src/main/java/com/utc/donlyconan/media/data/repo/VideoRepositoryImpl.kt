@@ -31,7 +31,7 @@ class VideoRepositoryImpl @Inject constructor(private val videoDao: VideoDao,
 
     override fun delete(videoId: Int): Int = videoDao.delete(videoId)
 
-    override fun getVideo(videoId: Int): Video = videoDao.getVideo(videoId)
+    override fun get(videoId: Int): Video = videoDao.get(videoId)
 
     override fun getNext(videoId: Int): Video = videoDao.getNextVideo(videoId)
 

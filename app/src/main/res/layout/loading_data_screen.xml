@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/frame_container"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
     android:gravity="center"
-    android:padding="12dp"
+    android:paddingStart="30dp"
+    android:paddingEnd="30dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     android:background="@drawable/bg_loading_screen"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -19,12 +22,12 @@
         android:layout_gravity="center">
 
         <ProgressBar
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:indeterminate="true"/>
 
         <TextView
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/loading_data"
@@ -43,6 +46,6 @@
         android:layout_gravity="center"
         android:drawablePadding="@dimen/spacing_8"
         android:textSize="16sp"
-        android:drawableStart="@drawable/outline_movie_24"/>
+        app:drawableStartCompat="@drawable/outline_movie_24" />
 
 </FrameLayout>

@@ -18,10 +18,11 @@ import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 open class BaseFragment : Fragment() {
     protected val activity by lazy { requireActivity() as MainActivity }
     protected val application by lazy { requireContext().applicationContext as EGMApplication }
-    protected val applicationComponent by lazy { application.applicationComponent() }
-    protected val supportFragmentManager by lazy { activity.supportFragmentManager }
-    protected var lBinding: LoadingDataScreenBinding? = null
-    protected val settings by lazy { applicationComponent.getSettings() }
+    protected val appComponent by lazy { application.applicationComponent() }
+    protected val sfManager by lazy { activity.supportFragmentManager }
+    // loading screen
+    protected var lsBinding: LoadingDataScreenBinding? = null
+    protected val settings by lazy { appComponent.getSettings() }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -31,13 +32,13 @@ open class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val icdLoading = view.findViewById<View>(R.id.icd_loading)
         if(icdLoading != null) {
-            lBinding = LoadingDataScreenBinding.bind(icdLoading)
+            lsBinding = LoadingDataScreenBinding.bind(icdLoading)
         }
     }
 
     fun showLoadingScreen() {
         Log.d(MainDisplayFragment.TAG, "showLoadingScreen() called")
-        lBinding?.apply {
+        lsBinding?.apply {
             llLoading.visibility = View.VISIBLE
             tvNoData.visibility = View.INVISIBLE
             frameContainer.visibility = View.VISIBLE
@@ -46,7 +47,7 @@ open class BaseFragment : Fragment() {
 
     fun showNoDataScreen() {
         Log.d(ListVideosFragment.TAG, "showNoDataScreen() called")
-        lBinding?.apply {
+        lsBinding?.apply {
             llLoading.visibility = View.INVISIBLE
             tvNoData.visibility = View.VISIBLE
             frameContainer.visibility = View.VISIBLE
@@ -55,7 +56,7 @@ open class BaseFragment : Fragment() {
 
     fun hideLoading() {
         Log.d(ListVideosFragment.TAG, "hideLoading() called")
-        lBinding?.apply {
+        lsBinding?.apply {
             frameContainer.visibility = View.INVISIBLE
         }
     }

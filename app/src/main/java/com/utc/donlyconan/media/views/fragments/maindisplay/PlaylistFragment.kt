@@ -17,11 +17,11 @@ import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.DialogAddPlaylistBinding
 import com.utc.donlyconan.media.databinding.FragmentPlaylistBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
-import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
 import com.utc.donlyconan.media.views.BaseFragment
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
+import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.PlaylistAdapter
 import com.utc.donlyconan.media.views.fragments.MainDisplayFragmentDirections
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
@@ -31,7 +31,7 @@ import javax.inject.Inject
 /**
  * Represent for Playlist screen where we will manage all playlist and video in each playlist
  */
-class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListener ,
+class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListener,
     OnItemLongClickListener {
 
     val binding by lazy { FragmentPlaylistBinding.inflate(layoutInflater) }
@@ -43,14 +43,14 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
-        applicationComponent.inject(this)
+        appComponent.inject(this)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        lBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
+        lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
 
@@ -107,7 +107,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     }.show()
                 }
             }
-        }.show(supportFragmentManager, TAG)
+        }.show(sfManager, TAG)
     }
 
     override fun onClick(v: View?) {

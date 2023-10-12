@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.extension.widgets.setLocale
 import javax.inject.Inject
 
@@ -15,6 +16,8 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     @Inject lateinit var settings: Settings
+    protected val application by lazy { applicationContext as EGMApplication }
+    protected val appComponent by lazy { application.applicationComponent() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as EGMApplication)

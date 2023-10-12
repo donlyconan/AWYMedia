@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.views.adapter.Selectable
 
 @Entity(tableName = "playlist")
 data class Playlist(
@@ -17,9 +18,11 @@ data class Playlist(
     var createdAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "updated_at")
     var updatedAt: Long = System.currentTimeMillis()
-) {
+): Selectable {
     @Ignore
     var itemSize: Int = 0
+    @Ignore
+    var isChecked: Boolean = false
 
     fun compareTo(v: Playlist, sortBy: Int) = when (sortBy) {
         Settings.SORT_BY_CREATION -> {
@@ -33,6 +36,14 @@ data class Playlist(
             val sch = v.title.first()
             fch.toInt() - sch.toInt()
         }
+    }
+
+    override fun isSelected(): Boolean {
+        return isChecked
+    }
+
+    override fun setSelected(isSelected: Boolean) {
+        this.isChecked = isSelected
     }
 
     companion object {

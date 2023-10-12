@@ -19,6 +19,8 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
+import com.utc.donlyconan.media.app.services.EGMService
+import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
@@ -28,6 +30,8 @@ import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
+import com.utc.donlyconan.media.views.fragments.options.listedvideos.ListedVideosDialog
+import com.utc.donlyconan.media.views.fragments.options.listedvideos.OnSelectedChangeListener
 
 
 /**
@@ -37,8 +41,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     private val viewModel by viewModels<VideoDisplayViewModel>()
     private val binding by lazy { ActivityVideoDisplayBinding.inflate(layoutInflater) }
-    private lateinit var bindingOverlay: PlayerControlViewBinding
-    private lateinit var beView: CustomOptionPlayerControlViewBinding
+    private lateinit var playerControlBinding: PlayerControlViewBinding
+    private lateinit var customBinding: CustomOptionPlayerControlViewBinding
+    private val service: EGMService? by lazy { application.getEgmService() }
     private var player: ExoPlayer? = null
     // tell us that we will prevent playing change listener
     private var flagPlayingChanged = false
@@ -54,90 +59,112 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // stop media service
-        (applicationContext as EGMApplication).iMusicalService()
-            ?.release()
+//        // stop media service
+//        (applicationContext as EGMApplication).getEgmService()
+//            ?.release()
 
         setContentView(binding.root)
-        (applicationContext as EGMApplication).applicationComponent()
-            .inject(this)
-        bindingOverlay = PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
-        beView = CustomOptionPlayerControlViewBinding
-            .bind(bindingOverlay.layoutPlayerControlView.rootView)
+        (applicationContext as EGMApplication).applicationComponent().let { com ->
+            com.inject(this)
+            com.inject(viewModel)
+        }
+        playerControlBinding = PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
+        customBinding = CustomOptionPlayerControlViewBinding
+            .bind(playerControlBinding.layoutPlayerControlView.rootView)
 
-        viewModel.video.observe(this) { video ->
-            Log.d(TAG, "onCreate: position=${viewModel.position}, video=$video")
-            beView.headerTv.text = video.title
-            if(viewModel.isResetPosition) {
-                Log.d(TAG, "onCreate: reset position")
-                video.playedTime = 0L
+        service?.setupPlayer()
+        player = service?.getPlayer()
+
+        if(service == null || player == null){
+            Logs.d(TAG, "onCreate: service.(${service==null}) or player.(${player==null}) is not available!")
+            // TODO show errors when player is invalid
+        } else {
+            val videoId = intent.getIntExtra(EXTRA_VIDEO_ID, -1)
+            val playlistId = intent.getIntExtra(EXTRA_PLAYLIST, -1)
+            val continued = intent.getBooleanExtra(EXTRA_CONTINUE, false)
+            viewModel.initialize(videoId, playlistId, continued)
+
+            viewModel.videoMld.observe(this) { video ->
+                Logs.d(TAG, "video View Model: video=$video")
+                customBinding.headerTv.text = video.title
+                player!!.apply {
+
+                    setMediaItem(MediaItem.fromUri(video.path))
+                    playWhenReady = true
+                    binding.player.player = player
+                    prepare()
+                    addListener(listener)
+                }
             }
-            try {
-                initializePlayer(video)
-                viewModel.isResetPosition = false
-            } catch (e: Exception) {
-                showMessage(e.message)
-                e.printStackTrace()
-            }
+            initialize(true)
         }
-        viewModel.mLdSpeed.observe(this){ speed ->
-            Log.d(TAG, "onCreate() called with: speed = $speed")
-            player?.setPlaybackSpeed(speed)
-        }
-        viewModel.mRepeatMode.observe(this){ mode ->
-            Log.d(TAG, "onCreate() called with: mode = $mode")
-            player?.repeatMode = mode
-            beView.exoLoop?.isSelected = mode == ExoPlayer.REPEAT_MODE_ONE
-        }
-        viewModel.mPlayWhenReady.observe(this) { enabled ->
-            Log.d(TAG, "onCreate() called with: enabled = $enabled")
-            player?.playWhenReady = enabled
-        }
-        loadingVideo()
-        initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+//        viewModel.mLdSpeed.observe(this){ speed ->
+//            Log.d(TAG, "onCreate() called with: speed = $speed")
+//            player?.setPlaybackSpeed(speed)
+//        }
+//        viewModel.mRepeatMode.observe(this){ mode ->
+//            Log.d(TAG, "onCreate() called with: mode = $mode")
+//            player?.repeatMode = mode
+//            customControlBinding.exoLoop?.isSelected = mode == ExoPlayer.REPEAT_MODE_ONE
+//        }
+//        viewModel.mPlayWhenReady.observe(this) { enabled ->
+//            Log.d(TAG, "onCreate() called with: enabled = $enabled")
+//            player?.playWhenReady = enabled
+//        }
+//        loadingVideo()
+//        initialize(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Log.d(TAG, "onNewIntent: ")
         viewModel.isInitialized = false
-        loadingVideo()
+//        loadingVideo()
+    }
+
+
+    fun showPlaylist(playlistId: Int) {
+        Logs.d(TAG, "showPlaylist() called with: playlistId = $playlistId")
+        val dialog = ListedVideosDialog.newInstance(playlistId, object : OnSelectedChangeListener {
+            override fun onSelectionChanged(videoId: Int) {
+                Logs.d(TAG, "onSelectionChanged() called with: videoId = $videoId")
+                viewModel.changeVideo(videoId)
+            }
+        })
+        dialog.show(supportFragmentManager, TAG)
     }
 
     fun loadingVideo() {
         Log.d(TAG, "loadingVideo() called isInit = ${viewModel.isInitialized}")
-        if (!viewModel.isInitialized) {
-            Log.d(TAG, "loadingVideo: video is loaded!")
-            if(!viewModel.isRestoredState && settings.restoreState) {
-                showDialogToRestoreState(viewModel.getVideo())
-            }
-            return
-        }
-        viewModel.playlist = intent.getParcelableArrayListExtra(EXTRA_PLAYLIST) ?: arrayListOf()
-        viewModel.position = intent.getIntExtra(EXTRA_POSITION, 0)
-        viewModel.isContinue = intent.getBooleanExtra(EXTRA_CONTINUE, false)
-        viewModel.mLdSpeed.value = intent.getFloatExtra(EXTRA_SPEED, 1.0f)
-        viewModel.mRepeatMode.value = intent.getIntExtra(EXTRA_REPEAT_MODE,
-            ExoPlayer.REPEAT_MODE_OFF)
+//        if (!viewModel.isInitialized) {
+//            Log.d(TAG, "loadingVideo: video is loaded!")
+//            if(!viewModel.isRestoredState && settings.restoreState) {
+//                showDialogToRestoreState(viewModel.getVideo())
+//            }
+//            return
+//        }
+        viewModel.playlist =  arrayListOf()
+        viewModel.videoId = intent.getIntExtra(EXTRA_VIDEO_ID, -1)
+        viewModel.continued = intent.getBooleanExtra(EXTRA_CONTINUE, false)
         viewModel.mPlayWhenReady.value = settings.autoPlay
 
-        // Reset position of video time down to zero and save the current position of video
-        val video = viewModel.getVideo()
-
-        if (viewModel.canShowDialog()) {
-            // Show dialog to restore state of video when restoreState from setting equals true
-            if(settings.restoreState) {
-                viewModel.video.value = video.copy(playedTime = -1)
-                showDialogToRestoreState(video)
-            } else {
-                viewModel.video.value = viewModel.getVideo().copy(playedTime = -1)
-            }
-            viewModel.isContinue = true
-        } else {
-            viewModel.video.value = if(viewModel.video.value == null)
-                viewModel.getVideo()
-            else viewModel.video.value?.copy(updatedAt = System.currentTimeMillis())
-        }
+//        // Reset position of video time down to zero and save the current position of video
+//        val video = viewModel.getVideo()
+//
+//        if (viewModel.canShowDialog()) {
+//            // Show dialog to restore state of video when restoreState from setting equals true
+//            if(settings.restoreState) {
+//                viewModel.videoMld.value = video.copy(playedTime = -1)
+//                showDialogToRestoreState(video)
+//            } else {
+//                viewModel.videoMld.value = viewModel.getVideo().copy(playedTime = -1)
+//            }
+//            viewModel.isContinue = true
+//        } else {
+//            viewModel.videoMld.value = if(viewModel.videoMld.value == null)
+//                viewModel.getVideo()
+//            else viewModel.videoMld.value?.copy(updatedAt = System.currentTimeMillis())
+//        }
     }
 
     /**
@@ -175,27 +202,28 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     private fun initialize(isLScreen: Boolean) {
         Log.d(TAG, "initialize() called with: isLandscapeScreen = $isLScreen")
         if (isLScreen) {
-            beView.exoLoop?.setOnClickListener(this)
-            beView.exoLock?.setOnClickListener(this)
-            beView.exoPrev?.setOnClickListener(this)
-            beView.exoPlaybackSpeed?.setOnClickListener(this)
-            beView.exoNext?.setOnClickListener(this)
-            beView.exoPlayMusic?.setOnClickListener(this)
+            customBinding.exoLoop?.setOnClickListener(this)
+            customBinding.exoLock?.setOnClickListener(this)
+            customBinding.exoPrev?.setOnClickListener(this)
+            customBinding.exoPlaybackSpeed?.setOnClickListener(this)
+            customBinding.exoNext?.setOnClickListener(this)
+            customBinding.exoPlayMusic?.setOnClickListener(this)
         } else {
-            beView.exoOption?.setOnClickListener(this)
+            customBinding.exoOption?.setOnClickListener(this)
         }
-        bindingOverlay.exoUnlock.setOnClickListener(this)
-        beView.autoPlay.isChecked = settings.autoPlayMode
-        beView.exoRotate.setOnClickListener(this)
-        beView.exoBack.setOnClickListener(this)
-        beView.autoPlay.setOnCheckedChangeListener { buttonView, isChecked ->
+        playerControlBinding.exoUnlock.setOnClickListener(this)
+        customBinding.autoPlay.isChecked = settings.autoPlayMode
+        customBinding.exoRotate.setOnClickListener(this)
+        customBinding.exoBack.setOnClickListener(this)
+        customBinding.autoPlay.setOnCheckedChangeListener { buttonView, isChecked ->
             settings.autoPlayMode = isChecked
         }
+        customBinding.btExpand.setOnClickListener(this)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        Log.d(TAG, "onConfigurationChanged() called with: newConfig = $newConfig")
+        Logs.d(TAG, "onConfigurationChanged() called with: newConfig = $newConfig")
         hideSystemUi()
     }
 
@@ -206,18 +234,18 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume() called")
+        Logs.d(TAG, "onResume() called")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause: isInPictureInPictureMode=${isInPictureInPictureMode}")
+        Logs.d(TAG, "onPause: isInPictureInPictureMode=${isInPictureInPictureMode}")
         player?.stop()
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onStop: ")
+        Logs.d(TAG, "onStop: ")
     }
 
     override fun onDestroy() {
@@ -227,14 +255,14 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View) {
-        Log.d(TAG, "onClick() called with: v = $v")
+        Logs.d(TAG, "onClick() called with: v = $v")
         handler.sendEmptyMessage(v.id)
     }
 
     private val handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            Log.d(TAG, "handleMessage() called with: msg = $msg")
+            Logs.d(TAG, "handleMessage() called with: msg = $msg")
             when (msg.what) {
                 R.id.exo_back -> {
                     finish()
@@ -247,12 +275,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     flagPlayingChanged = true
                 }
                 R.id.exo_unlock -> {
-                    bindingOverlay.layoutPlayerControlView.rootView.visibility = View.VISIBLE
-                    bindingOverlay.layoutScrim.visibility = View.INVISIBLE
+                    playerControlBinding.layoutPlayerControlView.rootView.visibility = View.VISIBLE
+                    playerControlBinding.layoutScrim.visibility = View.INVISIBLE
                 }
                 R.id.exo_lock -> {
-                    bindingOverlay.layoutPlayerControlView.rootView.visibility = View.INVISIBLE
-                    bindingOverlay.layoutScrim.visibility = View.VISIBLE
+                    playerControlBinding.layoutPlayerControlView.rootView.visibility = View.INVISIBLE
+                    playerControlBinding.layoutScrim.visibility = View.VISIBLE
                 }
                 R.id.exo_option -> {
                     val enabled = player?.repeatMode != ExoPlayer.REPEAT_MODE_OFF
@@ -283,7 +311,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 R.id.exo_next -> {
                     releasePlayer()
                     viewModel.next()
-                    beView.exoPrev?.apply {
+                    customBinding.exoPrev?.apply {
                         isClickable = true
                         setTextColor(resources.getColor(R.color.white))
                     }
@@ -292,23 +320,26 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     releasePlayer()
                     viewModel.previous()
                     if(!viewModel.hasPrev()) {
-                        beView.exoPrev?.apply {
+                        customBinding.exoPrev?.apply {
                             isClickable = false
                             setTextColor(resources.getColor(R.color.gray_20))
                         }
                     }
                 }
                 R.id.exo_play_music -> {
-                    val application = application as EGMApplication
-                    viewModel.getVideo().playedTime = player?.currentPosition ?: 0L
-                    application.iMusicalService()?.apply {
-                        setPlaylist(viewModel.position, viewModel.playlist)
-                        setKeepPlaying(true)
-                        setSpeed(viewModel.mLdSpeed.value!!)
-                        setRepeat(viewModel.mRepeatMode.value!!)
-                        play()
-                        finish()
-                    }
+//                    val application = application as EGMApplication
+//                    viewModel.getVideo().playedTime = player?.currentPosition ?: 0L
+//                    application.iMusicalService()?.apply {
+//                        setPlaylist(viewModel.videoId, viewModel.playlist)
+//                        setKeepPlaying(true)
+//                        setSpeed(viewModel.mLdSpeed.value!!)
+//                        setRepeat(viewModel.mRepeatMode.value!!)
+//                        play()
+//                        finish()
+//                    }
+                }
+                R.id.btExpand -> {
+                    showPlaylist(viewModel.playlistId)
                 }
                 else -> {
                     Log.d(TAG, "onClick: not found ${msg.what}")
@@ -331,15 +362,15 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             Log.d(TAG, "onMediaItemTransition: mediaItem=$mediaItem")
             with(viewModel) {
                 player?.stop()
-                mPlayWhenReady.value = beView.autoPlay.isChecked
+                mPlayWhenReady.value = customBinding.autoPlay.isChecked
                 viewModel.isResetPosition = true
                 updatePosition(player!!.currentMediaItemIndex)
-                val lastIndex = player!!.currentMediaItemIndex - 1
-                if(lastIndex >= 0) {
-                    val video = playlist[lastIndex]
-                    video.playedTime = -1L
-                    videoRepo.update(video)
-                }
+//                val lastIndex = player!!.currentMediaItemIndex - 1
+//                if(lastIndex >= 0) {
+//                    val video = playlist[lastIndex]
+//                    video.playedTime = -1L
+//                    videoRepo.update(video)
+//                }
             }
             super.onMediaItemTransition(mediaItem, reason)
         }
@@ -349,7 +380,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             Log.d(TAG, "onIsPlayingChanged() called with: isPlaying = $isPlaying")
             if(!flagPlayingChanged) {
                 viewModel.mPlayWhenReady.value = isPlaying
-                binding.videoView.keepScreenOn = isPlaying
+                binding.player.keepScreenOn = isPlaying
                 if(!isPlaying) {
                     window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
@@ -384,37 +415,30 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         Log.d(TAG, "initializePlayer: orientation=$orientation")
     }
 
-    private fun initializePlayer(video: Video) {
-        Log.d(TAG, "initializePlayer() called with: video = $video, playlist=${viewModel.playlist}")
-        if(viewModel.isInitialized && settings.autoRotate) {
-            rotateScreenIfNeed(video)
-        }
+    private fun setupPlayer(video: Video) {
+        Log.d(TAG, "setupPlayer() called with: video = $video")
+//        if(viewModel.isInitialized && settings.autoRotate) {
+//            rotateScreenIfNeed(video)
+//        }
         player = ExoPlayer.Builder(this)
-            .setSeekForwardIncrementMs(10000)
-            .setSeekBackIncrementMs(10000)
+
             .build()
             .also { exoPlayer ->
-                binding.videoView.player = exoPlayer
-                exoPlayer.addMediaItems(viewModel.playlist.map { video ->  MediaItem.fromUri(video.path) })
-                val index = viewModel.playlist.indexOfFirst { v -> video.videoId == v.videoId }
-                exoPlayer.playWhenReady = viewModel.mPlayWhenReady.value ?: settings.autoPlay
-                exoPlayer.seekTo(index, video.playedTime)
-                exoPlayer.prepare()
-                exoPlayer.addListener(listener)
+
             }
         with(viewModel) {
-            isContinue = true
+            continued = true
             isInitialized = false
         }
     }
 
     private fun releasePlayer() {
         player?.run {
-            viewModel.video.value?.playedTime = currentPosition
+            viewModel.videoMld.value?.playedTime = currentPosition
             removeListener(listener)
             release()
-            binding.videoView.player = null
-            Log.d(TAG, "releasePlayer() called video=${viewModel.video.value}")
+            binding.player.player = null
+            Log.d(TAG, "releasePlayer() called video=${viewModel.videoMld.value}")
         }
         player = null
     }
@@ -437,24 +461,16 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         }
 
     companion object {
-        const val EXTRA_POSITION = "com.utc.donlyconan.media.EXTRA_POSITION"
-        const val EXTRA_CONTINUE = "com.utc.donlyconan.media.EXTRA_CONTINUE"
-        const val EXTRA_PLAYLIST = "com.utc.donlyconan.media.EXTRA_PLAYLIST"
-        const val EXTRA_REPEAT_MODE = "com.utc.donlyconan.media.EXTRA_REPEAT_MODE"
-        const val EXTRA_SPEED = "com.utc.donlyconan.media.EXTRA_SPEED"
+        const val EXTRA_VIDEO_ID = "media.EXTRA_VIDEO_ID"
+        const val EXTRA_CONTINUE = "media.EXTRA_CONTINUE"
+        const val EXTRA_PLAYLIST = "media.EXTRA_PLAYLIST"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
 
-        fun newIntent(context: Context, position: Int, playlist: ArrayList<Video>,
-                      isContinue: Boolean = false, speed: Float = 1.0f,
-                      repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF): Intent {
-            Log.d(TAG, "newIntent() called with: context = $context, position = $position, " +
-                    "playlist = $playlist, isContinue = $isContinue")
+        fun newIntent(context: Context, videoId: Int, playlistId: Int = -1, continued: Boolean = false): Intent {
             return Intent(context, VideoDisplayActivity::class.java).apply {
-                putExtra(EXTRA_POSITION, position)
-                putExtra(EXTRA_PLAYLIST, playlist)
-                putExtra(EXTRA_CONTINUE, isContinue)
-                putExtra(EXTRA_REPEAT_MODE, repeatMode)
-                putExtra(EXTRA_SPEED, speed)
+                putExtra(EXTRA_VIDEO_ID, videoId)
+                putExtra(EXTRA_PLAYLIST, playlistId)
+                putExtra(EXTRA_CONTINUE, continued)
             }
         }
 

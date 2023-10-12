@@ -5,12 +5,13 @@ import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity
-import androidx.recyclerview.widget.RecyclerView
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
@@ -33,20 +34,19 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.getVideo(position)
+        val video = adapter.getItem(position) as Video
 
         if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) {
                 when (v.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
-                        startActivity(intent)
+                        startPlayingVideo(video.videoId)
                     }
                     R.id.btn_play_music -> {
-                        application.iMusicalService()?.apply {
-                            setPlaylist(position, adapter.videoList)
-                            play()
-                        }
+//                        application.iMusicalService()?.apply {
+//                            setPlaylist(position, arrayListOf())
+//                            play()
+//                        }
                     }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
@@ -71,9 +71,12 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
-            startActivity(intent)
+            startPlayingVideo(video.videoId)
         }
+    }
+
+    private fun startPlayingVideo(videoId: Int) {
+        VideoDisplayActivity.newIntent(requireContext(), videoId).let { startActivity(it) }
     }
 
     companion object {

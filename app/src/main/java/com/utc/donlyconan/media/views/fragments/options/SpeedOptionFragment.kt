@@ -7,8 +7,8 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.SpeedOptionFragmentBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.extension.widgets.hideSystemUi
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.SpeedOptionAdapter
 
 

@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.*
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.views.adapter.Selectable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -30,9 +31,9 @@ data class Video(
     var updatedAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "is_favorite")
     var isFavorite: Boolean = false,
-) : Parcelable {
+) : Parcelable, Selectable {
     @Ignore
-    var isSelected: Boolean = false
+    var isChecked: Boolean = false
 
     fun compareTo(v: Video, sortBy: Int) = when (sortBy) {
         Settings.SORT_BY_CREATION -> {
@@ -57,7 +58,23 @@ data class Video(
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<Video>() {
+        val diffUtil = object : DiffUtil.ItemCallback<Any>() {
+            override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return if(oldItem is Video && newItem is Video) {
+                    oldItem.videoId == newItem.videoId
+                } else if(oldItem is String && newItem is String) {
+                    oldItem == newItem
+                } else {
+                    false
+                }
+            }
+
+            override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return oldItem == newItem
+            }
+        }
+
+        val diffVideoUtil = object : DiffUtil.ItemCallback<Video>() {
             override fun areItemsTheSame(oldItem: Video, newItem: Video): Boolean {
                 return oldItem.videoId == newItem.videoId
             }
@@ -66,6 +83,15 @@ data class Video(
                 return oldItem == newItem
             }
         }
+    }
+
+
+    override fun isSelected(): Boolean {
+        return isChecked
+    }
+
+    override fun setSelected(isSelected: Boolean) {
+        this.isChecked = isSelected
     }
 
 }

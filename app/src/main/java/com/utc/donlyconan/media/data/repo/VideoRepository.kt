@@ -17,7 +17,7 @@ interface VideoRepository {
 
     fun delete(videoId: Int): Int
 
-    fun getVideo(videoId: Int): Video
+    fun get(videoId: Int): Video
 
     fun getNext(videoId: Int): Video
 

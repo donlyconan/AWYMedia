@@ -23,7 +23,7 @@ interface VideoDao {
     fun delete(videoId: Int): Int
 
     @Query("Select * from videos where video_id = :videoId")
-    fun getVideo(videoId: Int): Video
+    fun get(videoId: Int): Video
 
     @Query("Select * from videos where video_id > :fromId order by video_id asc limit 1")
     fun getNextVideo(fromId: Int): Video

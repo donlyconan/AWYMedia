@@ -12,8 +12,6 @@ import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.toShortTime
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemVideoSingleModeBinding
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
-import com.utc.donlyconan.media.extension.widgets.OnItemLongClickListener
 import com.utc.donlyconan.media.extension.widgets.TAG
 import java.text.DateFormat
 

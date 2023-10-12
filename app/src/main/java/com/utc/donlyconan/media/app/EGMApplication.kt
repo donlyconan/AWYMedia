@@ -7,8 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import com.utc.donlyconan.media.IMusicService
-import com.utc.donlyconan.media.app.services.MusicService
+import com.utc.donlyconan.media.app.services.EGMService
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
@@ -18,7 +17,7 @@ import com.utc.donlyconan.media.dagger.modules.ApplicationModule
  */
 class EGMApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
-    private var iMusicalService: IMusicService? = null
+    private var service: EGMService? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -30,15 +29,16 @@ class EGMApplication: Application() {
             .build()
 
         // Start musical service
-        val intent = Intent(this, MusicService::class.java)
+        val intent = Intent(this, EGMService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
     private val connection = object : ServiceConnection {
 
-        override fun onServiceConnected(name: ComponentName?, service: IBinder) {
-            Log.d(TAG, "onServiceConnected() called with: name = $name, service = $service")
-            iMusicalService = IMusicService.Stub.asInterface(service)
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
+            Log.d(TAG, "onServiceConnected() called with: name = $name, binder = $binder")
+            val egmBinder = binder as? EGMService.EGMBinder
+            service = egmBinder?.getService()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -46,15 +46,15 @@ class EGMApplication: Application() {
         }
     }
 
+    fun getEgmService(): EGMService? {
+        return service
+    }
+
     /**
      * Provide Application Component
      */
     fun applicationComponent(): ApplicationComponent {
         return appComponent
-    }
-
-    fun iMusicalService(): IMusicService? {
-        return iMusicalService
     }
 
     override fun onTerminate() {

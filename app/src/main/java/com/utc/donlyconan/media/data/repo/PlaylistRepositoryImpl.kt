@@ -28,7 +28,7 @@ class PlaylistRepositoryImpl @Inject constructor(val playlistDao: PlaylistDao,
         return playlistDao.countVideos(playlistId)
     }
 
-    override fun getAllPlaylist() = playlistDao.getAllPlaylist()
+    override fun getAllPlaylist() = playlistDao.getAll()
 
     override fun deleteFromPlaylist(videoId: Int, playlistId: Int) =
         playlistWithVideosDao.deleteFromPlaylist(videoId, playlistId)

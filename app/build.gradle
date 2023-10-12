@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.utc.donlyconan.media"
-        minSdkVersion 24
+        minSdkVersion 28
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
@@ -143,4 +143,6 @@ dependencies {
     // Setting preferences
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'com.google.android.exoplayer:extension-mediasession:2.17.1'
+
+    implementation 'com.jakewharton.timber:timber:3.0.0'
 }

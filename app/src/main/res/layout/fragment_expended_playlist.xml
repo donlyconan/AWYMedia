@@ -27,7 +27,6 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/search_bar"
         android:layout_above="@id/btn_done"
-        android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         tools:itemCount="10"

@@ -6,10 +6,11 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
-import com.utc.donlyconan.media.extension.widgets.OnItemClickListener
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity
+import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 
@@ -20,7 +21,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        videoRepo = applicationComponent.getVideoRepo()
+        videoRepo = appComponent.getVideoRepo()
     }
 
     override fun onItemClick(v: View, position: Int) {
@@ -31,14 +32,13 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
-                        startActivity(intent)
+                        startPlayingVideo(video.videoId)
                     }
                     R.id.btn_play_music -> {
-                        application.iMusicalService()?.apply {
-                            setPlaylist(position, adapter.videoList)
-                            play()
-                        }
+//                        application.iMusicalService()?.apply {
+//                            setPlaylist(position, arrayListOf<Video>())
+//                            play()
+//                        }
                     }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
@@ -63,9 +63,12 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), position, adapter.videoList)
-            startActivity(intent)
+            startPlayingVideo(video.videoId)
         }
+    }
+
+    private fun startPlayingVideo(videoId: Int) {
+        VideoDisplayActivity.newIntent(requireContext(), videoId).let { startActivity(it) }
     }
 
     companion object {
