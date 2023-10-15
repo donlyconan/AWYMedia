@@ -7,9 +7,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.extension.widgets.hideSystemUi
 
-open class BaseBottomSheetFragment: BottomSheetDialogFragment() {
+open class EGMBaseSheetFragment: BottomSheetDialogFragment() {
 
-    protected var isFullscreen: Boolean = true
+    var isFullscreen: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ open class BaseBottomSheetFragment: BottomSheetDialogFragment() {
     }
 
     companion object {
-        val TAG: String = BaseBottomSheetFragment::class.java.simpleName
+        val TAG: String = EGMBaseSheetFragment::class.java.simpleName
     }
 
 }

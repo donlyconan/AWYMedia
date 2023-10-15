@@ -44,6 +44,7 @@
     <color name="dark_recycler_color">#151617</color>
     <color name="transparent_recycler_color">#661F2123</color>
     <color name="gray">#383C40</color>
+    <color name="toolbar_color">#323639</color>
     <color name="gray_20">#515559</color>
 
     <color name="white_50">#80FFFFFF</color>

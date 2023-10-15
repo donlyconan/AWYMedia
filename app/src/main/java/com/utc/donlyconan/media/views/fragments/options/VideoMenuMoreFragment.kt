@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.utc.donlyconan.media.databinding.FragmentVideoMenuMoreBinding
 
 
-class VideoMenuMoreFragment : BaseBottomSheetFragment(), View.OnClickListener {
+class VideoMenuMoreFragment : EGMBaseSheetFragment(), View.OnClickListener {
 
     val binding by lazy { FragmentVideoMenuMoreBinding.inflate(layoutInflater) }
     var listener: View.OnClickListener ?= null

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_private_folder"
+    app:startDestination="@id/passwordFragment">
+
+
+    <fragment
+        android:id="@+id/passwordFragment"
+        android:name="com.utc.donlyconan.media.ui.login.PasswordFragment"
+        android:label="fragment_password"
+        tools:layout="@layout/fragment_password"/>
+
+    <fragment
+        android:id="@+id/privateFolderFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.privatefolder.PrivateFolderFragment"
+        android:label="fragment_private_folder"
+        tools:layout="@layout/fragment_private_folder" />
+
+    <fragment
+        android:id="@+id/changePasswordFragment2"
+        android:name="com.utc.donlyconan.media.views.fragments.privatefolder.ChangePasswordFragment"
+        android:label="fragment_change_password"
+        tools:layout="@layout/fragment_change_password" />
+
+</navigation>
