@@ -7,7 +7,8 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class DatabaseModule {
+class
+DatabaseModule {
 
     @Provides
     fun provideDatabase(application: Application): EGMDatabase  {

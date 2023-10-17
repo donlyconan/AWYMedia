@@ -70,6 +70,13 @@ class MainDisplayFragment : BaseFragment() {
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: ")
+        // Release service media if need
+        application.getEgmService()?.releasePlayer()
+    }
+
     private fun setUpViewPager() {
         Log.d(TAG, "setUpViewPager() called")
         mainDisplayAdapter = MainDisplayAdapter(this)

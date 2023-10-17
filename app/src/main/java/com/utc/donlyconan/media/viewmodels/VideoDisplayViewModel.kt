@@ -6,37 +6,47 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.exoplayer2.ExoPlayer
 import com.utc.donlyconan.media.app.utils.Logs
-import com.utc.donlyconan.media.data.dao.PlaylistDao
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.widgets.TAG
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class VideoDisplayViewModel : ViewModel() {
     @Inject lateinit var videoRepo: VideoRepository
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
-    var mPlayWhenReady = MutableLiveData(false)
-    var mLdSpeed = MutableLiveData(1.0f)
-    var mRepeatMode = MutableLiveData(ExoPlayer.REPEAT_MODE_OFF)
-    var playlist: ArrayList<Video> = arrayListOf()
     var isFinished = false
     var isInitialized = true
-    var isLooped = false
     var videoId: Int = 0
     var isResetPosition = false
     var isRestoredState = false
-
     var continued: Boolean = false
+
     var playlistId: Int = -1
     private var initialized: Boolean = false
-
-    val _videoMld: MutableLiveData<Video> = MutableLiveData<Video>()
+    private val _videoMld: MutableLiveData<Video> = MutableLiveData<Video>()
     val videoMld: LiveData<Video> get() = _videoMld
 
-    val _playlistMld: MutableLiveData<List<Video>> = MutableLiveData()
+    private var playlist = listOf<Video>()
+    private val _playlistMld: MutableLiveData<List<Video>> = MutableLiveData()
     val playlistMld: LiveData<List<Video>> get() = _playlistMld
-    var playingIndex: Int = -1
+
+    var playingIndexMld =  MutableLiveData<Int>(0)
+    var playingTimeMld = MutableLiveData<Long>(0L)
+    var playWhenReadyMld = MutableLiveData<Boolean>(false)
+    var speedMld = MutableLiveData(1.0f)
+    var repeatModeMld = MutableLiveData(ExoPlayer.REPEAT_MODE_OFF)
+
+    private val _events = MutableLiveData<Result>()
+    val events get() = _events
+    private val job = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
 
 
     fun initialize(videoId: Int, playlistId: Int, continued: Boolean) {
@@ -45,12 +55,24 @@ class VideoDisplayViewModel : ViewModel() {
             this.videoId = videoId
             this.continued = continued
             this.playlistId = playlistId
-            _videoMld.value = videoRepo.get(videoId)
+            val video = videoRepo.get(videoId)
 
-            if(playlistId >= 0) {
-                val videos = playlistWithVideosDao.get(playlistId).videos
-                _playlistMld.value = videos
-                playingIndex = videos.indexOfFirst { it.videoId == videoId }
+            if(video != null) {
+                _videoMld.value = video
+                if(continued) {
+                    playingTimeMld.value = video.playedTime
+                }
+                playWhenReadyMld.value = true
+            } else {
+                _events.value = Result.VideoNotFound()
+            }
+
+            playlist = playlistWithVideosDao.get(playlistId)?.videos
+            if(playlist != null) {
+                _playlistMld.value = playlist
+                playingIndexMld.value = playlist.indexOfFirst { it.videoId == videoId }
+            } else {
+                playingIndexMld.value = 0
             }
         }
         initialized = true
@@ -144,6 +166,11 @@ class VideoDisplayViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         Logs.d(TAG, "onCleared() called")
+        job.cancel()
+    }
+
+    sealed class Result {
+        class VideoNotFound(): Result()
     }
 
 }

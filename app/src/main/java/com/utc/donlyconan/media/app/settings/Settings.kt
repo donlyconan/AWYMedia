@@ -35,8 +35,6 @@ class Settings @Inject constructor(val appContext: Context) {
     var playlistSortBy by IntPreferenceDelegate(preferences, "playlist_sort_by", SORT_BY_NAME)
     var deleteFromStorage by BooleanPreferenceDelegate(preferences, "delete_from_storage", false)
     var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)
-    var autoRotate by BooleanPreferenceDelegate(preferences, "auto_rotate", true)
-    var restoreState by BooleanPreferenceDelegate(preferences, "restore_state", true)
     var autoDownload by BooleanPreferenceDelegate(preferences, "auto_download", true)
     var erasureCycle by StringPreferenceDelegate(preferences, "erasure_cycle", "30")
     var previousDeletionDate by LongPreferenceDelegate(preferences, "deletion_date", 0L)

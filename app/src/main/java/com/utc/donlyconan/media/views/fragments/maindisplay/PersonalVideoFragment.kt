@@ -84,7 +84,11 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                     )
                 )
             } else {
-                requestPermissionResult.launch(arrayOf(Manifest.permission.READ_MEDIA_VIDEO))
+                requestPermissionResult.launch(
+                    arrayOf(
+                        Manifest.permission.READ_MEDIA_VIDEO,
+                    )
+                )
             }
         }
     }

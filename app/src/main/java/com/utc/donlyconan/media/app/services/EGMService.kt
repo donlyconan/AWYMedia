@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.utc.donlyconan.media.IMusicService
 import com.utc.donlyconan.media.app.EGMApplication
+import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.models.Video
 
 
@@ -84,6 +85,10 @@ class EGMService : Service() {
 
     //----------------------- implement base function for the egm service --------------------
     fun setupPlayer() {
+        Logs.d("setupPlayer: initialize...")
+        if(player != null) {
+            releasePlayer()
+        }
         val builder = ExoPlayer.Builder(this)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)

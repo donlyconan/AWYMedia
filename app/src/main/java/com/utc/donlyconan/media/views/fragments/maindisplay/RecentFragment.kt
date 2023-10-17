@@ -51,18 +51,20 @@ class RecentFragment : ListVideosFragment() {
                 hideLoading()
             }
             videos.sortedWith { u, v -> (v.updatedAt - u.updatedAt).toInt() }
-            adapter.submit(videos)
+            val sortedData = viewModel.sortedByTime(videos)
+            adapter.submit(sortedData)
         }
     }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.getVideo(position)
+        val video = adapter.getItem(position) as Video
+        Log.d(TAG, "onItemClick: video=$video")
         if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), position, continued = true)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, continued = true)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {
@@ -94,7 +96,7 @@ class RecentFragment : ListVideosFragment() {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), position, continued = true)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, continued = true)
             startActivity(intent)
         }
     }

@@ -89,7 +89,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, args.playlistId)
+                        val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, -1)
                         startActivity(intent)
                     }
                     R.id.btn_play_music -> {

@@ -11,6 +11,7 @@ import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.viewmodels.PlaylistViewModel
+import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.BaseActivity
 import com.utc.donlyconan.media.views.VideoDisplayActivity
@@ -65,4 +66,5 @@ interface ApplicationComponent {
     fun inject(videoDisplayViewModel: VideoDisplayViewModel)
     fun inject(baseActivity: BaseActivity)
     fun inject(listedVideosDialog: ListedVideosDialog)
+    fun inject(viewModel: TrashViewModel)
 }

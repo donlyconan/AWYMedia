@@ -37,8 +37,11 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
-        (context?.applicationContext as EGMApplication).applicationComponent()
-            .inject(this)
+        application.applicationComponent().let { com ->
+            com.inject(this)
+            com.inject(viewModel)
+            viewModel.init()
+        }
         setHasOptionsMenu(true)
         val appCompat = activity
         appCompat.setSupportActionBar(binding.toolbar)
@@ -63,7 +66,7 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
         adapter.onItemClickListener = this
         binding.recyclerView.adapter = adapter
         showLoadingScreen()
-        viewModel.videoList.observe(viewLifecycleOwner) { videos ->
+        viewModel.videosMdl.observe(viewLifecycleOwner) { videos ->
             if(videos.isEmpty()) {
                 showNoDataScreen()
             } else {

@@ -7,9 +7,11 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import com.utc.donlyconan.media.app.utils.atStartOfDay
 import com.utc.donlyconan.media.app.utils.toShortTime
+import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
 import java.time.LocalDateTime
 import java.util.Date
+import javax.inject.Inject
 
 class PersonalVideoViewModel(val app: Application) : ListVideoViewModel(app) {
 
