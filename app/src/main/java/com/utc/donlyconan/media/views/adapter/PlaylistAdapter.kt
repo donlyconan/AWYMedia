@@ -75,7 +75,8 @@ class PlaylistAdapter(var context: Context,
         }
 
         fun bind(playlist: Playlist, video: Video?, listener: OnItemClickListener?, isLastItem: Boolean) {
-            Log.d(TAG, "bind() called with: video = $playlist, listener = $listener, " +
+            Log.d(
+                TAG, "bind() called with: video = $playlist, listener = $listener, " +
                         "isLastItem = $isLastItem")
             binding.tvTitle.text = playlist.title
             onItemClickListener = listener

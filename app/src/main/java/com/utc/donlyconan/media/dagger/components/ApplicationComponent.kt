@@ -6,6 +6,7 @@ import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
 import com.utc.donlyconan.media.dagger.modules.RepositoryModule
 import com.utc.donlyconan.media.dagger.modules.SettingsModule
+import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.data.repo.TrashRepository
@@ -48,6 +49,8 @@ interface ApplicationComponent {
     fun getPlaylistRepo(): PlaylistRepository
     fun getTrashRepo(): TrashRepository
     fun getSettings(): Settings
+    fun getTrashDao(): TrashDao
+
 
     fun inject(fragment: PersonalVideoFragment)
     fun inject(fragment: DetailedPlaylistFragment)
@@ -58,7 +61,7 @@ interface ApplicationComponent {
     fun inject(fragment: RecentFragment)
     fun inject(fragment: SearchBarFragment)
     fun inject(fragment: SplashScreenFragment)
-    fun inject(fragment: TrashFragment)
+    fun inject(fragment: RecycleBinFragment)
     fun inject(fragment: ListVideoDisplayFragment)
     fun inject(fragment: EGMService)
     fun inject(fragment: VideoDisplayActivity)

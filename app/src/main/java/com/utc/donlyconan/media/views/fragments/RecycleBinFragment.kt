@@ -10,8 +10,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
+import com.utc.donlyconan.media.app.utils.convertToStorageData
+import com.utc.donlyconan.media.app.utils.sortedByDeletedDate
+import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
@@ -19,7 +21,7 @@ import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
-import com.utc.donlyconan.media.views.adapter.TrashAdapter
+import com.utc.donlyconan.media.views.adapter.RecycleBinAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,11 +29,11 @@ import javax.inject.Inject
 /**
  * Show list of video that was temporarily deleted by user
  */
-class TrashFragment : BaseFragment(), OnItemClickListener {
+class RecycleBinFragment : BaseFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentTrashBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<TrashViewModel>()
-    private lateinit var adapter: TrashAdapter
+    private lateinit var adapter: RecycleBinAdapter
     @Inject lateinit var trashRepo: TrashRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,8 +64,8 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
-        adapter = TrashAdapter(requireContext(), arrayListOf())
-        adapter.onItemClickListener = this
+        adapter = RecycleBinAdapter(requireContext(), arrayListOf())
+        adapter.setOnItemClickListener(this)
         binding.recyclerView.adapter = adapter
         showLoadingScreen()
         viewModel.videosMdl.observe(viewLifecycleOwner) { videos ->
@@ -72,7 +74,13 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
             } else {
                 hideLoading()
             }
-            adapter.submit(videos)
+            var items = videos.sortedByDeletedDate(true)
+            binding.tvTotalSize.text = items
+                .filter { it is Trash }
+                .sumOf { (it as Trash).size }
+                .convertToStorageData()
+            Log.d(TAG, "onViewCreated: item.size=${items.size}")
+            adapter.submit(items)
         }
     }
 
@@ -97,7 +105,7 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemLongClick() called with: v = $v, position = $position")
-        val trash = adapter.trashes[position]
+        val trash = adapter.getItem(position) as Trash
         MenuMoreOptionFragment.newInstance(R.layout.fragment_trash_item_option) { v ->
             Log.d(TAG, "onItemLongClick() called with: v = $v")
             when(v.id) {
@@ -138,7 +146,9 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
                 }
                 AlertDialogManager.createDeleteAlertDialog(
                     requireContext(), getString(R.string.delete_file), getString(R.string.confirm_to_delete)) {
-                    viewModel.clearAll(adapter.trashes)
+                    val list = adapter.getData().filter { it is Trash }
+                        .map { it as Trash }
+                    viewModel.clearAll(list)
                 }.show()
             }
         }
@@ -147,7 +157,7 @@ class TrashFragment : BaseFragment(), OnItemClickListener {
 
 
     companion object {
-        val TAG: String = TrashFragment::class.java.simpleName
+        val TAG: String = RecycleBinFragment::class.java.simpleName
     }
 
 }

@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/passwordFragment"
-        android:name="com.utc.donlyconan.media.ui.login.PasswordFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.privatefolder.PasswordFragment"
         android:label="fragment_password"
         tools:layout="@layout/fragment_password"/>
 

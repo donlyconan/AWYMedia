@@ -73,7 +73,7 @@
     <string name="sort_by">Sort by</string>
     <string name="name">Name</string>
     <string name="created_at">Creatiton</string>
-    <string name="trash">Trash</string>
+    <string name="trash">Recycle Bin</string>
     <string name="speed">Speed</string>
     <string name="loading_data">Loading...</string>
     <string name="no_data">No data found</string>
@@ -105,6 +105,7 @@
     <string name="general_settings">General settings</string>
     <string name="select_language">Select language</string>
     <string name="author">Donly Conan</string>
+    <string name="_0_mb">0 MB</string>
 
     <string-array name="language_entries">
         <item>English</item>

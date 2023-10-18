@@ -33,7 +33,3 @@ class PersonalVideoViewModel(val app: Application) : ListVideoViewModel(app) {
     }
 
 }
-
-fun main() {
-    println(1694002528L.atStartOfDay().toShortTime())
-}

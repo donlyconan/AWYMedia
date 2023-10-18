@@ -55,12 +55,18 @@ data class Trash(
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<Trash>() {
-            override fun areItemsTheSame(oldItem: Trash, newItem: Trash): Boolean {
-                return oldItem.videoId == newItem.videoId
+        val diffUtil = object : DiffUtil.ItemCallback<Any>() {
+            override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return if(oldItem is Trash && newItem is Trash) {
+                    oldItem.videoId == newItem.videoId
+                } else if(oldItem is String && newItem is String) {
+                    oldItem == newItem
+                } else {
+                    false
+                }
             }
 
-            override fun areContentsTheSame(oldItem: Trash, newItem: Trash): Boolean {
+            override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
                 return oldItem == newItem
             }
         }

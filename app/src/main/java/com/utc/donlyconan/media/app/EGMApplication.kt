@@ -7,10 +7,15 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.utc.donlyconan.media.app.services.EGMService
+import com.utc.donlyconan.media.app.workmanager.TrashRemovalWorker
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
+import java.util.concurrent.TimeUnit
 
 /**
  * Represent a application of AWYMedia that provides all app's dependencies
@@ -31,6 +36,10 @@ class EGMApplication: Application() {
         // Start musical service
         val intent = Intent(this, EGMService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        var myWorker =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(1, TimeUnit.SECONDS)
+            .build()
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork("CLEAN", ExistingPeriodicWorkPolicy.KEEP, myWorker)
     }
 
     private val connection = object : ServiceConnection {

@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.utc.donlyconan.media.app.settings.Settings
@@ -12,13 +11,11 @@ import com.utc.donlyconan.media.data.dao.PlaylistDao
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Trash
-import com.utc.donlyconan.media.data.models.Video
-import com.utc.donlyconan.media.views.fragments.TrashFragment.Companion.TAG
+import com.utc.donlyconan.media.views.fragments.RecycleBinFragment.Companion.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class TrashViewModel : ViewModel()  {
 
@@ -41,15 +38,18 @@ class TrashViewModel : ViewModel()  {
         trashDao.delete(trash)
     }
 
-    fun delete(trash: Trash) {
-        Log.d(TAG, "delete() called with: trash = $trash")
-        trashDao.delete(trash)
+    fun delete(item: Trash) {
+        Log.d(TAG, "delete() called with: trash = $item")
+        trashDao.delete(item)
         viewModelScope.launch {
-            playlistDao.removeVideoFromPlaylist(trash.videoId)
-            Log.d(TAG, "clearAll: deleteFromStorage=" + settings.deleteFromStorage)
-            contentResolver.delete(Uri.parse(trash.path), null, null)
+            playlistDao.removeVideoFromPlaylist(item.videoId)
+            deleteFile(Uri.parse(item.path))
             Log.d(TAG, "clearAll: Done!")
         }
+    }
+
+    private fun deleteFile(uri: Uri) {
+        contentResolver.delete(uri, null, null)
     }
 
     fun clearAll(trashes: List<Trash>) {

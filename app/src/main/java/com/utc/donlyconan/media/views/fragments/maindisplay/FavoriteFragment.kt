@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.FavoriteVideoViewModel
@@ -49,8 +50,8 @@ class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
             } else {
                 hideLoading()
             }
-            videos.sortedWith {u,v -> (v.updatedAt - u.updatedAt).toInt() }
-            adapter.submit(videos)
+            val data = videos.sortedByCreatedDate(true)
+            adapter.submit(data)
         }
     }
 

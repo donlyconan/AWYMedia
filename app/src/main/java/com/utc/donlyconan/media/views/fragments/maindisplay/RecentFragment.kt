@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentRecentBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
@@ -50,8 +51,7 @@ class RecentFragment : ListVideosFragment() {
             } else {
                 hideLoading()
             }
-            videos.sortedWith { u, v -> (v.updatedAt - u.updatedAt).toInt() }
-            val sortedData = viewModel.sortedByTime(videos)
+            val sortedData = videos.sortedByCreatedDate(true)
             adapter.submit(sortedData)
         }
     }

@@ -24,7 +24,3 @@ fun Long.atEndOfDay(): Long {
 fun Long.toShortTime(): CharSequence {
     return shortestOfTimeFormat.format(this * 1000)
 }
-
-//fun main() {
-//    println((System.currentTimeMillis() / 1000).toShortTime() )
-//}

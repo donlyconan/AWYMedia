@@ -20,7 +20,18 @@
         app:menu="@menu/menu_trash_bar"
         app:titleTextColor="@android:color/white"
         app:title="@string/trash"
-        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"/>
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24">
+
+        <TextView
+            android:id="@+id/tvTotalSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textColor="@color/white"
+            android:text="@string/_0_mb"
+            tools:text="100 MB"/>
+
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

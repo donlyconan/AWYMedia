@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.components.getAllVideos
@@ -64,7 +65,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                     sortWith { u, v -> u.compareTo(v, settings.sortBy) }
                 }
                 hideLoading()
-                val data = viewModel.sortedByTime(sortedVideos)
+                val data = videos.sortedByCreatedDate(true)
                 adapter.submit(data)
             }
         }

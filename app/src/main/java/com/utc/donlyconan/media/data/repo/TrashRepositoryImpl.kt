@@ -1,7 +1,6 @@
 package com.utc.donlyconan.media.data.repo
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.models.Trash
 import javax.inject.Inject

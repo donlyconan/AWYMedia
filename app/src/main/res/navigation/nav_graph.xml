@@ -67,7 +67,7 @@
 
     <fragment
         android:id="@+id/trashFragment"
-        android:name="com.utc.donlyconan.media.views.fragments.TrashFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.RecycleBinFragment"
         android:label="TrashFragment"
         tools:layout="@layout/fragment_trash"/>
     <fragment

@@ -1,4 +1,4 @@
-package com.utc.donlyconan.media.ui.login
+package com.utc.donlyconan.media.views.fragments.privatefolder
 
 import android.os.Bundle
 import android.view.LayoutInflater
