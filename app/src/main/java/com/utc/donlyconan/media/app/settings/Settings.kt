@@ -39,6 +39,9 @@ class Settings @Inject constructor(val appContext: Context) {
     var erasureCycle by StringPreferenceDelegate(preferences, "erasure_cycle", "30")
     var previousDeletionDate by LongPreferenceDelegate(preferences, "deletion_date", 0L)
 
+    var password by StringPreferenceDelegate(preferences, "password")
+    var email by StringPreferenceDelegate(preferences, "email")
+
     /**
      * It represent for Auto Play Mode on Video Screen
      */

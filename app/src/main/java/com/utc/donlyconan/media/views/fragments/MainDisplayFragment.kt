@@ -4,16 +4,23 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.*
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginEnd
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
@@ -29,6 +36,7 @@ import com.utc.donlyconan.media.views.fragments.maindisplay.PlaylistFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 /**
  * Represent for Main Screen where will info as Navigation and Base View
@@ -56,6 +64,37 @@ class MainDisplayFragment : BaseFragment() {
         Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                     "savedInstanceState = $savedInstanceState")
         setHasOptionsMenu(true)
+
+
+
+        // Rotate the fragment when its orientation is the landscape mode
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val displayMetrics = resources.displayMetrics
+            val height = displayMetrics.xdpi
+
+            binding.navBar.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    val navBar = binding.navBar
+                    val layoutParams = navBar.layoutParams as ConstraintLayout.LayoutParams
+                    val width = binding.viewPager2.layoutParams.width
+                    layoutParams.width = width
+                    navBar.translationX = - navBar.width.toFloat()/2 + navBar.height.toFloat()/2
+                    navBar.requestLayout()
+
+                    val menuView = navBar.getChildAt(0) as? BottomNavigationMenuView
+                    menuView?.let { menu ->
+                        for (i in 0 until menu.childCount) {
+                            val iconView = menu.getChildAt(i)
+                            iconView.rotation = -90f
+                            iconView.requestLayout()
+                        }
+                    }
+                    binding.navBar.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+
+            })
+
+        }
         return binding.root
     }
 
@@ -68,6 +107,7 @@ class MainDisplayFragment : BaseFragment() {
         val appCompat = activity
         appCompat.setSupportActionBar(binding.appbar.toolbar)
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(false)
+
     }
 
     override fun onResume() {

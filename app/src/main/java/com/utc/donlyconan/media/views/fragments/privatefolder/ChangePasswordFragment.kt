@@ -7,26 +7,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.databinding.FragmentChangePasswordBinding
 
 class ChangePasswordFragment : Fragment() {
 
     companion object {
+        const val TYPE_REGISTER_PASSWORD = 1
+        const val TYPE_CHANGE_PASSWORD = 2
+
         fun newInstance() = ChangePasswordFragment()
     }
 
     private lateinit var viewModel: ChangePasswordViewModel
+    private lateinit var binding: FragmentChangePasswordBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_change_password, container, false)
+        binding = FragmentChangePasswordBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ChangePasswordViewModel::class.java)
-        // TODO: Use the ViewModel
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+
+        viewModel.event.observe(this) {
+
+        }
     }
+
 
 }

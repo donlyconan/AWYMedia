@@ -5,7 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
 import androidx.core.os.bundleOf
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.utc.donlyconan.media.R
 
@@ -48,6 +52,16 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
             }
         }
         onInitialView?.onInitial(view)
+        view.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val dialog = dialog as BottomSheetDialog?
+                val bottomSheet = dialog!!.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout?
+                val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet!!)
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        })
     }
 
     fun setOnInitialView(listener: OnInitialView): MenuMoreOptionFragment {
