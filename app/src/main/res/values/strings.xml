@@ -15,8 +15,8 @@
     <string name="tools_text_account_information_username" translatable="false">Sotti</string>
     <string name="tools_text_account_information_email" translatable="false">sotti@sottocorp.com</string>
     <string name="video_demo_title" translatable="false">Video demo title</string>
-    <string name="notification_channel" translatable="false">notification_channel</string>
-    <string name="notification_channel_description" translatable="false">notification_channel_description</string>
+    <string name="notification_channel" translatable="false">easy_guard_player_channel</string>
+    <string name="notification_channel_description" translatable="false">easy_guard_player_channel_description</string>
 
     <string name="settings">Settings</string>
     <string name="personal">Personal</string>
@@ -106,6 +106,7 @@
     <string name="select_language">Select language</string>
     <string name="author">Donly Conan</string>
     <string name="_0_mb">0 MB</string>
+    <string name="subtitles">Subtitles</string>
 
     <string-array name="language_entries">
         <item>English</item>

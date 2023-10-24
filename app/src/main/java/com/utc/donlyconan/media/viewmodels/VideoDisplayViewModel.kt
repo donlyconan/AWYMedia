@@ -25,7 +25,6 @@ class VideoDisplayViewModel : ViewModel() {
     var isInitialized = true
     var videoId: Int = 0
     var isResetPosition = false
-    var isRestoredState = false
     var continued: Boolean = false
 
     var playlistId: Int = -1
@@ -42,6 +41,7 @@ class VideoDisplayViewModel : ViewModel() {
     var playWhenReadyMld = MutableLiveData<Boolean>(false)
     var speedMld = MutableLiveData(1.0f)
     var repeatModeMld = MutableLiveData(ExoPlayer.REPEAT_MODE_OFF)
+    var currentPlayWhenReadyState = false
 
     private val _events = MutableLiveData<Result>()
     val events get() = _events

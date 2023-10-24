@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.data.models
 import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.*
+import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.views.adapter.Selectable
 import kotlinx.android.parcel.Parcelize

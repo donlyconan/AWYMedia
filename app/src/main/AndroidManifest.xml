@@ -2,13 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.utc.donlyconan.media">
 
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-<uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-<uses-permission android:name="android.permission.android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.android.permission.WAKE_LOCK" />
 
 <application
     android:name=".app.EGMApplication"
@@ -32,6 +35,9 @@ package="com.utc.donlyconan.media">
 
     <activity
         android:name=".views.VideoDisplayActivity"
+        android:screenOrientation="landscape"
+        android:turnScreenOn="true"
+        android:configChanges="orientation"
         android:exported="true"
         android:launchMode="singleInstance">
         <intent-filter android:scheme="http">
@@ -42,10 +48,6 @@ package="com.utc.donlyconan.media">
             <data android:scheme="http"/>
             <data android:scheme="https"/>
             <data android:mimeType="video/.mp4"/>
-<!--            <data android:mimeType="video/webm"/>-->
-<!--            <data android:mimeType="video/ismv"/>-->
-<!--            <data android:mimeType="video/m3u8"/>-->
-<!--            <data android:mimeType="video/flv"/>-->
         </intent-filter>
     </activity>
 
@@ -55,8 +57,9 @@ package="com.utc.donlyconan.media">
         android:launchMode="singleTop" />
 
     <service
-        android:name=".app.services.EGMService"
-        android:exported="false" />
+        android:name=".app.services.AudioService"
+        android:exported="false"
+        android:enabled="true"/>
 
 
     <meta-data

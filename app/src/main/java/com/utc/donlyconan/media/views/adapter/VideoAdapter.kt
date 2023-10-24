@@ -1,11 +1,19 @@
 package com.utc.donlyconan.media.views.adapter
 
 import android.content.Context
+import android.graphics.drawable.BitmapDrawable
+import android.media.ThumbnailUtils
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toFile
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.toShortTime
@@ -88,9 +96,13 @@ class VideoAdapter(
             }
 
             Glide.with(itemView.context)
+                .applyDefaultRequestOptions(
+                    RequestOptions()
+                        .fallback(R.drawable.ic_baseline_error_24)
+                        .diskCacheStrategy(DiskCacheStrategy.DATA)
+                )
                 .load(video.path)
                 .centerCrop()
-                .error(R.drawable.ic_baseline_error_24)
                 .into(binding.imgThumbnail)
 
             if (showProgress) {

@@ -52,4 +52,40 @@
         android:layout_centerInParent="true"
         />
 
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/btnRestore"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_gravity="bottom|end"-->
+<!--        android:layout_marginStart="@dimen/fab_margin"-->
+<!--        android:layout_marginTop="@dimen/fab_margin"-->
+<!--        android:layout_marginEnd="20dp"-->
+<!--        android:layout_marginBottom="@dimen/space_20"-->
+<!--        android:backgroundTint="@color/white_gray"-->
+<!--        android:foreground="?attr/selectableItemBackgroundBorderless"-->
+<!--        android:src="@drawable/ic_baseline_restore_24"-->
+<!--        app:fabSize="normal"-->
+<!--        app:maxImageSize="25dp"-->
+<!--        app:useCompatPadding="false" />-->
+
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/btnRemove"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_gravity="bottom|end"-->
+<!--        android:layout_marginStart="@dimen/fab_margin"-->
+<!--        android:layout_marginTop="@dimen/fab_margin"-->
+<!--        android:layout_marginBottom="@dimen/space_20"-->
+<!--        android:layout_toStartOf="@+id/btnRestore"-->
+<!--        android:backgroundTint="@color/white_gray"-->
+<!--        android:foreground="?attr/selectableItemBackgroundBorderless"-->
+<!--        android:src="@drawable/outline_delete_24"-->
+<!--        app:fabSize="normal"-->
+<!--        app:maxImageSize="25dp"-->
+<!--        app:useCompatPadding="false" />-->
+
+
 </RelativeLayout>

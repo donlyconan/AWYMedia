@@ -36,3 +36,12 @@ fun List<Video>.sortedByCreatedDate(descended: Boolean): List<Any> {
     }
     return result
 }
+
+//fun main() {
+//    val matrix = Searches.evaluate("doreamon ad".toCharArray(), "syoreakm".toCharArray());
+//
+//    for (i in 0 until matrix.size) {
+//        matrix[i].forEach { print("$it ") }
+//        println()
+//    }
+//}

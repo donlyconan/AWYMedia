@@ -61,9 +61,6 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                 val data = viewModel.sortedByTime(videos)
                 adapter.submit(data)
             } else {
-                val sortedVideos = ArrayList(videos).apply {
-                    sortWith { u, v -> u.compareTo(v, settings.sortBy) }
-                }
                 hideLoading()
                 val data = videos.sortedByCreatedDate(true)
                 adapter.submit(data)

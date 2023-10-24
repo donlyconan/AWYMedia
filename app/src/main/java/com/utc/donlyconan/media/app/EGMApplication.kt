@@ -10,8 +10,8 @@ import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.utc.donlyconan.media.app.services.EGMService
-import com.utc.donlyconan.media.app.workmanager.TrashRemovalWorker
+import com.utc.donlyconan.media.app.services.AudioService
+import com.utc.donlyconan.media.app.manager.TrashRemovalWorker
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
@@ -22,19 +22,19 @@ import java.util.concurrent.TimeUnit
  */
 class EGMApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
-    private var service: EGMService? = null
+    private var service: AudioService? = null
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate() called")
 
-//         Create dagger component
+//      Create dagger component
         appComponent = DaggerApplicationComponent.builder()
             .applicationModule(ApplicationModule(this))
             .build()
 
         // Start musical service
-        val intent = Intent(this, EGMService::class.java)
+        val intent = Intent(this, AudioService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
         var myWorker =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(1, TimeUnit.SECONDS)
             .build()
@@ -46,7 +46,7 @@ class EGMApplication: Application() {
 
         override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
             Log.d(TAG, "onServiceConnected() called with: name = $name, binder = $binder")
-            val egmBinder = binder as? EGMService.EGMBinder
+            val egmBinder = binder as? AudioService.EGMBinder
             service = egmBinder?.getService()
         }
 
@@ -55,7 +55,7 @@ class EGMApplication: Application() {
         }
     }
 
-    fun getEgmService(): EGMService? {
+    fun getEgmService(): AudioService? {
         return service
     }
 

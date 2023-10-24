@@ -81,5 +81,12 @@
     </style>
 
 
+    <style name="FloatButtonStyle">
+        <item name="backgroundTint">@color/white_gray</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:foreground">?attr/selectableItemBackgroundBorderless</item>
+
+    </style>
+
 
 </resources>

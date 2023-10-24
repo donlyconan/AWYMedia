@@ -25,6 +25,9 @@ interface VideoDao {
     @Query("Select * from videos where video_id = :videoId")
     fun get(videoId: Int): Video
 
+    @Query("Select * from videos where path = :uri")
+    fun get(uri: String): Video
+
     @Query("Select * from videos where video_id > :fromId order by video_id asc limit 1")
     fun getNextVideo(fromId: Int): Video
 
@@ -36,7 +39,6 @@ interface VideoDao {
 
     @Query("Select * from videos where path=:path limit 1")
     fun getVideoInfo(path: String): Video
-
 
     @Query("Select * from videos ")
     fun iterator(): Cursor

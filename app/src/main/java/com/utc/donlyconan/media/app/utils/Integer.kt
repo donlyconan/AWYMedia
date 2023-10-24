@@ -38,9 +38,11 @@ fun Int.toShortTime(): String {
 ////    println("Unit=" + 3000000000.convertToStorageData() )
 ////    println("Unit=" + 300000000000.convertToStorageData() )
 //
-//    println("Time=" + 10000L.toShortTime())
-//    println("Time=" + 10L.toShortTime())
-//    println("Time=" + 1000L.toShortTime())
-//    println("Time=" + 100L.toShortTime())
-//    println("Time=" + 1000900L.toShortTime())
+////    println("Time=" + 10000L.toShortTime())
+////    println("Time=" + 10L.toShortTime())
+////    println("Time=" + 1000L.toShortTime())
+////    println("Time=" + 100L.toShortTime())
+////    println("Time=" + 1000900L.toShortTime())
+//
+////    Searches.evaluate("doreamon", "sraamkon")
 //}

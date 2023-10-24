@@ -5,10 +5,11 @@ import android.content.Context
 import android.content.res.Configuration
 import android.provider.Settings.System.getConfiguration
 import android.widget.Toast
+import com.utc.donlyconan.media.app.EGMApplication
 import java.util.*
 
 
-val TAG = "AwyMediaApplication"
+val TAG = "EGMApplication"
 
 fun Context.showMessage(msg: Int, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, msg, duration).show()

@@ -17,7 +17,7 @@ class SpeedOptionFragment : DialogFragment(), OnItemClickListener {
     private val binding by lazy { SpeedOptionFragmentBinding.inflate(layoutInflater) }
     private var onSelectedSpeedChangeListener: OnSelectedSpeedChangeListener? = null
     private val currentSpeed by lazy { arguments?.getFloat(KEY_CURRENT_SPEED) ?: -1f }
-    private val speedList = listOf(0.25f, 0.5f, 1f, 1.25f, 1.5f, 2f)
+    private val speedList = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +49,7 @@ class SpeedOptionFragment : DialogFragment(), OnItemClickListener {
         if(currentSpeed != speed) {
             onSelectedSpeedChangeListener?.onSelectedSpeedChanged(speed)
         }
+        onSelectedSpeedChangeListener?.onSelectedSpeed(speed)
         dismiss()
     }
 
@@ -66,6 +67,8 @@ class SpeedOptionFragment : DialogFragment(), OnItemClickListener {
 
     interface OnSelectedSpeedChangeListener {
         fun onSelectedSpeedChanged(speed: Float)
+
+        fun onSelectedSpeed(speed: Float)
     }
 
     companion object {
