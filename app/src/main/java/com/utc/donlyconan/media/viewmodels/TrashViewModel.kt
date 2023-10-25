@@ -43,7 +43,7 @@ class TrashViewModel : ViewModel()  {
         trashDao.delete(item)
         viewModelScope.launch {
             playlistDao.removeVideoFromPlaylist(item.videoId)
-            deleteFile(Uri.parse(item.path))
+            deleteFile(Uri.parse(item.videoUri))
             Log.d(TAG, "clearAll: Done!")
         }
     }
@@ -59,7 +59,7 @@ class TrashViewModel : ViewModel()  {
                 playlistDao.removeVideoFromPlaylist(trash.videoId)
                 Log.d(TAG, "clearAll: deleteFromStorage=" + settings.deleteFromStorage)
                 if(settings.deleteFromStorage) {
-                    contentResolver.delete(Uri.parse(trash.path), null, null)
+                    contentResolver.delete(Uri.parse(trash.videoUri), null, null)
                 }
             }
             trashDao.removeAll()

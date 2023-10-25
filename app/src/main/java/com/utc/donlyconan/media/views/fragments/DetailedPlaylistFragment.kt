@@ -63,9 +63,9 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
         }
         binding.title.text = "Untitled"
 
-        adapter = VideoAdapter(requireContext(), arrayListOf())
-        adapter.setOnItemClickListener(this)
-        binding.recyclerView.adapter = adapter
+        videoAdapter = VideoAdapter(requireContext(), arrayListOf())
+        videoAdapter.setOnItemClickListener(this)
+        binding.recyclerView.adapter = videoAdapter
         showLoadingScreen()
         playlistWithVideosDao.getPlaylist(args.playlistId).observe(this) { videoPl ->
             Log.d(TAG, "onViewCreated() called video.size=" + videoPl.videos.size)
@@ -75,7 +75,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
             } else {
                 hideLoading()
             }
-            adapter.submit(videoPl.videos)
+            videoAdapter.submit(videoPl.videos)
             binding.title.text = videoPl.playlist.title
         }
     }
@@ -83,7 +83,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.getItem(position) as Video
+        val video = videoAdapter.getItem(position) as Video
 
         if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
@@ -101,7 +101,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
                         videoRepo.update(video)
-                        adapter.notifyItemChanged(position)
+                        videoAdapter.notifyItemChanged(position)
                     }
                     R.id.btn_delete -> {
                         playlistRepo.deleteFromPlaylist(video.videoId, args.playlistId)
@@ -109,7 +109,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
                         startActivity(Intent.createChooser(intent, "Share File"))
                     }

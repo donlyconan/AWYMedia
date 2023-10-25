@@ -10,7 +10,15 @@
         android:id="@+id/passwordFragment"
         android:name="com.utc.donlyconan.media.views.fragments.privatefolder.PasswordFragment"
         android:label="fragment_password"
-        tools:layout="@layout/fragment_password"/>
+        tools:layout="@layout/fragment_password">
+        <action
+            android:id="@+id/action_passwordFragment_to_privateFolderFragment"
+            app:destination="@id/privateFolderFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/privateFolderFragment"
+            app:popUpToInclusive="true"
+            />
+    </fragment>
 
     <fragment
         android:id="@+id/privateFolderFragment"

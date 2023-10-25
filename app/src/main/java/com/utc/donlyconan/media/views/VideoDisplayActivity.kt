@@ -14,6 +14,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.net.toUri
+import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -36,6 +37,8 @@ import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.ListedVideosDialog
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.OnSelectedChangeListener
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 /**
@@ -71,7 +74,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     private val binding by lazy { ActivityVideoDisplayBinding.inflate(layoutInflater) }
     private lateinit var playerControlBinding: PlayerControlViewBinding
     private lateinit var customBinding: CustomOptionPlayerControlViewBinding
-    private val service: AudioService? by lazy { application.getEgmService() }
+    private val service: AudioService? by lazy { application.getAudioService() }
 
     private val audioAttributes = AudioAttributes.Builder()
         .setContentType(C.CONTENT_TYPE_MUSIC)
@@ -124,7 +127,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 Logs.d(TAG, "video View Model: video=$video")
                 customBinding.headerTv.text = video.title
                 binding.player.player = this@VideoDisplayActivity.player.apply {
-                    setMediaItem(MediaItem.fromUri(video.path))
+                    setMediaItem(MediaItem.fromUri(video.videoUri))
                     this@VideoDisplayActivity.player.playWhenReady = true
                     prepare()
                     addListener(listener)
@@ -308,9 +311,8 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-//        releasePlayer()
         viewModel.save()
-//        handler.removeCallbacksAndMessages(null)
+        releasePlayer()
     }
 
     override fun onClick(v: View) {
@@ -399,7 +401,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             R.id.exo_play_music -> {
                 service?.play(player.currentMediaItem!!, player.repeatMode)
                 player.pause()
-                finish()
+                viewModel.viewModelScope.launch {
+                    delay(500)
+                    finish()
+                }
             }
             R.id.exo_subtitles -> {
                 player.pause()
@@ -472,7 +477,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     private fun rotateScreenIfNeed(video: Video) {
         Log.d(TAG, "rotateScreenIfNeed() called with: video = $video")
         val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(this, video.path.toUri())
+//        retriever.setDataSource(this, video.getUri())
         val orientation =
             retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
                 ?.toInt()
@@ -487,12 +492,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun releasePlayer() {
-        this.player?.run {
+        Log.d(TAG, "releasePlayer() called")
+        player.run {
             viewModel.videoMld.value?.playedTime = currentPosition
             removeListener(listener)
+            stop()
             release()
-            binding.player.player = null
-            Log.d(TAG, "releasePlayer() called video=${viewModel.videoMld.value}")
         }
     }
 

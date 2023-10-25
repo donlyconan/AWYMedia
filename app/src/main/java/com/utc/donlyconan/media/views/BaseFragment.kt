@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
@@ -16,17 +17,15 @@ import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
  * This is basic class that will provide some properties for children class
  */
 open class BaseFragment : Fragment() {
+
     protected val activity by lazy { requireActivity() as MainActivity }
     protected val application by lazy { requireContext().applicationContext as EGMApplication }
     protected val appComponent by lazy { application.applicationComponent() }
-    protected val sfManager by lazy { activity.supportFragmentManager }
+    protected val supportFragmentManager by lazy { activity.supportFragmentManager }
     // loading screen
     protected var lsBinding: LoadingDataScreenBinding? = null
     protected val settings by lazy { appComponent.getSettings() }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,5 +60,8 @@ open class BaseFragment : Fragment() {
         }
     }
 
+    fun showToast(msg: String, duration: Int = Toast.LENGTH_SHORT) = Toast.makeText(requireContext(), msg, duration).show()
+
+    fun showToast(msgId: Int, duration: Int = Toast.LENGTH_SHORT) = showToast(getString(msgId), duration)
 
 }

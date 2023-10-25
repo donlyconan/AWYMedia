@@ -84,12 +84,13 @@ class AudioService : Service() {
             .build()
     }
 
-    fun play(item: MediaItem, repeatMode: Int) {
+    fun play(item: MediaItem, repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF) {
         Log.d(TAG, "play() called with: item = $item")
         setupPlayer()
         mediaSessionConnector.setPlayer(player)
         player?.apply {
             setMediaItem(item)
+            this.repeatMode = repeatMode
             prepare()
             playWhenReady = true
             notificationManager.showNotificationForPlayer(this)
@@ -131,9 +132,11 @@ class AudioService : Service() {
         override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
             Log.d(TAG, "onNotificationCancelled() called with: notificationId = $notificationId, " +
                     "dismissedByUser = $dismissedByUser")
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            isForegroundService = false
-            stopSelf()
+            if(dismissedByUser) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                isForegroundService = false
+                stopSelf()
+            }
         }
     }
 

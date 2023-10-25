@@ -120,7 +120,7 @@ class SplashScreenFragment : BaseFragment() {
         val contentResolver = application.contentResolver
         if(settings.deleteFromStorage) {
             trashes.forEach { video ->
-                contentResolver.delete(Uri.parse(video.path), null, null)
+                contentResolver.delete(Uri.parse(video.videoUri), null, null)
             }
         }
         trashRepo.removeAll()

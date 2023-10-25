@@ -9,6 +9,7 @@ package="com.utc.donlyconan.media">
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.android.permission.WAKE_LOCK" />
@@ -40,14 +41,14 @@ package="com.utc.donlyconan.media">
         android:configChanges="orientation"
         android:exported="true"
         android:launchMode="singleInstance">
-        <intent-filter android:scheme="http">
+        <intent-filter>
             <action android:name="android.intent.action.VIEW"/>
             <category android:name="android.intent.category.DEFAULT"/>
             <category android:name="android.intent.category.BROWSABLE"/>
             <category android:name="android.intent.category.OPENABLE"/>
             <data android:scheme="http"/>
             <data android:scheme="https"/>
-            <data android:mimeType="video/.mp4"/>
+            <data android:mimeType="video/*"/>
         </intent-filter>
     </activity>
 

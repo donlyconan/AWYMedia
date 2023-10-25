@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_mainDisplayFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_privateFolder"
+            app:destination="@id/nav_private_folder" />
 
     </fragment>
 
@@ -97,6 +100,9 @@
         android:id="@+id/settingsFragment"
         android:name="com.utc.donlyconan.media.views.fragments.SettingsFragment"
         android:label="SettingsFragment" />
+
+    <include app:graph="@navigation/nav_private_folder"
+        android:layout="@layout/fragment_private_folder"/>
 
 
 </navigation>

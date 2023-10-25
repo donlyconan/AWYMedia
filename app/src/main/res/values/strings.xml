@@ -107,6 +107,11 @@
     <string name="author">Donly Conan</string>
     <string name="_0_mb">0 MB</string>
     <string name="subtitles">Subtitles</string>
+    <string name="private_folder">Private folder</string>
+    <string name="unlock">Unlock</string>
+    <string name="require_password_content">Please use your password or fingerprint to authenticate</string>
+    <string name="password">password</string>
+    <string name="authentication_failed">The authenticated process is failed!</string>
 
     <string-array name="language_entries">
         <item>English</item>

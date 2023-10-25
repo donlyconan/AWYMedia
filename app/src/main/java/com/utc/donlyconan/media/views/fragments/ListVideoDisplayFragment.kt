@@ -6,7 +6,10 @@ import android.os.*
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.FileManager
+import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.views.BaseFragment
@@ -25,11 +28,14 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
 
     abstract val recyclerView: RecyclerView
     abstract val adapter: VideoAdapter
+    private var audioService: AudioService? = null
     @Inject lateinit var videoRepo: VideoRepository
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        audioService = application.getAudioService()
     }
 
     override fun onItemClick(v: View, position: Int) {
@@ -42,11 +48,8 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
                     R.id.btn_play -> {
                         startPlayingVideo(video.videoId)
                     }
-                    R.id.btn_play_music -> {
-//                        application.iMusicalService()?.apply {
-//                            setPlaylist(position, arrayListOf())
-//                            play()
-//                        }
+                    R.id.btn_play_music -> audioService?.let { service ->
+                        service.play(MediaItem.fromUri(video.videoUri))
                     }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
@@ -59,7 +62,7 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
                         startActivity(Intent.createChooser(intent, "Share File"))
                     }

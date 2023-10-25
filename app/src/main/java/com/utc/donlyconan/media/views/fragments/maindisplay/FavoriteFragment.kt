@@ -40,9 +40,9 @@ class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
             RecentFragment.TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, arrayListOf(), false)
-        adapter.setOnItemClickListener(this)
-        binding.recyclerView.adapter = adapter
+        videoAdapter = VideoAdapter(context!!, arrayListOf(), false)
+        videoAdapter.setOnItemClickListener(this)
+        binding.recyclerView.adapter = videoAdapter
         showLoadingScreen()
         viewModel.lstVideos.observe(this) { videos ->
             if(videos.isEmpty()) {
@@ -51,7 +51,7 @@ class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
                 hideLoading()
             }
             val data = videos.sortedByCreatedDate(true)
-            adapter.submit(data)
+            videoAdapter.submit(data)
         }
     }
 

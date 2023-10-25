@@ -4,18 +4,18 @@ import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.*
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.views.adapter.Selectable
 import kotlinx.android.parcel.Parcelize
 
-@Parcelize
-@Entity(tableName = "trashes", indices = [Index(value = ["path"], unique = true)])
+@Entity(tableName = "trashes", indices = [Index(value = ["video_uri"], unique = true)])
 data class Trash(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
     var videoId: Int,
     @ColumnInfo(name = "video_name")
     var title: String?,
-    @ColumnInfo(name = "path")
-    var path: String,
+    @ColumnInfo(name = "video_uri")
+    var videoUri: String,
     @ColumnInfo(name = "duration")
     var duration: Int,
     @ColumnInfo(name = "size")
@@ -28,21 +28,23 @@ data class Trash(
     var updatedAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "deleted_at")
     var deletedAt: Long = System.currentTimeMillis(),
-
-) : Parcelable {
+): Selectable {
     @Ignore
-    var isSelected: Boolean = false
+    var isChecked: Boolean = false
 
     fun compareTo(v: Trash, sortBy: Int) = when (sortBy) {
         Settings.SORT_BY_CREATION -> {
             (createdAt - v.createdAt).toInt()
         }
+
         Settings.SORT_BY_DURATION -> {
             duration - v.duration
         }
+
         Settings.SORT_BY_RECENT -> {
             (updatedAt - v.updatedAt).toInt()
         }
+
         else -> {
             val fch = title!!.first()
             val sch = v.title!!.first()
@@ -50,16 +52,24 @@ data class Trash(
         }
     }
 
+    override fun setSelected(isSelected: Boolean) {
+        isChecked = isSelected
+    }
+
+    override fun isSelected(): Boolean {
+        return isChecked
+    }
+
     fun toVideo(): Video {
-        return Video(videoId, title, path, duration, size, type, 0, createdAt, updatedAt, false)
+        return Video(videoId, title, videoUri, duration, size, type, 0, createdAt, updatedAt, false)
     }
 
     companion object {
         val diffUtil = object : DiffUtil.ItemCallback<Any>() {
             override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-                return if(oldItem is Trash && newItem is Trash) {
+                return if (oldItem is Trash && newItem is Trash) {
                     oldItem.videoId == newItem.videoId
-                } else if(oldItem is String && newItem is String) {
+                } else if (oldItem is String && newItem is String) {
                     oldItem == newItem
                 } else {
                     false

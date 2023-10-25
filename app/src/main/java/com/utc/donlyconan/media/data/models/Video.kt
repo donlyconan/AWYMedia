@@ -1,23 +1,28 @@
 package com.utc.donlyconan.media.data.models
 
-import android.os.Parcelable
+import android.content.UriPermission
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
-import androidx.room.*
-import com.google.android.exoplayer2.MediaItem
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.views.adapter.Selectable
-import kotlinx.android.parcel.Parcelize
+import java.io.File
+import java.util.Calendar
 
-@Parcelize
-@Entity(tableName = "videos", indices = [Index(value = ["path"], unique = true)])
+@Entity(tableName = "videos", indices = [Index(value = ["video_uri"], unique = true)])
 data class Video(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
     var videoId: Int,
     @ColumnInfo(name = "video_name")
     var title: String?,
-    @ColumnInfo(name = "path")
-    var path: String,
+    @ColumnInfo(name = "video_uri")
+    var videoUri: String,
     @ColumnInfo(name = "duration")
     var duration: Int,
     @ColumnInfo(name = "size")
@@ -29,10 +34,14 @@ data class Video(
     @ColumnInfo(name = "created_at")
     var createdAt: Long,
     @ColumnInfo(name = "updated_at")
-    var updatedAt: Long = System.currentTimeMillis(),
+    var updatedAt: Long = Calendar.getInstance().timeInMillis,
     @ColumnInfo(name = "is_favorite")
     var isFavorite: Boolean = false,
-) : Parcelable, Selectable {
+    @ColumnInfo(name = "secured")
+    var isSecured: Boolean = false,
+    @ColumnInfo(name = "subtitle_uri")
+    var subtitleUri: String? = null,
+) : Selectable {
     @Ignore
     var isChecked: Boolean = false
 
@@ -54,7 +63,7 @@ data class Video(
     }
 
     fun toTrash(): Trash {
-        return Trash(videoId, title, path, duration, size, type, createdAt,
+        return Trash(videoId, title, videoUri, duration, size, type, createdAt,
             updatedAt, System.currentTimeMillis())
     }
 
@@ -85,7 +94,6 @@ data class Video(
             }
         }
     }
-
 
     override fun isSelected(): Boolean {
         return isChecked

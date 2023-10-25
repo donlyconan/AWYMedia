@@ -20,16 +20,15 @@
         android:icon="@drawable/outline_settings_24"
         android:title="@string/settings" />
 
-
-<!--    <item-->
-<!--        android:id="@+id/it_backups"-->
-<!--        android:icon="@drawable/ic_baseline_cloud_upload_24"-->
-<!--        android:title="Backups" />-->
-
     <item
         android:id="@+id/it_trash"
         android:icon="@drawable/outline_delete_24"
         android:title="@string/trash" />
+
+    <item
+        android:id="@+id/it_private_folder"
+        android:icon="@drawable/outline_delete_24"
+        android:title="@string/private_folder" />
 
     <item
         android:id="@+id/it_sync_data"

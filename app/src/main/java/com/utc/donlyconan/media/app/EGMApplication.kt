@@ -55,7 +55,7 @@ class EGMApplication: Application() {
         }
     }
 
-    fun getEgmService(): AudioService? {
+    fun getAudioService(): AudioService? {
         return service
     }
 

@@ -1,16 +1,12 @@
 package com.utc.donlyconan.media.views.adapter
 
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
-import android.media.ThumbnailUtils
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
-import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toFile
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -101,7 +97,7 @@ class VideoAdapter(
                         .fallback(R.drawable.ic_baseline_error_24)
                         .diskCacheStrategy(DiskCacheStrategy.DATA)
                 )
-                .load(video.path)
+                .load(video.videoUri.toUri())
                 .centerCrop()
                 .into(binding.imgThumbnail)
 

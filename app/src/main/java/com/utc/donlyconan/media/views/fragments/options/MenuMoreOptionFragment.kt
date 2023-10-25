@@ -95,8 +95,8 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
         
         val TAG = MenuMoreOptionFragment::class.simpleName
         const val EXTRA_LAYOUT_ID = "layout_id"
-        
-        fun newInstance(layoutId: Int, listener: View.OnClickListener? = null) : MenuMoreOptionFragment {
+
+        fun newInstance(layoutId: Int,   listener: View.OnClickListener? = null) : MenuMoreOptionFragment {
             val instance = MenuMoreOptionFragment()
             instance.listener = listener
             instance.arguments = bundleOf(EXTRA_LAYOUT_ID to layoutId)

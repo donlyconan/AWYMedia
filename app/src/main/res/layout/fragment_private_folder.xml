@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".views.fragments.privatefolder.PrivateFolderFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".views.fragments.privatefolder.PrivateFolderFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -16,14 +16,34 @@
         android:gravity="start|center"
         android:theme="@style/MenuStylle"
         app:menu="@menu/menu_trash_bar"
-        app:titleTextColor="@android:color/white"
-        app:title="Private Folder"
-        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"/>
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+        app:title="@string/private_folder"
+        app:titleTextColor="@android:color/white" />
 
 
-    <include
+    <FrameLayout
+        android:id="@+id/layout_content_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        layout="@layout/fragment_personal_video"/>
+        android:background="@color/recycler_color">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+            tools:itemCount="10"
+            tools:listitem="@layout/item_video_single_mode" />
+
+        <include
+            android:id="@+id/icd_loading"
+            layout="@layout/loading_data_screen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
 
 </LinearLayout>

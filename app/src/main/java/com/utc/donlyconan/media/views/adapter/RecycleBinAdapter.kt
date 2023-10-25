@@ -11,7 +11,6 @@ import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
 import com.utc.donlyconan.media.databinding.ItemTrashBinding
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 
 class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
@@ -69,7 +68,7 @@ class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
             binding.tvSize.text = trash.size.convertToStorageData()
 
             Glide.with(itemView.context)
-                .load(trash.path)
+                .load(trash.videoUri)
                 .into(binding.imgThumbnail)
 
             if (isLastItem) {

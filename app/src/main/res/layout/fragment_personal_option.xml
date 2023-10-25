@@ -37,6 +37,24 @@
         />
 
     <TextView
+        android:id="@+id/btn_lock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_delete_24"
+        android:text="@string/lock"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
+        android:id="@+id/btn_unlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_delete_24"
+        android:text="@string/unlock"
+        style="@style/BottomMenuItem"
+        />
+
+    <TextView
         android:id="@+id/btn_delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

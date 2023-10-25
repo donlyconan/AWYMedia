@@ -37,7 +37,7 @@ class ListedVideosAdapter(
             val video = value as Video
             binding.tvTitle.text = video.title
             Glide.with(itemView.context)
-                .load(video.path)
+                .load(video.videoUri)
                 .centerCrop()
                 .error(R.drawable.ic_baseline_error_24)
                 .into(binding.imgThumbnail)

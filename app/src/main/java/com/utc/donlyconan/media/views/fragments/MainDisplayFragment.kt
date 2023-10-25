@@ -7,20 +7,17 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.view.*
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginEnd
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
@@ -69,8 +66,6 @@ class MainDisplayFragment : BaseFragment() {
 
         // Rotate the fragment when its orientation is the landscape mode
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val displayMetrics = resources.displayMetrics
-            val height = displayMetrics.xdpi
 
             binding.navBar.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
@@ -114,7 +109,7 @@ class MainDisplayFragment : BaseFragment() {
         super.onResume()
         Log.d(TAG, "onResume: ")
         // Release service media if need
-        application.getEgmService()?.releasePlayer()
+        application.getAudioService()?.releasePlayer()
     }
 
     private fun setUpViewPager() {
@@ -197,14 +192,14 @@ class MainDisplayFragment : BaseFragment() {
                 val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)
                if(fragment is PersonalVideoFragment) {
                    fragment.let { frag ->
-                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
-                           .show(sfManager, TAG)
+                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, listener = frag)
+                           .show(supportFragmentManager, TAG)
                    }
                } else if(fragment is PlaylistFragment) {
                    fragment.let { frag ->
-                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, frag)
+                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, listener = frag)
                            .setVisibility(R.id.btn_sort_by_duration)
-                           .show(sfManager, TAG)
+                           .show(supportFragmentManager, TAG)
                    }
                }
             }
@@ -220,6 +215,10 @@ class MainDisplayFragment : BaseFragment() {
             }
             R.id.it_help -> {
                 val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToHelpAndFeedbackFragment()
+                findNavController().navigate(action)
+            }
+            R.id.it_private_folder -> {
+                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToPrivateFolder()
                 findNavController().navigate(action)
             }
             else -> {

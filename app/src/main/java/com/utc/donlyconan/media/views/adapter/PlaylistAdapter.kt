@@ -83,7 +83,7 @@ class PlaylistAdapter(var context: Context,
             binding.tvNumber.text = "${playlist.itemSize} videos"
 
             Glide.with(itemView.context)
-                .load(video?.path)
+                .load(video?.videoUri)
                 .error(R.drawable.outline_playlist_play_24)
                 .circleCrop()
                 .into(binding.thumbnailCard)

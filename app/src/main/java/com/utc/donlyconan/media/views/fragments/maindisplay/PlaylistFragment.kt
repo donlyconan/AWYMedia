@@ -107,7 +107,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     }.show()
                 }
             }
-        }.show(sfManager, TAG)
+        }.show(supportFragmentManager, TAG)
     }
 
     override fun onClick(v: View?) {

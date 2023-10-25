@@ -71,7 +71,7 @@ class ListVideoAdapter(var context: Context, var videos: List<Video>) :
             binding.tvSize.text = video.size.convertToStorageData()
             binding.tvDuration.text = (video.duration / 1000).toShortTime()
             Glide.with(itemView.context)
-                .load(video.path)
+                .load(video.videoUri)
                 .into(binding.imgThumbnail)
             if (isLastItem) {
                 binding.container.apply {

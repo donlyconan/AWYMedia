@@ -78,7 +78,7 @@ class VideoChoiceAdapter(var context: Context, var videos: ArrayList<Video>) :
             binding.tvTitle.text = video.title
             binding.tvSize.text = video.size.convertToStorageData()
             Glide.with(itemView.context)
-                .load(video.path)
+                .load(video.videoUri)
                 .into(binding.imgThumbnail)
             if (isLastItem) {
                 binding.container.apply {

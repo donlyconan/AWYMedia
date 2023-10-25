@@ -19,6 +19,7 @@ import com.utc.donlyconan.media.views.BaseActivity
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.*
 import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PlaylistFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.RecentFragment
@@ -73,4 +74,5 @@ interface ApplicationComponent {
     fun inject(baseActivity: BaseActivity)
     fun inject(listedVideosDialog: ListedVideosDialog)
     fun inject(viewModel: TrashViewModel)
+    fun inject(listVideosFragment: ListVideosFragment)
 }

@@ -41,9 +41,9 @@ class RecentFragment : ListVideosFragment() {
         Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                 "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
-        adapter = VideoAdapter(context!!, arrayListOf(), true)
-        adapter.setOnItemClickListener(this)
-        binding.recyclerView.adapter = adapter
+        videoAdapter = VideoAdapter(context!!, arrayListOf(), true)
+        videoAdapter.setOnItemClickListener(this)
+        binding.recyclerView.adapter = videoAdapter
         showLoadingScreen()
         viewModel.lstVideos.observe(this) { videos ->
             if(videos.isEmpty()) {
@@ -52,13 +52,13 @@ class RecentFragment : ListVideosFragment() {
                 hideLoading()
             }
             val sortedData = videos.sortedByCreatedDate(true)
-            adapter.submit(sortedData)
+            videoAdapter.submit(sortedData)
         }
     }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = adapter.getItem(position) as Video
+        val video = videoAdapter.getItem(position) as Video
         Log.d(TAG, "onItemClick: video=$video")
         if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
@@ -76,7 +76,7 @@ class RecentFragment : ListVideosFragment() {
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
                         videoRepo.update(video)
-                        adapter.notifyItemChanged(position)
+                        videoAdapter.notifyItemChanged(position)
                     }
                     R.id.btn_delete -> {
                         videoRepo.moveToTrash(video)
@@ -84,7 +84,7 @@ class RecentFragment : ListVideosFragment() {
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
                         startActivity(Intent.createChooser(intent, "Share File"))
                     }
