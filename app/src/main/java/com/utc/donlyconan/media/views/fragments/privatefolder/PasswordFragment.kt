@@ -53,8 +53,15 @@ class PasswordFragment : BaseFragment() {
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
                 Log.d(ListVideosFragment.TAG, "onAuthenticationError() called with: errorCode = $errorCode, errString = $errString")
-                findNavController().navigateUp()
-                showToast("The authenticated process is failed!")
+//                findNavController().navigateUp()
+//                showToast("The authenticated process is failed!")
+                val action = PasswordFragmentDirections.actionPasswordFragmentToPrivateFolderFragment()
+                findNavController().navigate(
+                    action,
+                    NavOptions.Builder()
+                        .setPopUpTo(R.id.passwordFragment, true)
+                        .build()
+                )
             }
 
             override fun onAuthenticationFailed() {

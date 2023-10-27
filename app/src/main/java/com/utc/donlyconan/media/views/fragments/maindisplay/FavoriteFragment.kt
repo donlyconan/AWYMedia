@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.viewmodels.FavoriteVideoViewModel
+import com.utc.donlyconan.media.viewmodels.FavoriteViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 
@@ -20,7 +22,13 @@ import com.utc.donlyconan.media.views.adapter.VideoAdapter
 class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
 
     val binding by lazy { FragmentFavoriteBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<FavoriteVideoViewModel>()
+    private val viewModel by viewModels<FavoriteViewModel> {
+        viewModelFactory {
+            initializer {
+                FavoriteViewModel(appComponent.getVideoRepository())
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

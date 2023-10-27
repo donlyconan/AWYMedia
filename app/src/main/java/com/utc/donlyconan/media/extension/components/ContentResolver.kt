@@ -6,6 +6,8 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import com.utc.donlyconan.media.data.models.Video
+import java.io.File
+import java.io.FileFilter
 
 const val TAG = "ContentResolver"
 
@@ -98,4 +100,43 @@ fun ContentResolver.getVideoInfo(uri: Uri): Video? {
             }
         }
     return null
+}
+
+var videoExtentions = listOf("mp4", "wav", "mp3", "ogg", "webm", "fmp4", "m4a")
+
+fun File.loadAllVideos(excludes: List<String>? = null): List<Video>  {
+    val filter = FileFilter { file ->
+        if(excludes?.contains(file.name) == true) {
+            false
+        } else {
+            videoExtentions.any { ext -> file.extension == ext}
+        }
+    }
+    val videos = arrayListOf<Video>()
+    recursiveFile(listFiles(filter), filter, videos)
+    return videos
+}
+
+fun File.browseFolder(excludes: List<String>? = null, onAccepted: (file: File) -> Unit) {
+    val filter = FileFilter { file ->
+        if(excludes?.contains(file.name) == true) {
+            false
+        } else {
+            videoExtentions.any { ext -> file.extension == ext}
+        }
+    }
+    recursiveFile(listFiles(filter), filter, onAccepted = onAccepted)
+}
+
+fun recursiveFile(listFiles: Array<File>?, fileFilter: FileFilter, videos: ArrayList<Video>? = null, onAccepted: (file: File) -> Unit? = {_ -> }) {
+    listFiles?.let { files ->
+        for (file in files) {
+            if(file.isFile) {
+                videos?.add(Video.fromFile(file))
+                onAccepted.invoke(file)
+            } else {
+                recursiveFile(file.listFiles(fileFilter), fileFilter, videos)
+            }
+        }
+    }
 }

@@ -3,16 +3,18 @@ package com.utc.donlyconan.media.app
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.androidFile
+import com.utc.donlyconan.media.extension.widgets.showMessage
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -20,14 +22,20 @@ import javax.inject.Inject
  */
 class FileManager @Inject constructor(val context: Context) {
 
-
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    @Throws(IOException::class)
+    private fun generateExceptionHandler() = CoroutineExceptionHandler { _, e ->
+        coroutineScope.launch(Dispatchers.Main) {
+            context.showMessage(R.string.toast_when_failed_user_action, duration = Toast.LENGTH_LONG)
+        }
+    }
+
     @WorkerThread
-    fun saveIntoInternal(uri: Uri, filename: String, onFinished:(uri: Uri) -> Unit = {}) {
+    fun saveIntoInternal(
+        uri: Uri, filename: String,
+                         onFinished:(uri: Uri, newName: String) -> Unit = { uri: Uri, name: String -> }) {
         Logs.d( "save() called with: uri = $uri, filename = $filename")
-        coroutineScope.launch {
+        coroutineScope.launch (generateExceptionHandler()) {
             val file = File(filename)
             val newFilename = handleFilename(file)
             val outputStream = context.openFileOutput(newFilename, Context.MODE_PRIVATE)
@@ -37,13 +45,13 @@ class FileManager @Inject constructor(val context: Context) {
                 outputStream.close()
             }
             val newUri = context.getFileStreamPath(newFilename).toUri()
-            onFinished.invoke(newUri)
+            onFinished.invoke(newUri, newFilename)
         }
     }
 
     fun removeFromInternal(filename: String, onFinished:(uri: Uri) -> Unit = {}) {
         Logs.d("removeFromInternal() called with: filename = $filename, onFinished = $onFinished")
-        coroutineScope.launch {
+        coroutineScope.launch(generateExceptionHandler()) {
             val newFile = File(androidFile(Environment.DIRECTORY_MOVIES), filename)
             val outputStream = newFile.outputStream()
             context.getFileStreamPath(filename).inputStream().use { stream ->

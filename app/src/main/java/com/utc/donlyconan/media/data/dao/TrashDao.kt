@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.utc.donlyconan.media.data.models.Trash
+import com.utc.donlyconan.media.data.models.Video
 
 @Dao
 interface TrashDao {

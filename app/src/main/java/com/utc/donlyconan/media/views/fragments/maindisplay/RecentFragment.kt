@@ -79,7 +79,7 @@ class RecentFragment : ListVideosFragment() {
                         videoAdapter.notifyItemChanged(position)
                     }
                     R.id.btn_delete -> {
-                        videoRepo.moveToTrash(video)
+                        videoRepo.moveToRecyleBin(video)
                     }
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)

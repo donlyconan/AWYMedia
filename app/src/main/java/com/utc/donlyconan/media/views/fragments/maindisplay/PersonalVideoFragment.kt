@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,8 +20,6 @@ import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.extension.components.getAllVideos
-import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
@@ -36,7 +33,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>{
         viewModelFactory {
-            initializer { PersonalVideoViewModel(appComponent.getVideoDao(), context!!.contentResolver) }
+            initializer { PersonalVideoViewModel(appComponent.getVideoRepository(), context!!.contentResolver) }
         }
     }
 

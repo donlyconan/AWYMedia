@@ -2,22 +2,20 @@ package com.utc.donlyconan.media.viewmodels
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
-import com.utc.donlyconan.media.app.settings.Settings
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.utc.donlyconan.media.data.models.Video
-import com.utc.donlyconan.media.extension.components.getAllVideos
 import com.utc.donlyconan.media.extension.widgets.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
-import java.util.*
 
 open class ListVideoViewModel(app: Application) : BaseAndroidViewModel(app) {
     private val _selectedVideo = MutableLiveData<Video>()
-    val listVideoRepo = myApp.applicationComponent().getListVideoRepo()
-    val videoRepo = myApp.applicationComponent().getVideoRepo()
+    val listVideoRepo = myApp.applicationComponent().getListVideoRepository()
+    val videoRepo = myApp.applicationComponent().getVideoRepository()
     val selectedVideo: LiveData<Video> = _selectedVideo
 
     protected val job = Job()
@@ -44,7 +42,7 @@ open class ListVideoViewModel(app: Application) : BaseAndroidViewModel(app) {
             Log.d(TAG, "insertDataIntoDbIfNeed: Database had been loaded!")
             return@launch
         }
-        val videoList = listVideoRepo.loadAllVideos()
+        val videoList = videoRepo.loadAllVideos()
         Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
         videoRepo.insert(*videoList.toTypedArray())
     }

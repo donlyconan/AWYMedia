@@ -4,5 +4,5 @@ import androidx.lifecycle.ViewModel
 import com.utc.donlyconan.media.data.dao.VideoDao
 
 class PrivateFolderViewModel(val videoDao: VideoDao) : ViewModel() {
-    val videosLd = videoDao.getAll(true)
+    val videosLd = videoDao.getAllVideosBySecuring(true)
 }

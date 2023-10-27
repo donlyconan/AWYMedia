@@ -1,7 +1,6 @@
 package com.utc.donlyconan.media.data.models
 
-import android.content.UriPermission
-import android.net.Uri
+import android.media.MediaMetadataRetriever
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.ColumnInfo
@@ -10,6 +9,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.views.adapter.Selectable
 import java.io.File
 import java.util.Calendar
@@ -62,12 +62,24 @@ data class Video(
         }
     }
 
-    fun toTrash(): Trash {
+    fun convertToTrash(): Trash {
         return Trash(videoId, title, videoUri, duration, size, type, createdAt,
-            updatedAt, System.currentTimeMillis())
+            updatedAt, deletedAt = System.currentTimeMillis(), isSecured, subtitleUri)
     }
 
     companion object {
+        fun fromFile(file: File): Video {
+            return Video(
+                videoId = 0,
+                title = file.name,
+                videoUri = file.toUri().toString(),
+                duration = 0,
+                size = file.length(),
+                createdAt = file.lastModified(),
+                type = file.extension
+            )
+        }
+
         val diffUtil = object : DiffUtil.ItemCallback<Any>() {
             override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
                 return if(oldItem is Video && newItem is Video) {

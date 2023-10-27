@@ -19,6 +19,8 @@ import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.FragmentSplashScreenBinding
 import com.utc.donlyconan.media.views.BaseFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -56,22 +58,14 @@ class SplashScreenFragment : BaseFragment() {
     override fun onResume() {
         Log.d(TAG, "onResume() called")
         super.onResume()
-        lifecycleScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             val startPoint = System.currentTimeMillis()
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "onResume: Check conditions for loading process.")
-                // Load all data from the device
-                if (settings.autoDownload) {
-                    loadingData()
-                }
 
-                // Delete all video in trash
-                if(settings.erasureCycle != "0") {
-                    deleteDataIfNeed()
-                }
+            // Load all data from the device
+            try {
+                videoRepo.sync()
+            } catch (e: Exception) {
+                Log.e(TAG, "onResume: ", e)
             }
 
             val currentTime = System.currentTimeMillis()
@@ -103,15 +97,6 @@ class SplashScreenFragment : BaseFragment() {
             deleteData()
             settings.previousDeletionDate = System.currentTimeMillis()
         }
-    }
-
-    private suspend fun loadingData() {
-        Log.d(TAG, "loadingData: loading autoDownload=[${settings.autoDownload}]...")
-        val videoList = listVideoRepo.loadAllVideos().filter { video ->
-            trashRepo.find(video.videoId) == null
-        }
-        Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
-        videoRepo.insert(*videoList.toTypedArray())
     }
 
     private suspend fun deleteData() {

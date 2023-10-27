@@ -36,10 +36,10 @@ class EGMApplication: Application() {
         // Start musical service
         val intent = Intent(this, AudioService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        var myWorker =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(1, TimeUnit.SECONDS)
+        var periodicWorkRequest =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(REPEATED_INTERVAL_TIME, TimeUnit.MINUTES)
             .build()
         WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork("CLEAN", ExistingPeriodicWorkPolicy.KEEP, myWorker)
+            .enqueueUniquePeriodicWork(WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
     }
 
     private val connection = object : ServiceConnection {
@@ -74,9 +74,10 @@ class EGMApplication: Application() {
     companion object {
         val TAG: String = EGMApplication.javaClass.simpleName
 
+        const val WORK_TAG = "CLEAN_YOUR_TRASH"
+        const val REPEATED_INTERVAL_TIME = 15L
+
         private lateinit var instance: EGMApplication
 
-        // Save instance of Application
-        fun getInstance() = instance
     }
 }

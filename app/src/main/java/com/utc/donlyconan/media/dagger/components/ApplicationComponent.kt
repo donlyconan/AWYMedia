@@ -4,8 +4,8 @@ import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
-import com.utc.donlyconan.media.dagger.modules.RepositoryModule
 import com.utc.donlyconan.media.dagger.modules.SettingsModule
+import com.utc.donlyconan.media.data.dao.PlaylistDao
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
@@ -17,7 +17,13 @@ import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.BaseActivity
 import com.utc.donlyconan.media.views.VideoDisplayActivity
-import com.utc.donlyconan.media.views.fragments.*
+import com.utc.donlyconan.media.views.fragments.DetailedPlaylistFragment
+import com.utc.donlyconan.media.views.fragments.ExpendedPlaylistFragment
+import com.utc.donlyconan.media.views.fragments.ListVideoDisplayFragment
+import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
+import com.utc.donlyconan.media.views.fragments.RecycleBinFragment
+import com.utc.donlyconan.media.views.fragments.SearchBarFragment
+import com.utc.donlyconan.media.views.fragments.SplashScreenFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.FavoriteFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
@@ -31,7 +37,6 @@ import javax.inject.Singleton
 @Component(modules = [
     ApplicationModule::class,
     DatabaseModule::class,
-    RepositoryModule::class,
     SettingsModule::class
 ])
 interface ApplicationComponent {
@@ -46,13 +51,15 @@ interface ApplicationComponent {
 
     }
 
-    fun getVideoRepo(): VideoRepository
-    fun getListVideoRepo(): ListVideoRepository
-    fun getPlaylistRepo(): PlaylistRepository
-    fun getTrashRepo(): TrashRepository
+    fun getVideoRepository(): VideoRepository
+    fun getListVideoRepository(): ListVideoRepository
+    fun getPlaylistRepository(): PlaylistRepository
+    fun getTrashRepository(): TrashRepository
     fun getSettings(): Settings
     fun getTrashDao(): TrashDao
     fun getVideoDao(): VideoDao
+    fun getPlaylistDao(): PlaylistDao
+
 
 
 

@@ -8,8 +8,8 @@ import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.extension.widgets.TAG
 
 class SearchViewModel(app: Application) : BaseAndroidViewModel(app) {
-    val lstVideoRepo = myApp.applicationComponent().getListVideoRepo()
-    val playlistRepo = myApp.applicationComponent().getPlaylistRepo()
+    val lstVideoRepo = myApp.applicationComponent().getListVideoRepository()
+    val playlistRepo = myApp.applicationComponent().getPlaylistRepository()
 
     fun searchAllPlaylist(keyword: String): LiveData<List<Playlist>> {
         return playlistRepo.findAll(keyword)

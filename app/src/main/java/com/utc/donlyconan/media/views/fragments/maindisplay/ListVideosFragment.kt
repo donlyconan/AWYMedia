@@ -1,17 +1,12 @@
 package com.utc.donlyconan.media.views.fragments.maindisplay
 
-import android.app.RecoverableSecurityException
+import android.app.Activity
 import android.content.Intent
-import android.content.IntentSender
 import android.net.Uri
-import android.os.Build
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.ActivityResult
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
@@ -22,6 +17,7 @@ import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import com.utc.donlyconan.media.views.fragments.VideoTask
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import javax.inject.Inject
 
@@ -32,10 +28,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
     protected var unlockMode = false
     @Inject lateinit var fileManager: FileManager
     @Inject lateinit var videoRepo: VideoRepository
-
-    protected val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-
-    }
+    protected var handlingVideoTask: VideoTask? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +54,21 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                         videoAdapter.notifyItemChanged(position)
                     }
                     R.id.btn_delete -> {
-                        videoRepo.moveToTrash(video)
+                        if(video.isSecured) {
+                            videoRepo.moveToRecyleBin(video)
+                        } else {
+                            fileManager.saveIntoInternal(video.videoUri.toUri(), video.title!!) { uri, name ->
+                                val newVideo = video.copy(videoUri = uri.toString(), title = name)
+                                deleteVideoFromExternalStorage(video.videoUri.toUri())
+                                handlingVideoTask = VideoTask(listOf(newVideo), succeed = {
+                                    Log.d(TAG, "handle succeeded items")
+                                    videoRepo.moveToRecyleBin(video)
+                                }, error = {
+                                    Log.d(TAG, "handle error items")
+                                    context?.deleteFile(newVideo.videoUri)
+                                })
+                            }
+                        }
                     }
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
@@ -71,10 +78,14 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                         startActivity(Intent.createChooser(intent, "Share File"))
                     }
                     R.id.btn_lock -> {
-                        fileManager.saveIntoInternal(video.videoUri.toUri(), video.title ?: "no_name") { uri ->
-                            deleteVideoFromExternalStorage(video.videoUri.toUri())
-                            val newVideo = video.copy(isSecured = true, videoUri = uri.toString())
-                            videoRepo.update(newVideo)
+                        fileManager.saveIntoInternal(video.videoUri.toUri(), video.title ?: "no_name") { uri, newName ->
+                            try {
+                                deleteVideoFromExternalStorage(video.videoUri.toUri())
+                                val newVideo = video.copy(isSecured = true, videoUri = uri.toString(), title = newName)
+                                videoRepo.update(newVideo)
+                            } catch (e: Exception) {
+                                showToast(R.string.toast_when_failed_user_action)
+                            }
                         }
                     }
                     R.id.btn_unlock -> {
@@ -96,33 +107,23 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         }
     }
 
-    private fun deleteVideoFromExternalStorage(uri: Uri) {
-        Log.d(TAG, "deleteVideoFromExternalStorage() called with: uri = $uri")
+    override fun onDeletedResult(result: ActivityResult) {
+        Log.d(TAG, "onDeletedResult() called with: result = $result")
         try {
-            requireContext().contentResolver.delete(uri, null, null)
+            if(result.resultCode == Activity.RESULT_OK) {
+                handlingVideoTask?.succeed?.run()
+            } else {
+                handlingVideoTask?.error?.run()
+            }
         } catch (e: Exception) {
-            val intentSender: IntentSender? = when {
-                Build.VERSION.SDK_INT >= VERSION_CODES.R -> {
-                    MediaStore
-                        .createDeleteRequest(requireContext()?.contentResolver, listOf(uri))
-                        .intentSender
-                }
-                Build.VERSION.SDK_INT >= VERSION_CODES.Q -> {
-                    val exception = e as? RecoverableSecurityException
-                    exception?.userAction?.actionIntent?.intentSender
-                }
-                else -> null
-            }
-            intentSender?.let { intent ->
-                intentSenderForResult.launch(
-                    IntentSenderRequest.Builder(intent).build()
-                )
-            }
+            Log.e(TAG, "onDeletedResult: ", e)
+            showToast(R.string.toast_when_failed_user_action)
         }
+        handlingVideoTask = null
     }
 
-    companion object {
 
+    companion object {
         val TAG = ListVideosFragment::class.simpleName
 
     }

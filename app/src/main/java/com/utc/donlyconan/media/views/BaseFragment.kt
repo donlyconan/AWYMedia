@@ -1,22 +1,35 @@
 package com.utc.donlyconan.media.views
 
+import android.app.RecoverableSecurityException
 import android.content.Context
+import android.content.IntentSender
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
+import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
  * This is basic class that will provide some properties for children class
  */
-open class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment() {
 
     protected val activity by lazy { requireActivity() as MainActivity }
     protected val application by lazy { requireContext().applicationContext as EGMApplication }
@@ -32,6 +45,42 @@ open class BaseFragment : Fragment() {
         val icdLoading = view.findViewById<View>(R.id.icd_loading)
         if(icdLoading != null) {
             lsBinding = LoadingDataScreenBinding.bind(icdLoading)
+        }
+    }
+
+    protected val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        onDeletedResult(result)
+    }
+
+    fun deleteVideoFromExternalStorage(vararg uris: Uri) {
+        Log.d(ListVideosFragment.TAG, "deleteVideoFromExternalStorage() called with: uri = ${uris.size}")
+        val contentResolver = requireContext().contentResolver
+        lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler {_, e ->
+            showToast(R.string.toast_when_failed_user_action)
+        }) {
+            try {
+                uris.forEach { uri ->
+                    contentResolver.delete(uri, null, null)
+                }
+            } catch (e: Exception) {
+                val intentSender: IntentSender? = when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                        MediaStore
+                            .createDeleteRequest(contentResolver, uris.toList())
+                            .intentSender
+                    }
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                        val exception = e as? RecoverableSecurityException
+                        exception?.userAction?.actionIntent?.intentSender
+                    }
+                    else -> null
+                }
+                intentSender?.let { intent ->
+                    intentSenderForResult.launch(
+                        IntentSenderRequest.Builder(intent).build()
+                    )
+                }
+            }
         }
     }
 
@@ -63,5 +112,9 @@ open class BaseFragment : Fragment() {
     fun showToast(msg: String, duration: Int = Toast.LENGTH_SHORT) = Toast.makeText(requireContext(), msg, duration).show()
 
     fun showToast(msgId: Int, duration: Int = Toast.LENGTH_SHORT) = showToast(getString(msgId), duration)
+
+    open fun onDeletedResult(result: ActivityResult) {
+        Logs.d( "onDeletedResult() called with: result = $result")
+    }
 
 }

@@ -112,6 +112,7 @@
     <string name="require_password_content">Please use your password or fingerprint to authenticate</string>
     <string name="password">password</string>
     <string name="authentication_failed">The authenticated process is failed!</string>
+    <string name="toast_when_failed_user_action">There are some of occurred problems, please try again!</string>
 
     <string-array name="language_entries">
         <item>English</item>

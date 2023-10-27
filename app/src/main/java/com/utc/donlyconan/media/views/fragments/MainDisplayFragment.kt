@@ -180,7 +180,7 @@ class MainDisplayFragment : BaseFragment() {
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
                     lifecycleScope.launch {
-                        val videoList = listVideoRepo.loadAllVideos().filter { video ->
+                        val videoList = videoRepo.loadAllVideos().filter { video ->
                             trashRepo.find(video.videoId) == null
                         }
                         Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
