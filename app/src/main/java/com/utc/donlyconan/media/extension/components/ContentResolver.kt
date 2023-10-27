@@ -2,15 +2,31 @@ package com.utc.donlyconan.media.extension.components
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.Context
+import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import androidx.core.net.toFile
+import androidx.core.net.toUri
+import com.utc.donlyconan.media.app.utils.Logs
+import com.utc.donlyconan.media.app.utils.androidFile
 import com.utc.donlyconan.media.data.models.Video
 import java.io.File
 import java.io.FileFilter
 
 const val TAG = "ContentResolver"
 
+val FOLDERS = listOf(
+    androidFile(Environment.DIRECTORY_MOVIES),
+    androidFile(Environment.DIRECTORY_DCIM),
+    androidFile(Environment.DIRECTORY_DOCUMENTS),
+    androidFile(Environment.DIRECTORY_DOWNLOADS),
+    androidFile(Environment.DIRECTORY_MUSIC),
+    androidFile(Environment.DIRECTORY_PODCASTS),
+    androidFile(Environment.DIRECTORY_RINGTONES),
+)
 
 /**
  * Get all videos in the device
@@ -138,5 +154,11 @@ fun recursiveFile(listFiles: Array<File>?, fileFilter: FileFilter, videos: Array
                 recursiveFile(file.listFiles(fileFilter), fileFilter, videos)
             }
         }
+    }
+}
+
+fun String.getMediaUri(context: Context, onFinish: (uri: Uri) -> Unit) {
+    MediaScannerConnection.scanFile(context, arrayOf(toUri().toFile().absolutePath), arrayOf("*/*")) { path, uri ->
+        onFinish.invoke(uri)
     }
 }

@@ -137,9 +137,11 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
             val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.hideSoftInputFromWindow(view!!.windowToken, 0)
             videoAdapter?.let { adapter ->
-                val videoList = arrayListOf<Video>()
-                val intent = VideoDisplayActivity.newIntent(requireContext(), position)
-                startActivity(intent)
+                val video = adapter.getItem(position) as? Video
+                video?.let {
+                    val intent = VideoDisplayActivity.newIntent(requireContext(), it.videoId, it.videoUri)
+                    startActivity(intent)
+                }
             }
         }
     }

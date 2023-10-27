@@ -113,6 +113,10 @@
     <string name="password">password</string>
     <string name="authentication_failed">The authenticated process is failed!</string>
     <string name="toast_when_failed_user_action">There are some of occurred problems, please try again!</string>
+    <string name="add">Add</string>
+    <string name="shared_file">Shared File</string>
+    <string name="share_file">Share File</string>
+    <string name="type_all_video">video/*</string>
 
     <string-array name="language_entries">
         <item>English</item>

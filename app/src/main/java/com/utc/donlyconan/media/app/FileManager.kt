@@ -1,10 +1,13 @@
 package com.utc.donlyconan.media.app
 
 import android.content.Context
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.WorkerThread
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.Logs
@@ -32,8 +35,7 @@ class FileManager @Inject constructor(val context: Context) {
 
     @WorkerThread
     fun saveIntoInternal(
-        uri: Uri, filename: String,
-                         onFinished:(uri: Uri, newName: String) -> Unit = { uri: Uri, name: String -> }) {
+        uri: Uri, filename: String, onFinished:(uri: Uri, newName: String) -> Unit = { uri: Uri, name: String -> }) {
         Logs.d( "save() called with: uri = $uri, filename = $filename")
         coroutineScope.launch (generateExceptionHandler()) {
             val file = File(filename)
@@ -52,13 +54,20 @@ class FileManager @Inject constructor(val context: Context) {
     fun removeFromInternal(filename: String, onFinished:(uri: Uri) -> Unit = {}) {
         Logs.d("removeFromInternal() called with: filename = $filename, onFinished = $onFinished")
         coroutineScope.launch(generateExceptionHandler()) {
-            val newFile = File(androidFile(Environment.DIRECTORY_MOVIES), filename)
+            val rootFolder = androidFile(Environment.DIRECTORY_MOVIES)
+            val file = File(rootFolder, filename)
+            val newFilename = handleFilename(file)
+            val newFile = File(rootFolder, newFilename)
+            if(!newFile.exists()) {
+                newFile.createNewFile()
+            }
             val outputStream = newFile.outputStream()
             context.getFileStreamPath(filename).inputStream().use { stream ->
                 stream.copyTo(outputStream)
             }
-            context.deleteFile(filename)
-            onFinished.invoke(newFile.toUri())
+            if(context.deleteFile(filename)) {
+                onFinished.invoke(newFile.toUri())
+            }
         }
     }
 

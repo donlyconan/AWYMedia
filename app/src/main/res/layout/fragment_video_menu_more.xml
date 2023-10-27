@@ -47,7 +47,7 @@
         android:text="@string/play_music" />
 
     <TextView
-        android:id="@+id/exo_prev"
+        android:id="@+id/btn_prev"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_baseline_skip_previous_24"
@@ -56,7 +56,7 @@
         />
 
     <TextView
-        android:id="@+id/exo_next"
+        android:id="@+id/btn_next"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_baseline_skip_next_24"

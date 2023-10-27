@@ -14,6 +14,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -37,6 +38,7 @@ import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.ListedVideosDialog
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.OnSelectedChangeListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -48,6 +50,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     companion object {
         const val EXTRA_VIDEO_ID = "media.EXTRA_VIDEO_ID"
+        const val EXTRA_VIDEO_URI = "media.EXTRA_VIDEO_URI"
         const val EXTRA_CONTINUE = "media.EXTRA_CONTINUE"
         const val EXTRA_PLAYLIST = "media.EXTRA_PLAYLIST"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
@@ -58,11 +61,13 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         fun newIntent(
             context: Context,
             videoId: Int,
+            uri: String,
             playlistId: Int = -1,
             continued: Boolean = false
         ): Intent {
             return Intent(context, VideoDisplayActivity::class.java).apply {
                 putExtra(EXTRA_VIDEO_ID, videoId)
+                putExtra(EXTRA_VIDEO_URI, uri)
                 putExtra(EXTRA_PLAYLIST, playlistId)
                 putExtra(EXTRA_CONTINUE, continued)
             }
@@ -117,8 +122,18 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             .bind(playerControlBinding.layoutPlayerControlView.rootView)
 
         val videoId = intent.getIntExtra(EXTRA_VIDEO_ID, -1)
+        val videoUri = intent.getStringExtra(EXTRA_VIDEO_URI)
         val playlistId = intent.getIntExtra(EXTRA_PLAYLIST, -1)
         val continued = intent.getBooleanExtra(EXTRA_CONTINUE, false)
+
+        videoUri?.let { uri->
+            if(viewModel.shouldRotate) {
+                requestRotationScreen(uri)
+            }
+        }
+
+        binding.player.player = player
+        player.addListener(listener)
 
         with(viewModel) {
             initialize(videoId, playlistId, continued)
@@ -126,11 +141,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             videoMld.observe(this@VideoDisplayActivity) { video ->
                 Logs.d(TAG, "video View Model: video=$video")
                 customBinding.headerTv.text = video.title
-                binding.player.player = this@VideoDisplayActivity.player.apply {
+                player.apply {
                     setMediaItem(MediaItem.fromUri(video.videoUri))
-                    this@VideoDisplayActivity.player.playWhenReady = true
                     prepare()
-                    addListener(listener)
+                    play()
                 }
             }
             speedMld.observe(this@VideoDisplayActivity) { speed ->
@@ -149,6 +163,21 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             playingTimeMld.observe(this@VideoDisplayActivity) { position ->
                 Log.d(TAG, "playingTimeMld position: $position")
                 player.seekTo(position)
+            }
+            playingIndexMld.observe(this@VideoDisplayActivity) { index ->
+                val videos = playlistMld.value
+                Log.d(TAG, "playingIndexMld: has list = ${videos != null}")
+                if(videos == null) {
+                    customBinding.btnNext?.setEnabledState(false)
+                    customBinding.btnPrev?.setEnabledState(false)
+                } else if(index >= videos.size - 1) {
+                    customBinding.btnNext?.setEnabledState(false)
+                } else if(index <= 0) {
+                    customBinding.btnPrev?.setEnabledState(false)
+                } else {
+                    customBinding.btnNext?.setEnabledState(true)
+                    customBinding.btnPrev?.setEnabledState(true)
+                }
             }
         }
         initializeViews()
@@ -177,12 +206,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     }
 
 
-    fun showPlaylist(playlistId: Int) {
+    private fun showPlaylist(playlistId: Int) {
         Logs.d(TAG, "showPlaylist() called with: playlistId = $playlistId")
         val dialog = ListedVideosDialog.newInstance(playlistId, object : OnSelectedChangeListener {
             override fun onSelectionChanged(videoId: Int) {
                 Logs.d(TAG, "onSelectionChanged() called with: videoId = $videoId")
-                viewModel.changeVideo(videoId)
+                viewModel.replaceVideo(videoId)
             }
         })
         dialog.show(supportFragmentManager, TAG)
@@ -253,37 +282,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 //        dialog.show()
 //    }
 
-    private fun initializeViews() {
-        val landscapeMode = requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        val listener = this@VideoDisplayActivity
-        Log.d(TAG, "initialize() called with: landscapeMode = $landscapeMode")
-        with(customBinding) {
-            exoLoop?.setOnClickListener(listener)
-            exoLock?.setOnClickListener(listener)
-            exoPrev?.setOnClickListener(listener)
-            exoPlaybackSpeed?.setOnClickListener(listener)
-            exoNext?.setOnClickListener(listener)
-            exoPlayMusic?.setOnClickListener(listener)
-            exoSubtitles?.setOnClickListener(listener)
-            exoOption?.setOnClickListener(listener)
-            playerControlBinding.exoUnlock.setOnClickListener(listener)
-            autoPlay.isChecked = settings.autoPlayMode
-            exoRotate.setOnClickListener(listener)
-            exoBack.setOnClickListener(listener)
-            autoPlay.setOnCheckedChangeListener { buttonView, isChecked ->
-                settings.autoPlayMode = isChecked
-            }
-            btExpand.setOnClickListener(listener)
-        }
-
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        Logs.d(TAG, "onConfigurationChanged() called with: newConfig = $newConfig")
-        hideSystemUi()
-    }
-
     override fun onStart() {
         hideSystemUi()
         super.onStart()
@@ -311,9 +309,43 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.save()
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.save()
+        }
         releasePlayer()
     }
+
+
+    private fun initializeViews() {
+        val landscapeMode = requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        val listener = this@VideoDisplayActivity
+        Log.d(TAG, "initialize() called with: landscapeMode = $landscapeMode")
+        with(customBinding) {
+            exoLoop?.setOnClickListener(listener)
+            exoLock?.setOnClickListener(listener)
+            btnNext?.setOnClickListener(listener)
+            exoPlaybackSpeed?.setOnClickListener(listener)
+            btnPrev?.setOnClickListener(listener)
+            exoPlayMusic?.setOnClickListener(listener)
+            exoSubtitles?.setOnClickListener(listener)
+            exoOption?.setOnClickListener(listener)
+            playerControlBinding.exoUnlock.setOnClickListener(listener)
+            autoPlay.isChecked = settings.autoPlayMode
+            exoRotate.setOnClickListener(listener)
+            exoBack.setOnClickListener(listener)
+            autoPlay.setOnCheckedChangeListener { buttonView, isChecked ->
+                settings.autoPlayMode = isChecked
+            }
+            btExpand.setOnClickListener(listener)
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Logs.d(TAG, "onConfigurationChanged() called with: newConfig = $newConfig")
+        hideSystemUi()
+    }
+
 
     override fun onClick(v: View) {
         Logs.d(TAG, "onClick() called with: v = $v")
@@ -378,24 +410,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     }).show(supportFragmentManager, TAG)
             }
 
-            R.id.exo_next -> {
-//                    releasePlayer()
-//                    viewModel.next()
-//                    customBinding.exoPrev?.apply {
-//                        isClickable = true
-//                        setTextColor(resources.getColor(R.color.white))
-//                    }
+            R.id.btn_next -> {
+                viewModel.moveNext()
             }
 
-            R.id.exo_prev -> {
-//                    releasePlayer()
-//                    viewModel.previous()
-//                    if(!viewModel.hasPrev()) {
-//                        customBinding.exoPrev?.apply {
-//                            isClickable = false
-//                            setTextColor(resources.getColor(R.color.gray_20))
-//                        }
-//                    }
+            R.id.btn_prev -> {
+                viewModel.movePrevious()
             }
 
             R.id.exo_play_music -> {
@@ -436,16 +456,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             Log.d(TAG, "onMediaItemTransition: mediaItem=$mediaItem")
             with(viewModel) {
-                this@VideoDisplayActivity.player?.stop()
                 playWhenReadyMld.value = customBinding.autoPlay.isChecked
-                viewModel.isResetPosition = true
-                updatePosition(this@VideoDisplayActivity.player.currentMediaItemIndex)
-//                val lastIndex = player!!.currentMediaItemIndex - 1
-//                if(lastIndex >= 0) {
-//                    val video = playlist[lastIndex]
-//                    video.playedTime = -1L
-//                    videoRepo.update(video)
-//                }
             }
             super.onMediaItemTransition(mediaItem, reason)
         }
@@ -466,29 +477,34 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     player.prepare()
                 }
             }
-            if (playbackState == Player.STATE_BUFFERING) {
-                viewModel.finishPlaying()
-            } else if (playbackState == Player.STATE_READY) {
-                viewModel.isFinished = false
+            if (!playWhenReady && playbackState == Player.STATE_READY) {
+                lifecycleScope.launch(Dispatchers.Default) {
+                    viewModel.finish()
+                }
             }
         }
     }
 
-    private fun rotateScreenIfNeed(video: Video) {
-        Log.d(TAG, "rotateScreenIfNeed() called with: video = $video")
-        val retriever = MediaMetadataRetriever()
-//        retriever.setDataSource(this, video.getUri())
-        val orientation =
-            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
-                ?.toInt()
-                ?.also { orientation ->
-                    if (orientation == 0 && resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    } else if (resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    private fun requestRotationScreen(uri: String) {
+        Log.d(TAG, "requestRotationScreen() called with: uri = $uri")
+        viewModel.shouldRotate = false
+        try {
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(this, uri.toUri())
+            val orientation =
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
+                    ?.toInt()
+                    ?.also { orientation ->
+                        if (orientation == 0 && resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                        } else if (resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
+                            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                        }
                     }
-                }
-        Log.d(TAG, "initializePlayer: orientation=$orientation")
+            Log.d(TAG, "initializePlayer: orientation=$orientation")
+        } catch (e: Exception) {
+            Log.e(TAG, "requestRotationScreen: ", e)
+        }
     }
 
     private fun releasePlayer() {
@@ -517,5 +533,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 window.decorView.systemUiVisibility = systemFlags
             }
         }
+}
 
+fun View.setEnabledState(isEnabled: Boolean) {
+    this.isEnabled = isEnabled
+    alpha = if(isEnabled) 1.0f else 0.3f
 }

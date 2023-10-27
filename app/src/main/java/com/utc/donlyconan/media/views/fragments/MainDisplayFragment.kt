@@ -62,8 +62,6 @@ class MainDisplayFragment : BaseFragment() {
                     "savedInstanceState = $savedInstanceState")
         setHasOptionsMenu(true)
 
-
-
         // Rotate the fragment when its orientation is the landscape mode
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
 

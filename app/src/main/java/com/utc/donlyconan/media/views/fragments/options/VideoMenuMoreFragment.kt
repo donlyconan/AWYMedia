@@ -26,19 +26,19 @@ class VideoMenuMoreFragment : EGMBaseSheetFragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         binding.exoLock.setOnClickListener(this)
         binding.exoLoop.setOnClickListener(this)
-        binding.exoPrev.setOnClickListener(this)
-        binding.exoNext.setOnClickListener(this)
+        binding.btnPrev.setOnClickListener(this)
+        binding.btnNext.setOnClickListener(this)
         binding.exoPlayMusic.setOnClickListener(this)
         binding.exoPlaybackSpeed.setOnClickListener(this)
         binding.exoLoop.isSelected = isSelected
 
         if(!hasPrev) {
-            binding.exoPrev.alpha = 0.3f
-            binding.exoPrev.isClickable = false
+            binding.btnPrev.alpha = 0.3f
+            binding.btnPrev.isClickable = false
         }
         if(!hasNext) {
-            binding.exoNext.alpha = 0.3f
-            binding.exoNext.isClickable = false
+            binding.btnNext.alpha = 0.3f
+            binding.btnNext.isClickable = false
         }
     }
 

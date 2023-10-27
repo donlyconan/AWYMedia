@@ -23,9 +23,6 @@ interface PlaylistDao {
     @Query("Select * from playlist")
     fun getAll(): LiveData<List<Playlist>>
 
-//    @Query("Select * from video_playlist where playlist_id=:playlistId")
-//    fun getAllVideos(playlistId: Int): List<Video>
-
     @Query("Select count(video_id) from video_playlist where playlist_id=:playlistId and video_id in (Select video_id from videos)")
     fun countVideos(playlistId: Int): Int
 

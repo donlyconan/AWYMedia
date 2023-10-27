@@ -12,6 +12,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.manager.TrashRemovalWorker
+import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit
  */
 class EGMApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
-    private var service: AudioService? = null
+    private var audioService: AudioService? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -36,6 +37,7 @@ class EGMApplication: Application() {
         // Start musical service
         val intent = Intent(this, AudioService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        // Register work manager
         var periodicWorkRequest =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(REPEATED_INTERVAL_TIME, TimeUnit.MINUTES)
             .build()
         WorkManager.getInstance(this)
@@ -47,7 +49,7 @@ class EGMApplication: Application() {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
             Log.d(TAG, "onServiceConnected() called with: name = $name, binder = $binder")
             val egmBinder = binder as? AudioService.EGMBinder
-            service = egmBinder?.getService()
+            audioService = egmBinder?.getService()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -56,7 +58,7 @@ class EGMApplication: Application() {
     }
 
     fun getAudioService(): AudioService? {
-        return service
+        return audioService
     }
 
     /**

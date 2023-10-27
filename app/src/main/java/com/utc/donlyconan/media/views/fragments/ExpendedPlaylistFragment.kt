@@ -115,10 +115,6 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
 
         val videoCross = VideoPlaylistCrossRef(video.videoId, args.playlistId)
         playlistWithVideosDao.insert(videoCross)
-        playlistRepo.findById(args.playlistId)?.let { pl ->
-            pl.updatedAt = System.currentTimeMillis()
-            playlistRepo.update(pl)
-        }
         adapter.notifyItemRemoved(position)
         adapter.notifyItemRangeChanged(position, adapter.videos.size)
     }

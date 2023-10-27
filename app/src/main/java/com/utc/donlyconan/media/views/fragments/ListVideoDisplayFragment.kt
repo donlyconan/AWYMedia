@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
@@ -18,7 +19,10 @@ import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 
 /**
@@ -30,6 +34,7 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
     abstract val adapter: VideoAdapter
     private var audioService: AudioService? = null
     @Inject lateinit var videoRepo: VideoRepository
+    private var lock: Boolean = false
 
 
 
@@ -39,6 +44,10 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
     }
 
     override fun onItemClick(v: View, position: Int) {
+        if(lock) {
+            Log.d(TAG, "onItemClick: The list is locked!")
+            return
+        }
         Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
         val video = adapter.getItem(position) as Video
 
@@ -46,7 +55,7 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) {
                 when (v.id) {
                     R.id.btn_play -> {
-                        startPlayingVideo(video.videoId)
+                        startPlayingVideo(video.videoId, video.videoUri)
                     }
                     R.id.btn_play_music -> audioService?.let { service ->
                         service.play(MediaItem.fromUri(video.videoUri))
@@ -63,8 +72,8 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
                         val intent = Intent(Intent.ACTION_SEND)
                         intent.type = "video/*"
                         intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
-                        startActivity(Intent.createChooser(intent, "Share File"))
+                        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.shared_file))
+                        startActivity(Intent.createChooser(intent, getString(R.string.share_file)))
                     }
                     else -> {
                         Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
@@ -74,12 +83,8 @@ abstract class ListVideoDisplayFragment : BaseFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            startPlayingVideo(video.videoId)
+            startPlayingVideo(video.videoId, video.videoUri,)
         }
-    }
-
-    private fun startPlayingVideo(videoId: Int) {
-        VideoDisplayActivity.newIntent(requireContext(), videoId).let { startActivity(it) }
     }
 
     companion object {

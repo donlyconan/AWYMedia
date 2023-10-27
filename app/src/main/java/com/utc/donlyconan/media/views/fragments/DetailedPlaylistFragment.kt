@@ -5,11 +5,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Video
@@ -89,14 +94,10 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, -1)
-                        startActivity(intent)
+                        startPlayingVideo(video.videoId, video.videoUri, -1)
                     }
                     R.id.btn_play_music -> {
-//                        application.iMusicalService()?.apply {
-//                            setPlaylist(position, arrayListOf())
-//                            play()
-//                        }
+                        application.getAudioService()?.play(MediaItem.fromUri(video.videoUri))
                     }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
@@ -108,10 +109,10 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
                     }
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)
-                        intent.type = "video/*"
+                        intent.type = getString(R.string.type_all_video)
                         intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
-                        startActivity(Intent.createChooser(intent, "Share File"))
+                        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.shared_file))
+                        startActivity(Intent.createChooser(intent, getString(R.string.share_file)))
                     }
                     else -> {
                         Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
@@ -132,9 +133,23 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, args.playlistId)
+            val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, video.videoUri, args.playlistId)
             startActivity(intent)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        Log.d(TAG, "onCreateOptionsMenu() called with: menu = $menu, inflater = $inflater")
+        if (menu is MenuBuilder) {
+            menu.setOptionalIconsVisible(true)
+        }
+        inflater.inflate(R.menu.menu_detail_list, menu)
+        menu.findItem(R.id.it_add).setOnMenuItemClickListener {
+            val action = DetailedPlaylistFragmentDirections.actionDetailedPlaylistFragmentToExpendedPlaylistFragment(args.playlistId)
+            findNavController().navigate(action)
+            true
+        }
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     companion object {

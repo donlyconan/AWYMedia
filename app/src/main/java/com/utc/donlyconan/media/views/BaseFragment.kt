@@ -23,6 +23,7 @@ import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -44,6 +45,7 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val icdLoading = view.findViewById<View>(R.id.icd_loading)
         if(icdLoading != null) {
+            Logs.d("onViewCreated: LoadingDataScreenBinding is setup.")
             lsBinding = LoadingDataScreenBinding.bind(icdLoading)
         }
     }
@@ -53,14 +55,14 @@ abstract class BaseFragment : Fragment() {
     }
 
     fun deleteVideoFromExternalStorage(vararg uris: Uri) {
-        Log.d(ListVideosFragment.TAG, "deleteVideoFromExternalStorage() called with: uri = ${uris.size}")
+        Log.d(ListVideosFragment.TAG, "deleteVideoFromExternalStorage() called with: uri = $uris")
         val contentResolver = requireContext().contentResolver
-        lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler {_, e ->
-            showToast(R.string.toast_when_failed_user_action)
-        }) {
+        lifecycleScope.launch(Dispatchers.IO +
+                CoroutineExceptionHandler {_, e -> showToast(R.string.toast_when_failed_user_action) }
+        ) {
             try {
                 uris.forEach { uri ->
-                    contentResolver.delete(uri, null, null)
+                    contentResolver.delete(uri, null, null) > 0
                 }
             } catch (e: Exception) {
                 val intentSender: IntentSender? = when {
@@ -109,12 +111,29 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    fun showToast(msg: String, duration: Int = Toast.LENGTH_SHORT) = Toast.makeText(requireContext(), msg, duration).show()
+    fun showToast(msg: String, duration: Int = Toast.LENGTH_SHORT) = activity.runOnUiThread {
+        Toast.makeText(requireContext(), msg, duration).show()
+    }
 
-    fun showToast(msgId: Int, duration: Int = Toast.LENGTH_SHORT) = showToast(getString(msgId), duration)
+    fun showToast(msgId: Int, duration: Int = Toast.LENGTH_SHORT) = activity.runOnUiThread {
+        showToast(getString(msgId), duration)
+    }
 
     open fun onDeletedResult(result: ActivityResult) {
         Logs.d( "onDeletedResult() called with: result = $result")
+    }
+
+    fun startPlayingVideo(videoId: Int, videoUri: String, playlist: Int = -1)  {
+        Log.d(ListVideosFragment.TAG, "startPlayingVideo() called with: videoId = $videoId, videoUri = $videoUri")
+        lifecycleScope.launch {
+            showLoadingScreen()
+            delay(400)
+            launch(Dispatchers.Default) {
+                VideoDisplayActivity.newIntent(requireContext(), videoId, videoUri, playlist).let { startActivity(it) }
+            }
+            delay(400)
+            hideLoading()
+        }
     }
 
 }

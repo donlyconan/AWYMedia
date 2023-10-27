@@ -86,14 +86,24 @@ class AudioService : Service() {
 
     fun play(item: MediaItem, repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF) {
         Log.d(TAG, "play() called with: item = $item")
-        setupPlayer()
-        mediaSessionConnector.setPlayer(player)
-        player?.apply {
-            setMediaItem(item)
-            this.repeatMode = repeatMode
-            prepare()
-            playWhenReady = true
-            notificationManager.showNotificationForPlayer(this)
+        if(player != null) {
+            player?.apply {
+                stop()
+                setMediaItem(item)
+                prepare()
+                play()
+                notificationManager.showNotificationForPlayer(this)
+            }
+        } else {
+            setupPlayer()
+            mediaSessionConnector.setPlayer(player)
+            player?.apply {
+                setMediaItem(item)
+                this.repeatMode = repeatMode
+                prepare()
+                playWhenReady = true
+                notificationManager.showNotificationForPlayer(this)
+            }
         }
     }
 

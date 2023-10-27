@@ -13,9 +13,6 @@ import com.utc.donlyconan.media.extension.widgets.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class VideoDisplayViewModel : ViewModel() {
@@ -32,7 +29,7 @@ class VideoDisplayViewModel : ViewModel() {
     private val _videoMld: MutableLiveData<Video> = MutableLiveData<Video>()
     val videoMld: LiveData<Video> get() = _videoMld
 
-    private var playlist = listOf<Video>()
+    var playlist = listOf<Video>()
     private val _playlistMld: MutableLiveData<List<Video>> = MutableLiveData()
     val playlistMld: LiveData<List<Video>> get() = _playlistMld
 
@@ -42,6 +39,7 @@ class VideoDisplayViewModel : ViewModel() {
     var speedMld = MutableLiveData(1.0f)
     var repeatModeMld = MutableLiveData(ExoPlayer.REPEAT_MODE_OFF)
     var currentPlayWhenReadyState = false
+    var shouldRotate: Boolean = true
 
     private val _events = MutableLiveData<Result>()
     val events get() = _events
@@ -80,51 +78,24 @@ class VideoDisplayViewModel : ViewModel() {
 
     fun browsedByPlaylist(): Boolean = playlistId != -1
 
-    fun changeVideo(videoId: Int) {
-        val video = videoRepo.get(videoId)
-        _videoMld.value = video
+    fun replaceVideo(videoId: Int) {
+        Log.d(TAG, "replaceVideo() called with: videoId = $videoId")
+        playlist.forEachIndexed { index, video ->
+            if(video.videoId == videoId) {
+                _videoMld.value = video
+                playingIndexMld.value = index
+            }
+        }
     }
 
     fun hasNext() = videoId < playlist.size - 1
 
     fun hasPrev() = videoId > 0
 
-    private fun getNext(): Video? {
-        if(hasNext()) {
-            return playlist[++videoId]
-        }
-        return null
-    }
-
-    private fun getPrevious(): Video? {
-        if(hasPrev()) {
-            return  playlist[--videoId]
-        }
-        return null
-    }
-
-    fun next(): Boolean {
-        if(hasNext()) {
-            _videoMld.value = getNext()
-            isResetPosition = true
-            return true
-        }
-        return false
-    }
-
-    fun previous(): Boolean {
-        if(hasPrev()) {
-            _videoMld.value = getPrevious()
-            isResetPosition = true
-            return true
-        }
-        return false
-    }
-
     /**
      * Set status finish for playing operation and save video state
      */
-    fun finishPlaying() {
+    suspend fun finish() {
         Log.d(TAG, "endVideo() called")
         isFinished = true
         videoMld.value?.let { video ->
@@ -133,13 +104,7 @@ class VideoDisplayViewModel : ViewModel() {
         }
     }
 
-    fun updatePosition(position: Int) {
-//        Log.d(TAG, "updatePosition() called with: position = $position")
-//        this.videoId = position
-//        _videoMld.value = playlist[position]
-    }
-
-    fun save() {
+    suspend fun save() {
         Log.d(TAG, "save() called + ${videoMld.value}")
         val video = videoMld.value
         if(video != null && !isFinished) {
@@ -147,26 +112,28 @@ class VideoDisplayViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Check a dialog can be shown or not
-     * @return true if can show dialog
-     */
-//    fun canShowDialog(): Boolean {
-//        return !isContinue && isInitialized && load().playedTime > 0L
-//    }
-
-    /**
-     * Get current video that is playing by exoplayer
-     * @return current video
-     */
-    fun load() {
-        _videoMld.value = videoRepo.get(videoId)
-    }
-
     override fun onCleared() {
         super.onCleared()
         Logs.d(TAG, "onCleared() called")
         job.cancel()
+    }
+
+    fun moveNext() {
+        var index = playingIndexMld.value!!
+        index++
+        if(index < playlist.size) {
+            _videoMld.value = playlist[index]
+        }
+        playingIndexMld.value = index
+    }
+
+    fun movePrevious() {
+        var index = playingIndexMld.value!!
+        index--
+        if(index >= 0) {
+            _videoMld.value = playlist[index]
+        }
+        playingIndexMld.value = index
     }
 
     sealed class Result {

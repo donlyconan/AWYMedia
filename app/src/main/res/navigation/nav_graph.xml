@@ -81,6 +81,9 @@
         <argument
             android:name="playlistId"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_detailedPlaylistFragment_to_expendedPlaylistFragment"
+            app:destination="@id/expendedPlaylistFragment" />
     </fragment>
     <fragment
         android:id="@+id/expendedPlaylistFragment"
