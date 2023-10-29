@@ -5,6 +5,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.View.OnLongClickListener
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.fragment.app.viewModels
@@ -27,6 +28,7 @@ import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
+import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.RecycleBinAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +38,7 @@ import javax.inject.Inject
 /**
  * Show list of video that was temporarily deleted by user
  */
-class RecycleBinFragment : BaseFragment(), OnItemClickListener {
+class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
 
     @Inject lateinit var trashRepo: TrashRepository
     @Inject lateinit var fileManager: FileManager
@@ -83,7 +85,7 @@ class RecycleBinFragment : BaseFragment(), OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
         adapter = RecycleBinAdapter(requireContext(), arrayListOf())
-        adapter.setOnItemClickListener(this)
+        adapter.setOnLongClickListener(this)
         binding.recyclerView.adapter = adapter
         showLoadingScreen()
         viewModel.videosMdl.observe(viewLifecycleOwner) { videos ->
@@ -103,7 +105,7 @@ class RecycleBinFragment : BaseFragment(), OnItemClickListener {
     }
 
 
-    override fun onItemClick(v: View, position: Int) {
+    override fun onItemLongClick(v: View, position: Int)  {
         Log.d(TAG, "onItemLongClick() called with: v = $v, position = $position")
         val trash = adapter.getItem(position) as Trash
         MenuMoreOptionFragment.newInstance(R.layout.fragment_trash_item_option) { v ->
@@ -120,7 +122,7 @@ class RecycleBinFragment : BaseFragment(), OnItemClickListener {
                 }
                 R.id.btn_delete -> {
                     AlertDialogManager.createDeleteAlertDialog(requireContext(),
-                        "Deleting file", "Do you want to delete file \"${trash.title}\"?") {
+                        getString(R.string.app_name), "Would you want to delete \"${trash.title}\"?") {
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             if(context?.deleteFile(trash.title) == true) {
                                 viewModel.delete(trash)
@@ -155,20 +157,23 @@ class RecycleBinFragment : BaseFragment(), OnItemClickListener {
         when (item.itemId) {
             // remove all trash items on db
             R.id.it_trash -> {
-                if(adapter.itemCount == 0) {
+                val items = adapter.getSelectedItems()
+                if(items.isEmpty()) {
                     Log.d(TAG, "onOptionsItemSelected: video list is empty!")
-                    requireContext().showMessage(R.string.empty_list_des)
-                    return false
+                    requireContext().showMessage("You need to choose at least one item.")
+                    return true
                 }
                 AlertDialogManager.createDeleteAlertDialog(
-                    requireContext(), getString(R.string.delete_file), getString(R.string.confirm_to_delete)) {
-                    adapter.getData().filter { it is Trash }
+                    requireContext(), getString(R.string.app_name), "Would you like to remove ${items.size} files") {
+                    showLoadingScreen()
+                    items.filter { it is Trash }
                         .map { it as Trash }
                         .forEach { trash ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 if (context?.deleteFile(trash.title) == true) {
                                     viewModel.delete(trash)
                                 }
+                                hideLoading()
                             }
                         }
 

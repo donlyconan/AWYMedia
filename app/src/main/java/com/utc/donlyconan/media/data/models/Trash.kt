@@ -27,6 +27,8 @@ data class Trash(
     var updatedAt: Long = now(),
     @ColumnInfo(name = "deleted_at")
     var deletedAt: Long = now(),
+    @ColumnInfo(name = "is_favorite")
+    var isFavorite: Boolean = false,
     @ColumnInfo(name = "secured")
     var isSecured: Boolean = false,
     @ColumnInfo(name = "subtitle_uri")
@@ -64,7 +66,7 @@ data class Trash(
     }
 
     fun convertToVideo(): Video {
-        return Video(videoId, title, videoUri, duration, size, type, 0, createdAt, updatedAt, false, isSecured, subtitleUri)
+        return Video(videoId, title, videoUri, duration, size, type, 0, createdAt, now(), isFavorite, isSecured, subtitleUri)
     }
 
     companion object {

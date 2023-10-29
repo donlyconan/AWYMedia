@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.views
 import android.app.RecoverableSecurityException
 import android.content.Context
 import android.content.IntentSender
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.MediaItem
@@ -27,6 +29,8 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.jar.Manifest
 
 
 /**
@@ -54,6 +58,10 @@ abstract class BaseFragment : Fragment() {
 
     protected val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         onDeletedResult(result)
+    }
+
+    protected val requestPermissionResult = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+        onPermissionResult(result)
     }
 
     fun deleteVideoFromExternalStorage(vararg uris: Uri) {
@@ -108,8 +116,10 @@ abstract class BaseFragment : Fragment() {
 
     fun hideLoading() {
         Log.d(ListVideosFragment.TAG, "hideLoading() called")
-        lsBinding?.apply {
-            frameContainer.visibility = View.INVISIBLE
+        lifecycleScope.launch(Dispatchers.Main) {
+            lsBinding?.apply {
+                frameContainer.visibility = View.INVISIBLE
+            }
         }
     }
 
@@ -123,6 +133,10 @@ abstract class BaseFragment : Fragment() {
 
     open fun onDeletedResult(result: ActivityResult) {
         Logs.d( "onDeletedResult() called with: result = $result")
+    }
+
+    open fun onPermissionResult(result: Map<String, Boolean>) {
+
     }
 
     fun startPlayingVideo(videoId: Int, videoUri: String, playlist: Int = -1)  {
@@ -139,6 +153,21 @@ abstract class BaseFragment : Fragment() {
     fun startPlayMusic(video: Video) {
         Logs.d( "startPlayMusic() called with: video = $video")
         application.getAudioService()?.play(MediaItem.fromUri(video.videoUri))
+    }
+
+
+    fun checkPermission(vararg permissions: String): Boolean {
+        var result = true
+        for (permission in permissions) {
+            result = result and (ContextCompat.checkSelfPermission(requireActivity(), permission) == PackageManager.PERMISSION_GRANTED)
+        }
+        return result
+    }
+
+    fun requestPermissionIfNeed(vararg permissions: String) {
+        if(!checkPermission(*permissions)) {
+            requestPermissionResult.launch(permissions.toList().toTypedArray())
+        }
     }
 
 }

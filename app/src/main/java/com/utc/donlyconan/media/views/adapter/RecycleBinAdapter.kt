@@ -3,14 +3,20 @@ package com.utc.donlyconan.media.views.adapter
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
+import com.utc.donlyconan.media.app.utils.formatToTime
 import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
 import com.utc.donlyconan.media.databinding.ItemTrashBinding
 import java.text.DateFormat
+import java.util.Objects
 
 
 class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
@@ -64,11 +70,24 @@ class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
         fun bind(trash: Trash, isLastItem: Boolean) {
             Log.d(TAG, "bind() called with: trash = $trash, isLastItem = $isLastItem")
             binding.tvTitle.text = trash.title
-            binding.tvDate.text = DateFormat.getDateInstance().format(trash.updatedAt * 1000)
+            binding.tvDate.text = trash.deletedAt.formatToTime()
             binding.tvSize.text = trash.size.convertToStorageData()
+            binding.rdRadio.isChecked = trash.isSelected()
+
+            binding.rdRadio.setOnCheckedChangeListener { buttonView, isChecked ->
+                trash.setSelected(isChecked)
+            }
 
             Glide.with(itemView.context)
-                .load(trash.videoUri)
+                .applyDefaultRequestOptions(
+                    RequestOptions()
+                        .fallback(R.drawable.ic_baseline_error_24)
+                        .diskCacheStrategy(DiskCacheStrategy.DATA)
+                )
+                .load(trash.videoUri.toUri())
+                .placeholder(R.drawable.im_loading)
+                .error(R.drawable.img_error)
+                .fitCenter()
                 .into(binding.imgThumbnail)
 
             if (isLastItem) {
@@ -78,6 +97,10 @@ class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
                     setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
                 }
             }
+        }
+
+        override fun onClick(v: View) {
+            binding.rdRadio.isChecked = binding.rdRadio.isChecked.not()
         }
     }
 

@@ -9,11 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
+import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.DialogAddPlaylistBinding
 import com.utc.donlyconan.media.databinding.FragmentPlaylistBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
@@ -25,6 +27,8 @@ import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.PlaylistAdapter
 import com.utc.donlyconan.media.views.fragments.MainDisplayFragmentDirections
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -39,6 +43,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     lateinit var adapter: PlaylistAdapter
 
     @Inject lateinit var playlistRepo: PlaylistRepository
+    @Inject lateinit var videoRepo: VideoRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,10 +91,11 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         val item = adapter.playlists[position]
         MenuMoreOptionFragment.newInstance(R.layout.fragment_playlist_option) {
             when(it.id) {
-                R.id.btn_open -> {
-                    val action = MainDisplayFragmentDirections
-                        .actionMainDisplayFragmentToDetailedPlaylistFragment(item.playlistId!!)
-                    findNavController().navigate(action)
+                R.id.btn_open -> lifecycleScope.launch(Dispatchers.IO) {
+                    playlistRepo.getFirstVideo(item.playlistId!!)?.let { video ->
+                        startPlayingVideo(video.videoId, video.videoUri, item.playlistId!!)
+                    }
+
                 }
                 R.id.btn_add -> {
                     val action = MainDisplayFragmentDirections

@@ -1,26 +1,20 @@
 package com.utc.donlyconan.media.app.services
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.utc.donlyconan.media.app.EGMApplication
-import com.utc.donlyconan.media.data.models.Video
-
 
 
 /**
@@ -44,6 +38,7 @@ class AudioService : Service() {
         .build()
     private var player: ExoPlayer? = null
     private lateinit var mediaSessionConnector: MediaSessionConnector
+    private val mediaListeners by lazy { ArrayList<Player.Listener>() }
 
 
     override fun onCreate() {
@@ -55,7 +50,7 @@ class AudioService : Service() {
         mediaSession.isActive = true
         notificationManager = AudioNotificationManager(this, mediaSession.sessionToken, PlayerNotificationListener())
         mediaSessionConnector = MediaSessionConnector(mediaSession)
-//        registerReceiver(broadcastReceiver, IntentFilter(ACTION_MUSIC_SERVICE_RECEIVE))
+        registerReceiver(broadcastReceiver, IntentFilter(ACTION_MUSIC_SERVICE_RECEIVE))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -100,6 +95,7 @@ class AudioService : Service() {
             player?.apply {
                 setMediaItem(item)
                 this.repeatMode = repeatMode
+                addListener(mediaStateListener)
                 prepare()
                 playWhenReady = true
                 notificationManager.showNotificationForPlayer(this)
@@ -120,6 +116,8 @@ class AudioService : Service() {
             Log.d(TAG, "onReceive: player is available [${player == null}]")
         }
     }
+
+
 
 
     /**
@@ -148,6 +146,46 @@ class AudioService : Service() {
                 stopSelf()
             }
         }
+    }
+
+    private val mediaStateListener = object : Player.Listener {
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+            mediaListeners.forEach { it.onIsPlayingChanged(isPlaying) }
+        }
+
+        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+            mediaListeners.forEach { it.onMediaMetadataChanged(mediaMetadata) }
+        }
+    }
+
+    fun registerPlayerListener(listener: Player.Listener) {
+        Log.d(TAG, "registerPlayerListener() called with: listener = $listener")
+        mediaListeners.add(listener)
+    }
+
+    fun removePlayerListener(listener: Player.Listener) {
+        Log.d(TAG, "removePlayerListener() called with: listener = $listener")
+        mediaListeners.remove(listener)
+    }
+
+    /**
+     * Stop playing musics
+     */
+    fun stop() {
+        player?.pause()
+    }
+
+    /**
+     * Start to play musics
+     */
+    fun start() {
+        player?.play()
+    }
+
+    fun getPlayer(): ExoPlayer? {
+        return player
     }
 
 

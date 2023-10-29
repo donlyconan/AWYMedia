@@ -11,10 +11,7 @@ class TrashRemovalWorker(app: Context, params: WorkerParameters): Worker(app, pa
     override fun doWork(): Result {
         Logs.d("doWork: start working...")
         var application = applicationContext as EGMApplication
-        var trashDao = application.applicationComponent().getTrashDao()
-
         // TODO Remove files from the recycle bin
-
 
         return Result.success()
     }

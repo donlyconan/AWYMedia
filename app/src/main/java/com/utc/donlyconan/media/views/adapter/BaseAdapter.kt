@@ -58,12 +58,12 @@ abstract class BaseAdapter<T>(differ: ItemCallback<T>, private var data: List<T>
         }
     }
 
-    fun setOnItemClickListener(onItemClickListener: OnItemClickListener?) {
+    open fun setOnItemClickListener(onItemClickListener: OnItemClickListener?) {
         this.onItemClickListener = onItemClickListener
         notifyDataSetChanged()
     }
 
-    fun setOnLongClickListener(onItemLongClickListener: OnItemLongClickListener?) {
+    open fun setOnLongClickListener(onItemLongClickListener: OnItemLongClickListener?) {
         this.onItemLongClickListener = onItemLongClickListener
         notifyDataSetChanged()
     }

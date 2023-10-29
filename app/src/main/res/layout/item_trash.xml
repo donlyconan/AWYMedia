@@ -29,13 +29,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/video_play_demo" />
+                android:src="@drawable/im_loading" />
 
             <ImageView
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:src="@drawable/ic_baseline_cancel_24"
-                android:layout_gravity="center" />
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="3dp"
+                android:src="@drawable/ic_warning"
+                android:layout_gravity="left" />
 
         </androidx.cardview.widget.CardView>
 
@@ -48,7 +50,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="8dp"
-            android:layout_toStartOf="@+id/img_menu_more"
+            android:layout_toStartOf="@+id/rd_radio"
             android:layout_toEndOf="@+id/thumbnail_card"
             android:ellipsize="end"
             android:maxLines="2"
@@ -91,6 +93,14 @@
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_more_event"
             android:padding="5dp"/>
+
+        <CheckBox
+            android:id="@+id/rd_radio"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:checked="true"
+            android:buttonTint="@color/white"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 </FrameLayout>

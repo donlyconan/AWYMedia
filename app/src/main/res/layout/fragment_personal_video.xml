@@ -25,10 +25,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:backgroundTint="@color/white_gray"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/outline_file_upload_24"
+        android:src="@drawable/bg_music_button"
         app:fabSize="normal"
-        app:maxImageSize="25dp"
+        app:maxImageSize="40dp"
         app:useCompatPadding="false" />
 
     <include

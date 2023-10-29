@@ -11,10 +11,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.MediaMetadata
+import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
@@ -23,6 +27,7 @@ import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import kotlin.math.log
 
 
 /**
@@ -48,6 +53,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                     "$savedInstanceState")
@@ -70,58 +76,60 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         }
 
         // Check permission of your app
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-            == PackageManager.PERMISSION_GRANTED) {
+        if (checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             Log.d(TAG, "onViewCreated: loading...")
             viewModel.importVideos()
         } else {
             Log.d(TAG, "onViewCreated: register permission!")
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                requestPermissionResult.launch(
-                    arrayOf(
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    )
-                )
-            } else {
-                requestPermissionResult.launch(
-                    arrayOf(
-                        Manifest.permission.READ_MEDIA_VIDEO,
-                    )
-                )
-            }
+            requestPermissionIfNeed(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_MEDIA_VIDEO,
+            )
+        }
+        application.getAudioService()?.let { audioService ->
+            audioService.registerPlayerListener(listener)
+            binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
         }
     }
 
-    private val requestPermissionResult =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
-            if (result.values.isNotEmpty()) {
-                viewModel.let { model ->
-                    model.importVideos()
-                }
-            } else {
-                activity.finish()
-            }
+
+    override fun onPermissionResult(result: Map<String, Boolean>) {
+        Log.d(TAG, "onPermissionResult() called with: result = $result")
+        if (result.values.isNotEmpty()) {
+            viewModel.importVideos()
+        } else {
+            activity.finish()
+        }
+    }
+
+    private val listener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            Log.d(TAG, "onIsPlayingChanged() called with: isPlaying = $isPlaying")
+            binding.fab.isSelected = isPlaying
         }
 
-    private val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
+        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+            Log.d(TAG, "onMediaMetadataChanged() called with: mediaMetadata = $mediaMetadata")
+            Glide.with(requireContext())
+                .load(mediaMetadata.mediaUri)
+                .into(binding.fab)
 
-            }
         }
+    }
 
 
     override fun onClick(v: View) {
         Log.d(TAG, "onClick() called with: v = $v")
         when (v.id) {
             R.id.fab -> {
-                val intent = Intent(Intent.ACTION_PICK).apply {
-                    type = "video/*"
-                    action = Intent.ACTION_GET_CONTENT
-                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                application.getAudioService()?.let { service ->
+                    if(binding.fab.isSelected) {
+                        service.stop()
+                    } else {
+                        service.start()
+                    }
                 }
-                activityResultLauncher.launch(intent)
             }
             R.id.btn_sort_by_name -> {
                 settings.sortBy = Settings.SORT_BY_NAME
@@ -144,6 +152,11 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                 videoAdapter.notifyDataSetChanged()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        application.getAudioService()?.removePlayerListener(listener)
     }
 
     override fun onDetach() {

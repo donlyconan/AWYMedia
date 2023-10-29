@@ -64,8 +64,7 @@ data class Video(
     }
 
     fun convertToTrash(): Trash {
-        return Trash(videoId, title, videoUri, duration, size, type, createdAt,
-            updatedAt, deletedAt = System.currentTimeMillis(), isSecured, subtitleUri)
+        return Trash(videoId, title, videoUri, duration, size, type, createdAt, isFavorite = isFavorite, isSecured = isSecured, subtitleUri = subtitleUri)
     }
 
     fun copyFrom(video: Video) {

@@ -12,7 +12,6 @@ class PersonalVideoViewModel(val videoRepository: VideoRepository, val contentRe
     val videosLd = videoRepository.getAllVideosBySecuring(isSecured = false)
 
     fun importVideos() = viewModelScope.launch(Dispatchers.IO) {
-        val videos = videoRepository.loadAllVideos()
-        videoRepository.insert(*videos.toTypedArray())
+        videoRepository.sync()
     }
 }
