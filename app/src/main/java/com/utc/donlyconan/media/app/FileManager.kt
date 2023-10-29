@@ -51,7 +51,7 @@ class FileManager @Inject constructor(val context: Context) {
         }
     }
 
-    fun removeFromInternal(filename: String, onFinished:(uri: Uri) -> Unit = {}) {
+    fun removeFromInternal(filename: String, onFinished:(file: File) -> Unit = {}) {
         Logs.d("removeFromInternal() called with: filename = $filename, onFinished = $onFinished")
         coroutineScope.launch(generateExceptionHandler()) {
             val rootFolder = androidFile(Environment.DIRECTORY_MOVIES)
@@ -66,7 +66,7 @@ class FileManager @Inject constructor(val context: Context) {
                 stream.copyTo(outputStream)
             }
             if(context.deleteFile(filename)) {
-                onFinished.invoke(newFile.toUri())
+                onFinished.invoke(newFile)
             }
         }
     }

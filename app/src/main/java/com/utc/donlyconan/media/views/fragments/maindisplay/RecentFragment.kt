@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.data.models.Video
@@ -17,6 +18,8 @@ import com.utc.donlyconan.media.viewmodels.RecentVideoViewModel
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  *  This is Recent screen which will show all video is playing
@@ -45,7 +48,7 @@ class RecentFragment : ListVideosFragment() {
         videoAdapter.setOnItemClickListener(this)
         binding.recyclerView.adapter = videoAdapter
         showLoadingScreen()
-        viewModel.lstVideos.observe(this) { videos ->
+        viewModel.videosLd.observe(this) { videos ->
             if(videos.isEmpty()) {
                 showNoDataScreen()
             } else {
@@ -67,19 +70,16 @@ class RecentFragment : ListVideosFragment() {
                         val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, video.videoUri, continued = true)
                         startActivity(intent)
                     }
-                    R.id.btn_play_music -> {
-//                        application.iMusicalService()?.apply {
-//                            setPlaylist(position, arrayListOf<Video>())
-//                            play()
-//                        }
-                    }
+                    R.id.btn_play_music -> startPlayMusic(video)
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
                         videoRepo.update(video)
                         videoAdapter.notifyItemChanged(position)
                     }
                     R.id.btn_delete -> {
-                        videoRepo.moveToRecyleBin(video)
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            videoRepo.moveToRecyleBin(video)
+                        }
                     }
                     R.id.btn_share -> {
                         val intent = Intent(Intent.ACTION_SEND)

@@ -1,5 +1,6 @@
 package com.utc.donlyconan.media.data.dao
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.utc.donlyconan.media.data.models.Video
@@ -21,7 +22,10 @@ interface VideoDao {
     fun update(vararg video: Video): Int
 
     @Query("Delete from videos where video_id = :videoId")
-    fun delete(videoId: Int): Int
+    suspend fun delete(videoId: Int): Int
+
+    @Query("Delete from videos where video_uri in (:uris)")
+    suspend fun delete(vararg uris: String): Int
 
     @Query("Select * from videos where video_id = :videoId")
     fun get(videoId: Int): Video
@@ -31,6 +35,10 @@ interface VideoDao {
 
     @Query("Select * from videos")
     fun getAll(): LiveData<List<Video>>
+
+    @Query("Select * from videos")
+    fun getAllAsFlow(): Flow<Video>
+
 
     @Query("Select * from videos where secured=:isSecured")
     fun getAllVideosBySecuring(isSecured: Boolean): LiveData<List<Video>>
@@ -50,8 +58,8 @@ interface VideoDao {
     @Query("Select * from videos where video_uri=:path limit 1")
     fun getVideoInfo(path: String): Video
 
-    @Query("Select * from videos ")
-    fun getVideosAsFlow(): Flow<Video>
+    @Query("Select * from videos where secured = 0")
+    suspend fun getAllPublicVideos(): List<Video>
 
     @Query("Delete from videos where secured = :isSecured")
     fun clearVideosWith(isSecured: Boolean = false): Int

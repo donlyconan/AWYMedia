@@ -15,9 +15,11 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.utils.Logs
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
@@ -127,13 +129,16 @@ abstract class BaseFragment : Fragment() {
         Log.d(ListVideosFragment.TAG, "startPlayingVideo() called with: videoId = $videoId, videoUri = $videoUri")
         lifecycleScope.launch {
             showLoadingScreen()
-            delay(400)
-            launch(Dispatchers.Default) {
+            launch(Dispatchers.IO) {
                 VideoDisplayActivity.newIntent(requireContext(), videoId, videoUri, playlist).let { startActivity(it) }
+                hideLoading()
             }
-            delay(400)
-            hideLoading()
         }
+    }
+
+    fun startPlayMusic(video: Video) {
+        Logs.d( "startPlayMusic() called with: video = $video")
+        application.getAudioService()?.play(MediaItem.fromUri(video.videoUri))
     }
 
 }

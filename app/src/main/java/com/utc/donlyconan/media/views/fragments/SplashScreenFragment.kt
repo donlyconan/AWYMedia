@@ -14,11 +14,13 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.FragmentSplashScreenBinding
 import com.utc.donlyconan.media.views.BaseFragment
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -59,20 +61,22 @@ class SplashScreenFragment : BaseFragment() {
         Log.d(TAG, "onResume() called")
         super.onResume()
         GlobalScope.launch(Dispatchers.IO) {
-            val startPoint = System.currentTimeMillis()
+            val startPoint = now()
 
             // Load all data from the device
-            try {
-                videoRepo.sync()
-            } catch (e: Exception) {
+            launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
                 Log.e(TAG, "onResume: ", e)
+            }) {
+                videoRepo.sync()
             }
 
-            val currentTime = System.currentTimeMillis()
+            val currentTime = now()
             val remainingTime = currentTime - startPoint
             Log.d(TAG, "onResume() called startPoint=$startPoint, currentTime=$currentTime, remainingTime=$remainingTime")
             if(remainingTime < LIMITED_FOR_SPLASH_SCREEN) {
-                delay(LIMITED_FOR_SPLASH_SCREEN - remainingTime)
+                val delayedTime = LIMITED_FOR_SPLASH_SCREEN - remainingTime
+                Log.d(TAG, "onResume: delayed time = $delayedTime")
+                delay(delayedTime)
             }
             activity.runOnUiThread {
                 val action = SplashScreenFragmentDirections.actionSplashScreenFragmentToMainDisplayFragment()

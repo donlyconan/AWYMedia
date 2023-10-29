@@ -6,9 +6,8 @@ import java.text.SimpleDateFormat
 const val ONE_HOUR = 3_600
 const val TIME_ONE_DAY = 86_400
 const val TIME_7_HOURS = 7 * ONE_HOUR
-val simpleDateFormat = SimpleDateFormat("dd MMM yyyy HH:mm")
-val shortTimeFormat = SimpleDateFormat("MM yyyy")
-val shortestOfTimeFormat = SimpleDateFormat("E, dd/MM/yyyy")
+val shortestOfTimeFormat = SimpleDateFormat("E, dd MMM yyyy")
+val formatDate = SimpleDateFormat("MMM dd, yyyy")
 
 
 fun Long.atStartOfDay(): Long {
@@ -21,6 +20,10 @@ fun Long.atEndOfDay(): Long {
     return this + TIME_ONE_DAY - offset - TIME_7_HOURS - 1
 }
 
-fun Long.toShortTime(): CharSequence {
-    return shortestOfTimeFormat.format(this * 1000)
+fun Long.formatShortTime(): CharSequence {
+    return shortestOfTimeFormat.format(this)
+}
+
+fun Long.formatToTime(): String {
+    return formatDate.format(this)
 }

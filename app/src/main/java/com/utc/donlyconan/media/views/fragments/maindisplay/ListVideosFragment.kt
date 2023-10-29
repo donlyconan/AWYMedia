@@ -59,23 +59,25 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                         videoAdapter.notifyItemChanged(position)
                     }
                     R.id.btn_delete -> {
-                        video.videoUri.getMediaUri(requireContext()) { mediaUri ->
-                            if(video.isSecured) {
+                        if(video.isSecured) {
+                            lifecycleScope.launch(Dispatchers.IO) {
                                 videoRepo.moveToRecyleBin(video)
-                            } else {
-                                fileManager.saveIntoInternal(mediaUri, video.title!!) { uri, name ->
-                                    deleteVideoFromExternalStorage(mediaUri)
-                                    val newVideo = video.copy(videoUri = uri.toString(), title = name)
-                                    handlingVideoTask = VideoTask(listOf(newVideo), succeed = {
-                                        Log.d(TAG, "handle succeeded items")
-                                        showToast("The file is moved into the Recycle Bin!")
+                            }
+                        } else {
+                            fileManager.saveIntoInternal(video.videoUri.toUri(), video.title!!) { uri, name ->
+                                deleteVideoFromExternalStorage(video.videoUri.toUri())
+                                val newVideo = video.copy(videoUri = uri.toString(), title = name)
+                                handlingVideoTask = VideoTask(listOf(newVideo), succeed = {
+                                    Log.d(TAG, "handle succeeded items")
+                                    showToast("The file is moved into the Recycle Bin!")
+                                    lifecycleScope.launch(Dispatchers.IO) {
                                         videoRepo.moveToRecyleBin(video)
-                                    }, error = {
-                                        Log.d(TAG, "handle error items")
-                                        showToast("Can't delete the file!")
-                                        context?.deleteFile(newVideo.videoUri)
-                                    })
-                                }
+                                    }
+                                }, error = {
+                                    Log.d(TAG, "handle error items")
+                                    showToast("Can't delete the file!")
+                                    context?.deleteFile(newVideo.videoUri)
+                                })
                             }
                         }
                     }
@@ -93,26 +95,29 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                     R.id.btn_lock -> {
                         fileManager.saveIntoInternal(video.videoUri.toUri(), video.title ?: "no_name") { uri, newName ->
                             try {
-                                video.videoUri.getMediaUri(requireContext()) { mediaUri ->
-                                    Log.d(TAG, "onItemClick: MediaUri=$mediaUri")
-                                    deleteVideoFromExternalStorage(mediaUri)
-                                    val newVideo = video.copy(isSecured = true, videoUri = uri.toString(), title = newName)
-                                    handlingVideoTask = VideoTask.from(newVideo, succeed = {
-                                        Log.d(TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
-                                        // Update the video in the database
-                                        videoRepo.update(newVideo)
-                                    })
-                                }
+                                 Log.d(TAG, "onItemClick: MediaUri=${video.videoUri.toUri()}")
+                                 deleteVideoFromExternalStorage(video.videoUri.toUri())
+                                 val newVideo = video.copy(isSecured = true, videoUri = uri.toString(), title = newName)
+                                 handlingVideoTask = VideoTask.from(newVideo, succeed = {
+                                     Log.d(TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
+                                     // Update the video in the database
+                                     videoRepo.update(newVideo)
+                                 }, error = {
+                                     showToast(R.string.request_action_again)
+                                 })
                             } catch (e: Exception) {
                                 showToast(R.string.toast_when_failed_user_action)
                             }
                         }
                     }
                     R.id.btn_unlock -> {
-                        fileManager.removeFromInternal(video.title!!) { uri ->
-                            val newVideo = video.copy(videoUri =  uri.toString(), isSecured = false)
-                            Log.d(TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
-                            videoRepo.update(newVideo)
+                        fileManager.removeFromInternal(video.title!!) { file ->
+                            Log.d(TAG, "onItemClick: file = ${file.absolutePath}")
+                            file.getMediaUri(requireContext()) { uri ->
+                                val newVideo = video.copy(videoUri =  uri.toString(), isSecured = false)
+                                Log.d(TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
+                                videoRepo.update(newVideo)
+                            }
                         }
                     }
                     else -> {

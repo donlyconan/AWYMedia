@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
-import com.utc.donlyconan.media.app.utils.toShortTime
+import com.utc.donlyconan.media.app.utils.formatShortTime
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemVideoSingleModeBinding
 import com.utc.donlyconan.media.extension.widgets.TAG
@@ -69,7 +69,7 @@ class ListVideoAdapter(var context: Context, var videos: List<Video>) :
             binding.tvTitle.text = video.title
             binding.tvDate.text = DateFormat.getDateInstance().format(video.updatedAt)
             binding.tvSize.text = video.size.convertToStorageData()
-            binding.tvDuration.text = (video.duration / 1000).toShortTime()
+            binding.tvDuration.text = (video.duration / 1000).formatShortTime()
             Glide.with(itemView.context)
                 .load(video.videoUri)
                 .into(binding.imgThumbnail)

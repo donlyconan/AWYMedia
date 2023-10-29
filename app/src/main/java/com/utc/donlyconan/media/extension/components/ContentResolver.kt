@@ -10,8 +10,8 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.androidFile
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.data.models.Video
 import java.io.File
 import java.io.FileFilter
@@ -31,8 +31,8 @@ val FOLDERS = listOf(
 /**
  * Get all videos in the device
  */
-fun ContentResolver.getAllVideos(uri: Uri, selection: String? = null, sortOrder: String? = null): List<Video> {
-    Log.d(TAG, "getAllVideos() called with: uri = $uri, selection = $selection, sortOrder = $sortOrder")
+fun ContentResolver.loadAllVideos(mediaUri: Uri, selection: String? = null, sortOrder: String? = null): List<Video> {
+    Log.d(TAG, "getAllVideos() called with: uri = $mediaUri, selection = $selection, sortOrder = $sortOrder")
 
     val projection = arrayOf(
         MediaStore.Video.Media._ID,
@@ -44,7 +44,7 @@ fun ContentResolver.getAllVideos(uri: Uri, selection: String? = null, sortOrder:
     )
     val videoList = ArrayList<Video>()
 
-    query(uri, projection, selection, null, sortOrder)
+    query(mediaUri, projection, selection, null, sortOrder)
         ?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
             val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
@@ -57,18 +57,24 @@ fun ContentResolver.getAllVideos(uri: Uri, selection: String? = null, sortOrder:
                 val videoId = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
                 val duration = cursor.getInt(durationColumn)
-                var createdAt = cursor.getLong(createdAtColumn)
-                val updatedAt = cursor.getLong(updatedAtColumn)
+                var createdAt = cursor.getLong(createdAtColumn) * 1000
+                val updatedAt = cursor.getLong(updatedAtColumn) * 1000
                 val size = cursor.getLong(sizeColumn)
                 val type = title.split('.').last()
                 val data =
                     ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, videoId)
                 if (createdAt == 0L) {
-                    createdAt = System.currentTimeMillis()
+                    createdAt = now()
                 }
                 videoList += Video(
-                    videoId.toInt(), title, data.toString(), duration, size, type, 0L,
-                    createdAt, updatedAt
+                    videoId = videoId.toInt(),
+                    title = title,
+                    videoUri = data.toString(),
+                    duration = duration,
+                    size = size,
+                    type = type,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt
                 )
             }
         }
@@ -81,7 +87,7 @@ fun ContentResolver.getAllVideos(uri: Uri, selection: String? = null, sortOrder:
  * Getting video info from uri
  * Uri should be a specify video
  */
-fun ContentResolver.getVideoInfo(uri: Uri): Video? {
+suspend fun ContentResolver.getVideoInfo(uri: Uri): Video? {
     val projection = arrayOf(
         MediaStore.Video.Media._ID,
         MediaStore.Video.Media.DISPLAY_NAME,
@@ -104,8 +110,8 @@ fun ContentResolver.getVideoInfo(uri: Uri): Video? {
                 val videoId = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
                 val duration = cursor.getInt(durationColumn)
-                var createdAt = cursor.getLong(createdAtColumn)
-                val updatedAt = cursor.getLong(updatedAtColumn)
+                var createdAt = cursor.getLong(createdAtColumn) * 1000
+                val updatedAt = cursor.getLong(updatedAtColumn) * 1000
                 val size = cursor.getLong(sizeColumn)
                 val type = title.split('.').last()
                 if (createdAt == 0L) {
@@ -159,6 +165,12 @@ fun recursiveFile(listFiles: Array<File>?, fileFilter: FileFilter, videos: Array
 
 fun String.getMediaUri(context: Context, onFinish: (uri: Uri) -> Unit) {
     MediaScannerConnection.scanFile(context, arrayOf(toUri().toFile().absolutePath), arrayOf("*/*")) { path, uri ->
+        onFinish.invoke(uri)
+    }
+}
+
+fun File.getMediaUri(context: Context, onFinish: (uri: Uri) -> Unit) {
+    MediaScannerConnection.scanFile(context, arrayOf(absolutePath), arrayOf("*/*")) { path, uri ->
         onFinish.invoke(uri)
     }
 }

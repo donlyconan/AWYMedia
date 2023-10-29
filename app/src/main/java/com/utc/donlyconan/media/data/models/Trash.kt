@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.data.models
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.*
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.views.adapter.Selectable
 
 @Entity(tableName = "trashes", indices = [Index(value = ["video_uri"], unique = true)])
@@ -23,9 +24,9 @@ data class Trash(
     @ColumnInfo(name = "created_at")
     var createdAt: Long,
     @ColumnInfo(name = "updated_at")
-    var updatedAt: Long = System.currentTimeMillis(),
+    var updatedAt: Long = now(),
     @ColumnInfo(name = "deleted_at")
-    var deletedAt: Long = System.currentTimeMillis(),
+    var deletedAt: Long = now(),
     @ColumnInfo(name = "secured")
     var isSecured: Boolean = false,
     @ColumnInfo(name = "subtitle_uri")

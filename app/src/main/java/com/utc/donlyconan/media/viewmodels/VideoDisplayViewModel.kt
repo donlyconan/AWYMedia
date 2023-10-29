@@ -76,8 +76,6 @@ class VideoDisplayViewModel : ViewModel() {
         initialized = true
     }
 
-    fun browsedByPlaylist(): Boolean = playlistId != -1
-
     fun replaceVideo(videoId: Int) {
         Log.d(TAG, "replaceVideo() called with: videoId = $videoId")
         playlist.forEachIndexed { index, video ->
@@ -104,11 +102,12 @@ class VideoDisplayViewModel : ViewModel() {
         }
     }
 
-    suspend fun save() {
-        Log.d(TAG, "save() called + ${videoMld.value}")
+    suspend fun save(position: Long = 0L) {
+        Log.d(TAG, "save() called with: position = $position")
         val video = videoMld.value
-        if(video != null && !isFinished) {
-            videoRepo.update(video)
+        video?.apply {
+            playedTime = if(isFinished) 0L else position
+            videoRepo.update(this)
         }
     }
 

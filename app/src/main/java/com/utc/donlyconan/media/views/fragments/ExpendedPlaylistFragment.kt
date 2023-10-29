@@ -113,7 +113,7 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
         video.isChecked = !video.isChecked
         adapter.notifyItemChanged(position)
 
-        val videoCross = VideoPlaylistCrossRef(video.videoId, args.playlistId)
+        val videoCross = VideoPlaylistCrossRef(video.videoId, args.playlistId, video.videoUri)
         playlistWithVideosDao.insert(videoCross)
         adapter.notifyItemRemoved(position)
         adapter.notifyItemRangeChanged(position, adapter.videos.size)

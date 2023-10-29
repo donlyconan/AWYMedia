@@ -14,7 +14,7 @@ fun List<Trash>.sortedByDeletedDate(descended: Boolean): List<Any> {
     }
     val result = ArrayList<Any>(maps.size * 2)
     for (item in maps) {
-        result.add(item.key.toShortTime())
+        result.add(item.key.formatShortTime())
         result.addAll(item.value)
     }
     return result
@@ -31,7 +31,7 @@ fun List<Video>.sortedByCreatedDate(descended: Boolean): List<Any> {
     }
     val result = ArrayList<Any>(maps.size * 2)
     for (item in maps) {
-        result.add(item.key.toShortTime())
+        result.add(item.key.formatShortTime())
         result.addAll(item.value)
     }
     return result

@@ -31,6 +31,7 @@ import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.PlaylistFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -175,15 +176,8 @@ class MainDisplayFragment : BaseFragment() {
                 findNavController().navigate(action)
             }
             R.id.it_sync_data -> {
-                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                    lifecycleScope.launch {
-                        val videoList = videoRepo.loadAllVideos().filter { video ->
-                            trashRepo.find(video.videoId) == null
-                        }
-                        Log.d(TAG, "insertDataIntoDb: loaded size = " + videoList.size)
-                        videoRepo.insert(*videoList.toTypedArray())
-                    }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    videoRepo.sync()
                 }
             }
             R.id.it_sort_by -> {

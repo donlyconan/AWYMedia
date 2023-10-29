@@ -39,6 +39,7 @@ import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.ListedVideosDialog
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.OnSelectedChangeListener
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -217,71 +218,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         dialog.show(supportFragmentManager, TAG)
     }
 
-//    fun loadingVideo() {
-//        Log.d(TAG, "loadingVideo() called isInit = ${viewModel.isInitialized}")
-////        if (!viewModel.isInitialized) {
-////            Log.d(TAG, "loadingVideo: video is loaded!")
-////            if(!viewModel.isRestoredState && settings.restoreState) {
-////                showDialogToRestoreState(viewModel.getVideo())
-////            }
-////            return
-////        }
-//        viewModel.playlist =  arrayListOf()
-//        viewModel.videoId = intent.getIntExtra(EXTRA_VIDEO_ID, -1)
-//        viewModel.continued = intent.getBooleanExtra(EXTRA_CONTINUE, false)
-//        viewModel.playWhenReadyMld.value = settings.autoPlay
-//
-////        // Reset position of video time down to zero and save the current position of video
-////        val video = viewModel.getVideo()
-////
-////        if (viewModel.canShowDialog()) {
-////            // Show dialog to restore state of video when restoreState from setting equals true
-////            if(settings.restoreState) {
-////                viewModel.videoMld.value = video.copy(playedTime = -1)
-////                showDialogToRestoreState(video)
-////            } else {
-////                viewModel.videoMld.value = viewModel.getVideo().copy(playedTime = -1)
-////            }
-////            viewModel.isContinue = true
-////        } else {
-////            viewModel.videoMld.value = if(viewModel.videoMld.value == null)
-////                viewModel.getVideo()
-////            else viewModel.videoMld.value?.copy(updatedAt = System.currentTimeMillis())
-////        }
-//    }
-
-    /**
-     * Show a dialog and it purpose to restore video state
-     * @param video Video info
-     */
-//    private fun showDialogToRestoreState(video: Video) {
-//        Log.d(TAG, "showDialogToRestoreState() called")
-//        val binding = DialogDisplayAgainBinding.inflate(layoutInflater)
-//        val dialog = AlertDialog.Builder(this)
-//            .setView(binding.root)
-//            .setCancelable(true)
-//            .create()
-//        binding.btnNo.setOnClickListener {
-//            viewModel.isRestoredState = true
-//            dialog.dismiss()
-//        }
-//        binding.btnYes.setOnClickListener {
-//            Log.d(TAG, "loadingVideo() playedTime=${video.playedTime}")
-//            viewModel.isRestoredState = true
-//            flagPlayingChanged = true
-//            player?.seekTo(video.playedTime)
-//            flagPlayingChanged = false
-//            dialog.dismiss()
-//        }
-//        dialog.setOnCancelListener {
-//            Log.d(TAG, "showDialogToRestoreState: setOnCancelListener")
-//            viewModel.isRestoredState = true
-//        }
-//        dialog.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
-//                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-//        dialog.show()
-//    }
-
     override fun onStart() {
         hideSystemUi()
         super.onStart()
@@ -309,8 +245,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.save()
+        val position = player.currentPosition
+        GlobalScope.launch(Dispatchers.IO) {
+            viewModel.save(position)
         }
         releasePlayer()
     }
@@ -477,11 +414,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     player.prepare()
                 }
             }
-            if (!playWhenReady && playbackState == Player.STATE_READY) {
-                lifecycleScope.launch(Dispatchers.Default) {
-                    viewModel.finish()
-                }
-            }
+            viewModel.isFinished = playbackState == Player.STATE_ENDED
         }
     }
 

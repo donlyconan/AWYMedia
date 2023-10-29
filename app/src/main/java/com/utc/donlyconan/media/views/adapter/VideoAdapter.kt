@@ -1,7 +1,7 @@
 package com.utc.donlyconan.media.views.adapter
 
 import android.content.Context
-import android.net.Uri
+import android.media.ThumbnailUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +12,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
-import com.utc.donlyconan.media.app.utils.toShortTime
+import com.utc.donlyconan.media.app.utils.formatToTime
+import com.utc.donlyconan.media.app.utils.formatShortTime
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
 import com.utc.donlyconan.media.databinding.ItemVideoSingleModeBinding
-import java.text.DateFormat
 
 
 class VideoAdapter(
@@ -81,9 +81,9 @@ class VideoAdapter(
 
         fun bind(video: Video, showProgress: Boolean, showOptionMenu: Boolean) {
             binding.tvTitle.text = video.title
-            binding.tvDate.text = DateFormat.getDateInstance().format(video.updatedAt * 1000)
+            binding.tvDate.text = video.createdAt.formatToTime()
             binding.tvSize.text = video.size.convertToStorageData()
-            binding.tvDuration.text = (video.duration / 1000).toShortTime()
+            binding.tvDuration.text = (video.duration / 1000).formatShortTime()
             if(!showOptionMenu) {
                 with(binding.imgMenuMore) {
                     layoutParams.width = 0
@@ -98,7 +98,9 @@ class VideoAdapter(
                         .diskCacheStrategy(DiskCacheStrategy.DATA)
                 )
                 .load(video.videoUri.toUri())
-                .centerCrop()
+                .placeholder(R.drawable.im_loading)
+                .error(R.drawable.img_error)
+                .fitCenter()
                 .into(binding.imgThumbnail)
 
             if (showProgress) {

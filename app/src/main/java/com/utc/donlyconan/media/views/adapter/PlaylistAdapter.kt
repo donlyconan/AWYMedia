@@ -82,9 +82,14 @@ class PlaylistAdapter(var context: Context,
             onItemClickListener = listener
             binding.tvNumber.text = "${playlist.itemSize} videos"
 
+            binding.imgMenuMore.setOnClickListener {
+                onItemLongClickListener?.onItemLongClick(it, absoluteAdapterPosition)
+            }
+
             Glide.with(itemView.context)
                 .load(video?.videoUri)
-                .error(R.drawable.outline_playlist_play_24)
+                .placeholder(R.drawable.im_loading)
+                .error(R.drawable.img_error)
                 .circleCrop()
                 .into(binding.thumbnailCard)
 

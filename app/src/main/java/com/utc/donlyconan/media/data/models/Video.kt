@@ -10,6 +10,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.convertToStorageData
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.views.adapter.Selectable
 import java.io.File
 import java.util.Calendar
@@ -34,7 +35,7 @@ data class Video(
     @ColumnInfo(name = "created_at")
     var createdAt: Long,
     @ColumnInfo(name = "updated_at")
-    var updatedAt: Long = Calendar.getInstance().timeInMillis,
+    var updatedAt: Long = now(),
     @ColumnInfo(name = "is_favorite")
     var isFavorite: Boolean = false,
     @ColumnInfo(name = "secured")
@@ -65,6 +66,27 @@ data class Video(
     fun convertToTrash(): Trash {
         return Trash(videoId, title, videoUri, duration, size, type, createdAt,
             updatedAt, deletedAt = System.currentTimeMillis(), isSecured, subtitleUri)
+    }
+
+    fun copyFrom(video: Video) {
+        this.title = video.title
+        this.videoUri = video.videoUri
+        this.duration = video.duration
+        this.size = video.size
+        this.type = video.type
+        this.createdAt = video.createdAt
+        updatedAt = now()
+    }
+
+
+    override fun equals(other: Any?): Boolean {
+        return (other as? Video)?.let { video ->
+            title == video.title &&
+            videoUri == video.videoUri &&
+            duration == video.duration &&
+            type == video.type &&
+            size == video.size
+        } == true
     }
 
     companion object {

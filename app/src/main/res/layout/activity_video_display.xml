@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:keepScreenOn="true"
         app:auto_show="true"
-        android:background="@color/recycler_color"
+        android:background="@color/transparent"
         app:show_timeout="3000"
         app:repeat_toggle_modes="none"
         app:resize_mode="fit"

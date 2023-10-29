@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.views.adapter.Selectable
 
 @Entity(tableName = "playlist")
@@ -15,9 +16,9 @@ data class Playlist(
     var playlistId: Int?,
     var title: String,
     @ColumnInfo(name = "created_at")
-    var createdAt: Long = System.currentTimeMillis(),
+    var createdAt: Long = now(),
     @ColumnInfo(name = "updated_at")
-    var updatedAt: Long = System.currentTimeMillis()
+    var updatedAt: Long = now()
 ): Selectable {
     @Ignore
     var itemSize: Int = 0

@@ -15,7 +15,7 @@ import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 abstract class EGMDatabase: RoomDatabase() {
 
     companion object {
-        val DATABASE_NAME = "AWY_Media"
+        private const val DATABASE_NAME = "EGPMedia"
         @Volatile
         private var instance: EGMDatabase? = null
 

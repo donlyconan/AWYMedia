@@ -117,6 +117,7 @@
     <string name="shared_file">Shared File</string>
     <string name="share_file">Share File</string>
     <string name="type_all_video">video/*</string>
+    <string name="request_action_again">The action is failed. Please try again!</string>
 
     <string-array name="language_entries">
         <item>English</item>

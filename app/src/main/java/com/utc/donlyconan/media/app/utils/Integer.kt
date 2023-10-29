@@ -14,7 +14,7 @@ fun Long.convertToStorageData(): String {
     return "${formatter.format(temp)} ${units[level]}"
 }
 
-fun Int.toShortTime(): String {
+fun Int.formatShortTime(): String {
     val hour = this / 3600
     val min = (this - 3600 * hour) / 60
     val sec = this - hour * 3600 - min * 60
