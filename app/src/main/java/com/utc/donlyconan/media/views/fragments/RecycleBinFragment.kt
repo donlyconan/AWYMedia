@@ -41,7 +41,6 @@ import javax.inject.Inject
 class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
 
     @Inject lateinit var trashRepo: TrashRepository
-    @Inject lateinit var fileManager: FileManager
     val binding by lazy { FragmentTrashBinding.inflate(layoutInflater) }
     private lateinit var adapter: RecycleBinAdapter
     private var handlingVideoTask: VideoTask? = null

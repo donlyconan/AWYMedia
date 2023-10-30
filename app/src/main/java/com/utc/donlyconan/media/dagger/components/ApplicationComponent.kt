@@ -1,5 +1,6 @@
 package com.utc.donlyconan.media.dagger.components
 
+import com.utc.donlyconan.media.app.FileManager
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
@@ -59,6 +60,7 @@ interface ApplicationComponent {
     fun getTrashDao(): TrashDao
     fun getVideoDao(): VideoDao
     fun getPlaylistDao(): PlaylistDao
+    fun getFileManager(): FileManager
 
 
 

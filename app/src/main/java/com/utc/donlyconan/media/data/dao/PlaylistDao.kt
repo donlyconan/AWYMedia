@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaylistDao {
@@ -22,6 +23,9 @@ interface PlaylistDao {
 
     @Query("Select * from playlist")
     fun getAll(): LiveData<List<Playlist>>
+
+    @Query("Select * from playlist")
+    fun getAllOnCurrentThread(): List<Playlist>
 
     @Query("Select count(video_id) from video_playlist where playlist_id=:playlistId and video_id in (Select video_id from videos)")
     fun countVideos(playlistId: Int): Int

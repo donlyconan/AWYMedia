@@ -11,9 +11,11 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentSearchBarBinding
@@ -22,8 +24,13 @@ import com.utc.donlyconan.media.viewmodels.SearchViewModel
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
-import com.utc.donlyconan.media.views.adapter.PlaylistAdapter
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -33,9 +40,7 @@ import javax.inject.Inject
 class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListener {
 
     private val binding by lazy { FragmentSearchBarBinding.inflate(layoutInflater) }
-    private val args by navArgs<SearchBarFragmentArgs>()
-    private var videoAdapter: VideoAdapter? = null
-    private var playlistAdapter: PlaylistAdapter? = null
+    private lateinit var adapter: VideoAdapter
     private val searchViewModel by viewModels<SearchViewModel>()
     @Inject lateinit var playlistRepo: PlaylistRepository
 
@@ -45,8 +50,6 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
-                "savedInstanceState = $savedInstanceState")
         lsBinding = LoadingDataScreenBinding.bind(binding.icdLoading.frameContainer)
         return binding.root
     }
@@ -61,52 +64,39 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
             setOnQueryTextListener(onQueryTextListener)
         }
         showNoDataScreen()
-        if(args.directFrom == MainDisplayFragment.PLAYLIST_FRAGMENT) {
-            playlistAdapter = PlaylistAdapter(requireContext(), arrayListOf(), playlistRepo)
-            playlistAdapter?.onItemClickListener = this
-            binding.recyclerView.adapter = playlistAdapter
-            if(binding.searchBar.query != null) {
-                onQueryTextListener.onQueryTextChange(binding.searchBar.query.toString())
+        adapter = VideoAdapter(requireContext(), arrayListOf(), showOptionMenu = false)
+        adapter?.setOnItemClickListener(this)
+        binding.recyclerView.adapter = adapter
+        binding.searchBar.setOnQueryTextListener(onQueryTextListener)
+        searchViewModel.commonData.observe(this)  { data ->
+            if(data.isEmpty()) {
+                showNoDataScreen()
+            } else {
+                hideLoading()
             }
-        } else {
-            videoAdapter = VideoAdapter(requireContext(), arrayListOf(), showOptionMenu = false)
-            videoAdapter?.setOnItemClickListener(this)
-            binding.recyclerView.adapter = videoAdapter
+            adapter.submit(data)
+        }
+
+        lifecycleScope.launch(Dispatchers.Default) {
+            searchViewModel.search("20")
         }
     }
 
+    private val sharedFlow = MutableSharedFlow<String>()
+        .debounce(400)
+        .distinctUntilChanged()
+        .flowOn(Dispatchers.Default)
+
+
     private val onQueryTextListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
-            Log.d(TAG, "onQueryTextSubmit() called with: query = $query")
             return true
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
-            Log.d(TAG, "onQueryTextChange() called with: newText = $newText")
-            if(newText != null && newText.isNotEmpty()) {
+            if(!newText.isNullOrEmpty() && newText.trim().isNotEmpty()) {
                 showLoadingScreen()
-                if(args.directFrom == MainDisplayFragment.PLAYLIST_FRAGMENT) {
-                    searchViewModel.searchAllPlaylist("%$newText%").observe(this@SearchBarFragment) { playlists ->
-                        if(playlists.isEmpty()) {
-                            showNoDataScreen()
-                        } else {
-                            hideLoading()
-                        }
-                        playlistAdapter?.submit(playlists)
-                    }
-                } else {
-                    searchViewModel.searchAllVideos("%$newText%").observe(this@SearchBarFragment) { videos ->
-                        if(videos.isEmpty()) {
-                            showNoDataScreen()
-                        } else {
-                            hideLoading()
-                        }
-                        videoAdapter?.submit(videos)
-                    }
-                }
-            } else {
-                playlistAdapter?.submit(arrayListOf())
-                videoAdapter?.submit(arrayListOf())
+//                searchViewModel.search(newText)
             }
             return true
         }
@@ -118,31 +108,22 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
             androidx.appcompat.R.id.search_mag_icon -> {
                 findNavController().navigateUp()
             }
-            else -> {
-                Log.d(TAG, "onClick haven't been handled yet!")
-            }
+            else -> null
         }
     }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
-        if(args.directFrom == MainDisplayFragment.PLAYLIST_FRAGMENT) {
-            playlistAdapter?.let { adapter ->
-                val playlist = adapter.playlists[position]
-                val action = SearchBarFragmentDirections
-                    .actionSearchBarFragmentToDetailedPlaylistFragment(playlist.playlistId!!)
-                findNavController().navigate(action)
-            }
-        } else {
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            imm?.hideSoftInputFromWindow(view!!.windowToken, 0)
-            videoAdapter?.let { adapter ->
-                val video = adapter.getItem(position) as? Video
-                video?.let {
-                    val intent = VideoDisplayActivity.newIntent(requireContext(), it.videoId, it.videoUri)
-                    startActivity(intent)
-                }
-            }
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(view!!.windowToken, 0)
+        val item = adapter.getItem(position)
+        if(item is Playlist) {
+            val action = SearchBarFragmentDirections
+                .actionSearchBarFragmentToDetailedPlaylistFragment(item.playlistId!!)
+            findNavController().navigate(action)
+        }
+        if(item is Video) {
+            startVideoDisplayActivity(item.videoId, item.videoUri)
         }
     }
 

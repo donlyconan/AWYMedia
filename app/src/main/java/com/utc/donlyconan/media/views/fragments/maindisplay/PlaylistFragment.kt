@@ -62,19 +62,25 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
-        adapter = PlaylistAdapter(context!!, arrayListOf(), playlistRepo)
+        adapter = PlaylistAdapter(context!!, arrayListOf())
         adapter.onItemClickListener = this
         adapter.onItemLongClickListener = this
         binding.recyclerView.adapter = adapter
         binding.fab.setOnClickListener(this)
         showLoadingScreen()
         viewModel.listPlaylist.observe(this) { playlists ->
-            if(playlists.isEmpty()) {
-                showNoDataScreen()
-            } else {
-                hideLoading()
+            lifecycleScope.launch(Dispatchers.IO) {
+                playlists.forEach { playlist: Playlist ->
+                    playlist.itemSize = playlistRepo.countVideos(playlistRepo.countVideos(playlist.playlistId!!))
+                    playlist.firstVideo = playlistRepo.getFirstVideo(playlist.playlistId!!)
+                }
+                if(playlists.isEmpty()) {
+                    showNoDataScreen()
+                } else {
+                    hideLoading()
+                }
+                adapter.submit(playlists)
             }
-            adapter.submit(playlists)
         }
     }
 
@@ -92,8 +98,8 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         MenuMoreOptionFragment.newInstance(R.layout.fragment_playlist_option) {
             when(it.id) {
                 R.id.btn_open -> lifecycleScope.launch(Dispatchers.IO) {
-                    playlistRepo.getFirstVideo(item.playlistId!!)?.let { video ->
-                        startPlayingVideo(video.videoId, video.videoUri, item.playlistId!!)
+                    item.firstVideo?.let { video ->
+                        startVideoDisplayActivity(video.videoId, video.videoUri, item.playlistId!!)
                     }
 
                 }
@@ -107,7 +113,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     playlistRepo.removePlaylist(item.playlistId!!)
                 }
                 R.id.btn_rename -> {
-                    AddedPlaylistDialog(requireContext(), true) { text, _ ->
+                    AddedPlaylistDialog(requireContext(), true, item.title) { text, _ ->
                         val item2 = Playlist(item.playlistId, text)
                         viewModel.playlistRepo.update(item2)
                     }.show()
@@ -154,7 +160,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     }
 
 
-    inner class AddedPlaylistDialog(context: Context, isEditMode: Boolean,
+    inner class AddedPlaylistDialog(context: Context, isEditMode: Boolean, currentName: String? = null,
                                     val listener: (text: String, isEditMode: Boolean) -> Unit) : Dialog(context) {
 
         private val binding by lazy { DialogAddPlaylistBinding.inflate(layoutInflater) }
@@ -162,6 +168,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         init {
             if(isEditMode){
                 binding.title.setText(R.string.rename)
+                binding.ipName.setText(currentName)
             }
             setContentView(binding.root)
             window?.apply {

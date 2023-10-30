@@ -18,6 +18,8 @@
         tools:itemCount="10"
         tools:listitem="@layout/item_video_single_mode" />
 
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -25,9 +27,11 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:backgroundTint="@color/white_gray"
-        android:src="@drawable/bg_music_button"
+        android:foreground="@drawable/bg_music_button"
+        android:visibility="invisible"
+        android:foregroundGravity="center"
         app:fabSize="normal"
-        app:maxImageSize="40dp"
+        app:maxImageSize="50dp"
         app:useCompatPadding="false" />
 
     <include

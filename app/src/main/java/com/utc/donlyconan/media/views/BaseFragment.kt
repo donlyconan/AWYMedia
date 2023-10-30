@@ -1,7 +1,7 @@
 package com.utc.donlyconan.media.views
 
 import android.app.RecoverableSecurityException
-import android.content.Context
+import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -15,22 +15,26 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
+import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.models.Video
+import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
+import com.utc.donlyconan.media.extension.components.getMediaUri
 import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
+import com.utc.donlyconan.media.views.fragments.VideoTask
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
+import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.jar.Manifest
 
 
 /**
@@ -42,9 +46,12 @@ abstract class BaseFragment : Fragment() {
     protected val application by lazy { requireContext().applicationContext as EGMApplication }
     protected val appComponent by lazy { application.applicationComponent() }
     protected val supportFragmentManager by lazy { activity.supportFragmentManager }
+    protected val fileManager by lazy { appComponent.getFileManager() }
     // loading screen
     protected var lsBinding: LoadingDataScreenBinding? = null
     protected val settings by lazy { appComponent.getSettings() }
+    protected var handlingTask: VideoTask? = null
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -139,12 +146,12 @@ abstract class BaseFragment : Fragment() {
 
     }
 
-    fun startPlayingVideo(videoId: Int, videoUri: String, playlist: Int = -1)  {
+    fun startVideoDisplayActivity(videoId: Int, videoUri: String, playlist: Int = -1)  {
         Log.d(ListVideosFragment.TAG, "startPlayingVideo() called with: videoId = $videoId, videoUri = $videoUri")
         lifecycleScope.launch {
             showLoadingScreen()
             launch(Dispatchers.IO) {
-                VideoDisplayActivity.newIntent(requireContext(), videoId, videoUri, playlist).let { startActivity(it) }
+                startActivity(VideoDisplayActivity.newIntent(requireContext(), videoId, videoUri, playlist))
                 hideLoading()
             }
         }
@@ -167,6 +174,80 @@ abstract class BaseFragment : Fragment() {
     fun requestPermissionIfNeed(vararg permissions: String) {
         if(!checkPermission(*permissions)) {
             requestPermissionResult.launch(permissions.toList().toTypedArray())
+        }
+    }
+
+    fun share(video: Video) {
+        if(!video.isSecured) {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "video/*"
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
+            startActivity(Intent.createChooser(intent, "Share File"))
+        } else {
+            showToast("The video is being protected, You cannot share it!")
+        }
+    }
+
+
+    fun lockVideo(video: Video, repository: VideoRepository) {
+        Logs.d("lockVideo() called with: video = $video")
+        fileManager.saveIntoInternal(video.videoUri.toUri(), video.title ?: "no_name") { uri, newName ->
+            try {
+                Log.d(ListVideosFragment.TAG, "onItemClick: MediaUri=${video.videoUri.toUri()}")
+                deleteVideoFromExternalStorage(video.videoUri.toUri())
+                val newVideo = video.copy(isSecured = true, videoUri = uri.toString(), title = newName)
+                handlingTask = VideoTask.from(newVideo, succeed = {
+                    Log.d(ListVideosFragment.TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
+                    // Update the video in the database
+                    repository.update(newVideo)
+                }, error = {
+                    showToast(R.string.request_action_again)
+                })
+            } catch (e: Exception) {
+                showToast(R.string.toast_when_failed_user_action)
+            }
+        }
+    }
+
+    fun unlockVideo(video: Video, videoRepository: VideoRepository) {
+        Logs.d("unlockVideo() called with: video = $video")
+        fileManager.removeFromInternal(video.title!!) { file ->
+            Log.d(ListVideosFragment.TAG, "onItemClick: file = ${file.absolutePath}")
+            file.getMediaUri(requireContext()) { uri ->
+                val newVideo = video.copy(videoUri =  uri.toString(), isSecured = false)
+                Log.d(ListVideosFragment.TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
+                videoRepository.update(newVideo)
+            }
+        }
+    }
+
+    fun playMusic(video: Video) {
+        Logs.d( "playMusic() called with: video = $video")
+        application.getAudioService()?.play(MediaItem.fromUri(video.videoUri))
+    }
+
+    suspend fun deleteVideo(video: Video, repository: VideoRepository) {
+        Logs.d("deleteVideo() called with: video = $video")
+        if(video.isSecured) {
+            repository.moveToRecyleBin(video)
+        } else {
+            val videoUri = video.videoUri.toUri()
+            fileManager.saveIntoInternal(videoUri, video.title!!) { uri, name ->
+                deleteVideoFromExternalStorage(videoUri)
+                val newVideo = video.copy(videoUri = uri.toString(), title = name)
+                handlingTask = VideoTask(listOf(newVideo), succeed = {
+                    Log.d(ListVideosFragment.TAG, "handle succeeded items")
+                    showToast("The file is moved into the Recycle Bin!")
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        repository.moveToRecyleBin(video)
+                    }
+                }, error = {
+                    Log.d(ListVideosFragment.TAG, "handle error items")
+                    showToast("Can't delete the file!")
+                    context?.deleteFile(newVideo.videoUri)
+                })
+            }
         }
     }
 

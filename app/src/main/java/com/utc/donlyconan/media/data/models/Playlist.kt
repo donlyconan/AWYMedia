@@ -23,6 +23,8 @@ data class Playlist(
     @Ignore
     var itemSize: Int = 0
     @Ignore
+    var firstVideo: Video? = null
+    @Ignore
     var isChecked: Boolean = false
 
     fun compareTo(v: Playlist, sortBy: Int) = when (sortBy) {

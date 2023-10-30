@@ -4,8 +4,11 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore.Audio.Media
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,13 +16,17 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.metadata.Metadata
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
@@ -103,19 +110,30 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         }
     }
 
-    private val listener = object : Player.Listener {
+    private val listener = object : MediaPlayerListener {
+
+        override fun onInitialVideo(uri: Uri) {
+            Log.d(TAG, "onInitialVideo() called with: uri = $uri")
+            Glide.with(requireContext())
+                .load(uri)
+                .circleCrop()
+                .into(binding.fab)
+        }
+
+        override fun onAudioServiceAvailable(available: Boolean) {
+            Log.d(TAG, "onAudioServiceAvailable() called with: available = $available")
+            binding.fab.visibility = if(available) View.VISIBLE else View.GONE
+        }
+
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             Log.d(TAG, "onIsPlayingChanged() called with: isPlaying = $isPlaying")
             binding.fab.isSelected = isPlaying
         }
 
-        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-            Log.d(TAG, "onMediaMetadataChanged() called with: mediaMetadata = $mediaMetadata")
-            Glide.with(requireContext())
-                .load(mediaMetadata.mediaUri)
-                .into(binding.fab)
-
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
         }
+
     }
 
 

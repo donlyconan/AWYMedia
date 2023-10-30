@@ -107,6 +107,8 @@ data class Video(
                     oldItem.videoId == newItem.videoId
                 } else if(oldItem is String && newItem is String) {
                     oldItem == newItem
+                } else if(oldItem is Playlist && newItem is Playlist) {
+                    oldItem.playlistId == newItem.playlistId
                 } else {
                     false
                 }

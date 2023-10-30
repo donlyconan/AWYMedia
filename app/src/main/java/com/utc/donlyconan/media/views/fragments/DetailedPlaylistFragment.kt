@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -94,7 +93,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
                     R.id.btn_play -> {
-                        startPlayingVideo(video.videoId, video.videoUri, -1)
+                        startVideoDisplayActivity(video.videoId, video.videoUri, -1)
                     }
                     R.id.btn_play_music -> {
                         application.getAudioService()?.play(MediaItem.fromUri(video.videoUri))

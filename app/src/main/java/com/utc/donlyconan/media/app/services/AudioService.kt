@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
@@ -13,8 +14,10 @@ import android.util.Log
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.utc.donlyconan.media.app.EGMApplication
+import kotlin.math.log
 
 
 /**
@@ -38,8 +41,7 @@ class AudioService : Service() {
         .build()
     private var player: ExoPlayer? = null
     private lateinit var mediaSessionConnector: MediaSessionConnector
-    private val mediaListeners by lazy { ArrayList<Player.Listener>() }
-
+    private val mediaListeners by lazy { ArrayList<MediaPlayerListener>() }
 
     override fun onCreate() {
         super.onCreate()
@@ -80,27 +82,30 @@ class AudioService : Service() {
     }
 
     fun play(item: MediaItem, repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF) {
-        Log.d(TAG, "play() called with: item = $item")
-        if(player != null) {
-            player?.apply {
-                stop()
-                setMediaItem(item)
-                prepare()
-                play()
-                notificationManager.showNotificationForPlayer(this)
-            }
-        } else {
-            setupPlayer()
-            mediaSessionConnector.setPlayer(player)
-            player?.apply {
-                setMediaItem(item)
-                this.repeatMode = repeatMode
-                addListener(mediaStateListener)
-                prepare()
-                playWhenReady = true
-                notificationManager.showNotificationForPlayer(this)
-            }
+        Log.d(TAG, "play() with player is available = ${isAvailable()}")
+        play(listOf(item), 0 , repeatMode)
+    }
+
+    fun play(items: List<MediaItem>, index: Int = 0, repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF) {
+        Log.d(TAG, "playlist() with player is available = ${isAvailable()}")
+        if(index >= items.size) {
+            Log.d(TAG, "playlist() called with: check index again.")
+            return
         }
+        releasePlayer()
+        setupPlayer()
+        mediaSessionConnector.setPlayer(player)
+        player?.apply {
+            setMediaItems(items)
+            seekTo(index, 0L)
+            this.repeatMode = repeatMode
+            addListener(mediaStateListener)
+            prepare()
+            playWhenReady = true
+            notificationManager.showNotificationForPlayer(this)
+        }
+        mediaStateListener.onAudioServiceAvailable(true)
+        mediaStateListener.onInitialVideo(items[index].localConfiguration?.uri!!)
     }
 
     fun releasePlayer() {
@@ -109,6 +114,7 @@ class AudioService : Service() {
             stop()
             release()
         }
+        mediaStateListener.onAudioServiceAvailable(false)
     }
 
     private val broadcastReceiver = object  : BroadcastReceiver() {
@@ -116,7 +122,6 @@ class AudioService : Service() {
             Log.d(TAG, "onReceive: player is available [${player == null}]")
         }
     }
-
 
 
 
@@ -148,24 +153,59 @@ class AudioService : Service() {
         }
     }
 
-    private val mediaStateListener = object : Player.Listener {
+    private val mediaStateListener = object : MediaPlayerListener {
+
+        override fun onAudioServiceAvailable(available: Boolean) {
+            Log.d(TAG, "onAudioServiceAvailable() called with: available = $available")
+            mediaListeners.forEach { it.onAudioServiceAvailable(available) }
+        }
+
+        override fun onInitialVideo(uri: Uri) {
+            Log.d(TAG, "onInitialVideo() called with: uri = $uri")
+            mediaListeners.forEach { it.onInitialVideo(uri) }
+        }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             mediaListeners.forEach { it.onIsPlayingChanged(isPlaying) }
         }
 
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+            Log.d(TAG, "onMediaItemTransition() called with: mediaItem = $mediaItem, reason = $reason")
+        }
+
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+            Log.d(TAG, "onMediaMetadataChanged() called with: mediaMetadata = $mediaMetadata")
             mediaListeners.forEach { it.onMediaMetadataChanged(mediaMetadata) }
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            Log.d(TAG, "onPlayerError() called with: error = $error")
+        }
+
+        override fun onPlayerErrorChanged(error: PlaybackException?) {
+            super.onPlayerErrorChanged(error)
+            Log.d(TAG, "onPlayerErrorChanged() called with: error = $error")
+        }
+
+        override fun onMetadata(metadata: Metadata) {
+            super.onMetadata(metadata)
+            Log.d(TAG, "onMetadata() called with: metadata = $metadata")
+        }
+
+    }
+
+    fun registerPlayerListener(listener: MediaPlayerListener) {
+        Log.d(TAG, "registerPlayerListener() called with: listener = $listener")
+        mediaListeners.add(listener)
+        mediaListeners.forEach { e ->
+            e.onAudioServiceAvailable(isAvailable())
         }
     }
 
-    fun registerPlayerListener(listener: Player.Listener) {
-        Log.d(TAG, "registerPlayerListener() called with: listener = $listener")
-        mediaListeners.add(listener)
-    }
-
-    fun removePlayerListener(listener: Player.Listener) {
+    fun removePlayerListener(listener: MediaPlayerListener) {
         Log.d(TAG, "removePlayerListener() called with: listener = $listener")
         mediaListeners.remove(listener)
     }
@@ -180,13 +220,22 @@ class AudioService : Service() {
     /**
      * Start to play musics
      */
-    fun start() {
-        player?.play()
+    fun start() { 
+        player?.let { player ->
+            if (player.playbackState == Player.STATE_ENDED ) {
+                Log.d(TAG, "start: prepare service. state = ${player.playbackState}")
+                player.prepare()
+                player.seekTo(0L)
+            }
+            player.play()
+        }
     }
 
     fun getPlayer(): ExoPlayer? {
         return player
     }
+
+    fun isAvailable(): Boolean = player != null
 
 
     inner class EGMBinder : Binder() {

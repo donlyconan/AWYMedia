@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.data.dao
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import kotlinx.coroutines.flow.Flow
 
@@ -37,8 +38,7 @@ interface VideoDao {
     fun getAll(): LiveData<List<Video>>
 
     @Query("Select * from videos")
-    fun getAllAsFlow(): Flow<Video>
-
+    fun getAllAsFlow(): Flow<List<Video>>
 
     @Query("Select * from videos where secured=:isSecured")
     fun getAllVideosBySecuring(isSecured: Boolean): LiveData<List<Video>>
@@ -63,4 +63,5 @@ interface VideoDao {
 
     @Query("Delete from videos where secured = :isSecured")
     fun clearVideosWith(isSecured: Boolean = false): Int
+
 }

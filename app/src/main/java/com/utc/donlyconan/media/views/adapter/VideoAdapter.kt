@@ -14,8 +14,10 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.formatToTime
 import com.utc.donlyconan.media.app.utils.formatShortTime
+import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
+import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.databinding.ItemVideoSingleModeBinding
 
 
@@ -29,6 +31,8 @@ class VideoAdapter(
     companion object {
         const val TYPE_GROUP = 1
         const val TYPE_VIDEO = 2
+        const val TYPE_PLAYLIST = 3
+        const val TYPE_TRASH_ITEM = 3
     }
 
     var inflater: LayoutInflater = LayoutInflater.from(context)
@@ -37,19 +41,30 @@ class VideoAdapter(
         val item = getItem(position)
         return if(item is String) {
             TYPE_GROUP
-        } else {
+        } else if(item is Video) {
             TYPE_VIDEO
+        } else if (item is Playlist) {
+            TYPE_PLAYLIST
+        } else {
+            TYPE_TRASH_ITEM
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocalHolder {
         Log.d(TAG, "onCreateViewHolder: ")
-        return if(viewType == TYPE_GROUP) {
-            val binding: ItemGroupNameBinding = ItemGroupNameBinding.inflate(inflater, parent, false)
-            GroupHolder(binding)
-        } else {
-            val binding: ItemVideoSingleModeBinding = ItemVideoSingleModeBinding.inflate(inflater, parent, false)
-            VideoHolder(binding)
+        return when(viewType) {
+            TYPE_GROUP -> {
+                val binding: ItemGroupNameBinding = ItemGroupNameBinding.inflate(inflater, parent, false)
+                GroupHolder(binding)
+            }
+            TYPE_VIDEO -> {
+                val binding: ItemVideoSingleModeBinding = ItemVideoSingleModeBinding.inflate(inflater, parent, false)
+                VideoHolder(binding)
+            }
+            else -> {
+                val binding: ItemPlaylistBinding = ItemPlaylistBinding.inflate(inflater, parent, false)
+                PlaylistAdapter.PlaylistHolder(binding)
+            }
         }
     }
 
@@ -64,6 +79,9 @@ class VideoAdapter(
             holder.bind(item)
             holder.onItemClickListener = null
             holder.onItemLongClickListener = null
+        }
+        if(item is Playlist && holder is PlaylistAdapter.PlaylistHolder) {
+            holder.bind(item, item.firstVideo, this, position == itemCount - 1, showOptionMenu)
         }
     }
 

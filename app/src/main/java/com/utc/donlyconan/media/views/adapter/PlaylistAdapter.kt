@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.models.Playlist
@@ -16,9 +15,8 @@ import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.TAG
 
 class PlaylistAdapter(var context: Context,
-                      var playlists: ArrayList<Playlist>,
-                      private val repository: PlaylistRepository) :
-    ListAdapter<Playlist, PlaylistAdapter.VideoHolder>(Playlist.diffUtil), OnItemClickListener {
+                      var playlists: ArrayList<Playlist>) :
+    ListAdapter<Playlist, PlaylistAdapter.PlaylistHolder>(Playlist.diffUtil), OnItemClickListener {
 
     var onItemLongClickListener: OnItemLongClickListener? = null
     var inflater: LayoutInflater = LayoutInflater.from(context)
@@ -26,16 +24,15 @@ class PlaylistAdapter(var context: Context,
     var selectedPosition: Int = -1
         private set
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistHolder {
         val binding: ItemPlaylistBinding = ItemPlaylistBinding.inflate(inflater)
-        return VideoHolder(binding)
+        return PlaylistHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: VideoHolder, position: Int) {
+    override fun onBindViewHolder(holder: PlaylistHolder, position: Int) {
         val item = playlists[position]
-        item.itemSize = repository.countVideos(item.playlistId!!)
         holder.onItemLongClickListener = onItemLongClickListener
-        holder.bind(item, repository.getFirstVideo(item.playlistId!!), this, position == itemCount - 1)
+        holder.bind(item, item.firstVideo, this, position == itemCount - 1)
     }
 
     override fun getItemCount(): Int {
@@ -55,10 +52,7 @@ class PlaylistAdapter(var context: Context,
     }
 
 
-    class VideoHolder(val binding: ItemPlaylistBinding) :
-        RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnLongClickListener {
-        var onItemClickListener: OnItemClickListener? = null
-        var onItemLongClickListener: OnItemLongClickListener? = null
+    class PlaylistHolder(val binding: ItemPlaylistBinding) : BaseAdapter.LocalHolder(binding) {
 
         init {
             binding.rootLayout.setOnClickListener(this)
@@ -74,13 +68,14 @@ class PlaylistAdapter(var context: Context,
             onItemClickListener?.onItemClick(v, adapterPosition)
         }
 
-        fun bind(playlist: Playlist, video: Video?, listener: OnItemClickListener?, isLastItem: Boolean) {
+        fun bind(playlist: Playlist, video: Video?, listener: OnItemClickListener?, isLastItem: Boolean, showOptionMenu: Boolean = false) {
             Log.d(
                 TAG, "bind() called with: video = $playlist, listener = $listener, " +
                         "isLastItem = $isLastItem")
             binding.tvTitle.text = playlist.title
             onItemClickListener = listener
             binding.tvNumber.text = "${playlist.itemSize} videos"
+            binding.imgMenuMore.visibility = if(showOptionMenu) View.VISIBLE else View.GONE
 
             binding.imgMenuMore.setOnClickListener {
                 onItemLongClickListener?.onItemLongClick(it, absoluteAdapterPosition)
