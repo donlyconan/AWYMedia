@@ -29,6 +29,7 @@ import com.utc.donlyconan.media.views.fragments.MainDisplayFragmentDirections
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -79,7 +80,9 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                 } else {
                     hideLoading()
                 }
-                adapter.submit(playlists)
+                withContext(Dispatchers.Main) {
+                    adapter.submit(playlists)
+                }
             }
         }
     }

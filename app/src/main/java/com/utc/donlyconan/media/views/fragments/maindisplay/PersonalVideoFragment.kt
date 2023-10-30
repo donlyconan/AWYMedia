@@ -1,30 +1,18 @@
 package com.utc.donlyconan.media.views.fragments.maindisplay
 
 import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore.Audio.Media
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.MediaMetadata
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.metadata.Metadata
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
@@ -34,7 +22,6 @@ import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import kotlin.math.log
 
 
 /**
@@ -60,7 +47,6 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewCreated() called with: view = $view, savedInstanceState = " +
                     "$savedInstanceState")
@@ -82,17 +68,28 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             }
         }
 
-        // Check permission of your app
-        if (checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Log.d(TAG, "onViewCreated: loading...")
-            viewModel.importVideos()
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(checkPermission(Manifest.permission.READ_MEDIA_VIDEO)) {
+                Log.d(TAG, "onViewCreated: loading...")
+                viewModel.sync()
+            } else {
+                requestPermissionIfNeed(
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+            }
         } else {
-            Log.d(TAG, "onViewCreated: register permission!")
-            requestPermissionIfNeed(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_MEDIA_VIDEO,
-            )
+            if(checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Log.d(TAG, "onViewCreated: loading...")
+                viewModel.sync()
+            } else {
+                requestPermissionIfNeed(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+            }
+
         }
         application.getAudioService()?.let { audioService ->
             audioService.registerPlayerListener(listener)
@@ -104,7 +101,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     override fun onPermissionResult(result: Map<String, Boolean>) {
         Log.d(TAG, "onPermissionResult() called with: result = $result")
         if (result.values.isNotEmpty()) {
-            viewModel.importVideos()
+            viewModel.sync()
         } else {
             activity.finish()
         }

@@ -25,7 +25,7 @@ class PlaylistAdapter(var context: Context,
         private set
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistHolder {
-        val binding: ItemPlaylistBinding = ItemPlaylistBinding.inflate(inflater)
+        val binding: ItemPlaylistBinding = ItemPlaylistBinding.inflate(inflater, parent, false)
         return PlaylistHolder(binding)
     }
 
