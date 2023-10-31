@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/mainDisplayFragment"
-        android:name="com.utc.donlyconan.media.views.fragments.MainDisplayFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment"
         android:label="fragment_main_display"
         tools:layout="@layout/fragment_main_display" >
         <argument

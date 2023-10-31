@@ -21,7 +21,7 @@ import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.fragments.DetailedPlaylistFragment
 import com.utc.donlyconan.media.views.fragments.ExpendedPlaylistFragment
 import com.utc.donlyconan.media.views.fragments.ListVideoDisplayFragment
-import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.RecycleBinFragment
 import com.utc.donlyconan.media.views.fragments.SearchBarFragment
 import com.utc.donlyconan.media.views.fragments.SplashScreenFragment

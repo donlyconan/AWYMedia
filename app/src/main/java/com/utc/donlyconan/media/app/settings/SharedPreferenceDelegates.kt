@@ -36,9 +36,9 @@ class StringSetPreferenceDelegate(
 }
 
 class IntPreferenceDelegate(
-  private val sharedPreferences: SharedPreferences,
-  private val key: String,
-  private val defaultValue: Int = 0,
+    private val sharedPreferences: SharedPreferences,
+    private val key: String,
+    private val defaultValue: Int = 0,
 ) : ReadWriteProperty<Any, Int> {
   override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) {
     sharedPreferences.edit { putInt(key, value) }

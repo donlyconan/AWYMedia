@@ -25,7 +25,6 @@ import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.PlaylistAdapter
-import com.utc.donlyconan.media.views.fragments.MainDisplayFragmentDirections
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,8 +79,9 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                 } else {
                     hideLoading()
                 }
+                val data = playlists.sortedWith { u, v -> u.compareTo(v, settings.playlistSortBy) }
                 withContext(Dispatchers.Main) {
-                    adapter.submit(playlists)
+                    adapter.submit(data)
                 }
             }
         }
@@ -134,21 +134,26 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     viewModel.playlistRepo.insert(item)
                 }.show()
             }
-            R.id.btn_sort_by_name -> {
-                settings.playlistSortBy = Settings.SORT_BY_NAME
-                adapter.playlists.sortWith { u, v -> u.compareTo(v, settings.playlistSortBy) }
+            R.id.btn_sort_by_name_up -> {
+                settings.playlistSortBy = Settings.SORT_BY_NAME_UP
+                adapter.playlists.sortWith { u, v -> u.compareTo(v, Settings.SORT_BY_NAME_UP) }
                 adapter.notifyDataSetChanged()
             }
-            R.id.btn_sort_by_creation -> {
-                settings.playlistSortBy = Settings.SORT_BY_CREATION
-                adapter.playlists.sortWith { u, v -> u.compareTo(v, settings.playlistSortBy) }
+            R.id.btn_sort_by_name_down -> {
+                settings.playlistSortBy = Settings.SORT_BY_NAME_DOWN
+                adapter.playlists.sortWith { u, v -> u.compareTo(v, Settings.SORT_BY_NAME_DOWN) }
                 adapter.notifyDataSetChanged()
             }
-            R.id.btn_sort_by_recent -> {
-                settings.playlistSortBy = Settings.SORT_BY_RECENT
-                adapter.playlists.sortWith { u, v -> u.compareTo(v, settings.playlistSortBy) }
-                adapter.notifyDataSetChanged()
-            }
+//            R.id.btn_sort_by_creation -> {
+//                settings.playlistSortBy = Settings.SORT_BY_CREATION
+//                adapter.playlists.sortWith { u, v -> u.compareTo(v, Settings.SORT_BY_CREATION) }
+//                adapter.notifyDataSetChanged()
+//            }
+//            R.id.btn_sort_by_recent -> {
+//                settings.playlistSortBy = Settings.SORT_BY_RECENT
+//                adapter.playlists.sortWith { u, v -> u.compareTo(v, Settings.SORT_BY_RECENT) }
+//                adapter.notifyDataSetChanged()
+//            }
         }
     }
 

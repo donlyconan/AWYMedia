@@ -15,6 +15,12 @@ class Settings @Inject constructor(val appContext: Context) {
         const val SORT_BY_RECENT = 3
         const val SORT_BY_DURATION = 4
 
+        const val SORT_BY_NAME_UP = 1
+        const val SORT_BY_NAME_DOWN = 2
+
+        const val SORT_VIDEO_BY_CREATION_UP = 10
+        const val SORT_VIDEO_BY_CREATION_DOWN = 11
+
         private var instance: Settings? = null
 
         fun getInstance(appContext: Context) = synchronized(Settings::class.java) {
@@ -31,16 +37,13 @@ class Settings @Inject constructor(val appContext: Context) {
         if(Locale.getDefault().language == "vn" || Locale.getDefault().language == "en")
             Locale.getDefault().language else "en")
     var isWellcome by BooleanPreferenceDelegate(preferences, "wellcome_to_app", false)
-    var sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_BY_NAME)
-    var playlistSortBy by IntPreferenceDelegate(preferences, "playlist_sort_by", SORT_BY_NAME)
+    var sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_VIDEO_BY_CREATION_DOWN)
+    var playlistSortBy by IntPreferenceDelegate(preferences, "playlist_sort_by", SORT_BY_NAME_DOWN)
     var deleteFromStorage by BooleanPreferenceDelegate(preferences, "delete_from_storage", false)
-    var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)
-    var autoDownload by BooleanPreferenceDelegate(preferences, "auto_download", true)
     var erasureCycle by StringPreferenceDelegate(preferences, "erasure_cycle", "30")
     var previousDeletionDate by LongPreferenceDelegate(preferences, "deletion_date", 0L)
 
     var password by StringPreferenceDelegate(preferences, "password")
-    var email by StringPreferenceDelegate(preferences, "email")
 
     /**
      * It represent for Auto Play Mode on Video Screen

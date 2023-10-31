@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/bg_bottom_sheet_fragment"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/sort_by"
+        android:fontFamily="@font/graduate"
+        android:textSize="20sp" />
+
+    <RadioGroup
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <RadioButton
+            android:id="@+id/btn_sort_by_creation_up"
+            style="@style/BottomMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/created_at"
+            android:checked="true"
+            android:buttonTint="@color/white"
+            android:layoutDirection="inherit"
+            app:drawableStartCompat="@drawable/ic_up"
+            app:drawableEndCompat="@drawable/ic_creation" />
+
+        <RadioButton
+            android:id="@+id/btn_sort_by_creation_down"
+            style="@style/BottomMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/created_at"
+            android:buttonTint="@color/white"
+            app:drawableStartCompat="@drawable/ic_down"
+            app:drawableEndCompat="@drawable/ic_creation" />
+
+    </RadioGroup>
+
+</LinearLayout>

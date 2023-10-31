@@ -28,16 +28,21 @@ data class Playlist(
     var isChecked: Boolean = false
 
     fun compareTo(v: Playlist, sortBy: Int) = when (sortBy) {
-        Settings.SORT_BY_CREATION -> {
-            (createdAt - v.createdAt).toInt()
-        }
-        Settings.SORT_BY_RECENT -> {
-            (updatedAt - v.updatedAt).toInt()
+//        Settings.SORT_BY_CREATION -> {
+//            (createdAt - v.createdAt).toInt()
+//        }
+//        Settings.SORT_BY_RECENT -> {
+//            (updatedAt - v.updatedAt).toInt()
+//        }
+        Settings.SORT_BY_NAME_UP -> {
+            val fch = title.first()
+            val sch = v.title.first()
+            sch.code - fch.code
         }
         else -> {
             val fch = title.first()
             val sch = v.title.first()
-            fch.toInt() - sch.toInt()
+            fch.code - sch.code
         }
     }
 

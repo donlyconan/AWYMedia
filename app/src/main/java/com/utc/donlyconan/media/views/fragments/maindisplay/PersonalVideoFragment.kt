@@ -63,7 +63,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                 videoAdapter.submit(videos)
             } else {
                 hideLoading()
-                val data = videos.sortedByCreatedDate(true)
+                val data = videos.sortedByCreatedDate(settings.sortBy == Settings.SORT_VIDEO_BY_CREATION_DOWN)
                 videoAdapter.submit(data)
             }
         }
@@ -146,25 +146,19 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                     }
                 }
             }
-            R.id.btn_sort_by_name -> {
-                settings.sortBy = Settings.SORT_BY_NAME
-//                adapter.getData().sortWith { u, v -> u.compareTo(v, settings.sortBy) }
-                videoAdapter.notifyDataSetChanged()
+            R.id.btn_sort_by_creation_up -> {
+                settings.sortBy = Settings.SORT_VIDEO_BY_CREATION_UP
+                viewModel.videosLd.value?.sortedByCreatedDate(false)?.let { data ->
+                    videoAdapter.submit(data)
+                    videoAdapter.notifyDataSetChanged()
+                }
             }
-            R.id.btn_sort_by_creation -> {
-                settings.sortBy = Settings.SORT_BY_CREATION
-//                adapter.videos.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
-                videoAdapter.notifyDataSetChanged()
-            }
-            R.id.btn_sort_by_recent -> {
-                settings.sortBy = Settings.SORT_BY_RECENT
-//                adapter.videos.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
-                videoAdapter.notifyDataSetChanged()
-            }
-            R.id.btn_sort_by_duration -> {
-                settings.sortBy = Settings.SORT_BY_DURATION
-//                adapter.videos.sortWith { u, v -> u.compareTo(v, settings.sortBy) }
-                videoAdapter.notifyDataSetChanged()
+            R.id.btn_sort_by_creation_down -> {
+                settings.sortBy = Settings.SORT_VIDEO_BY_CREATION_DOWN
+                viewModel.videosLd.value?.sortedByCreatedDate(true)?.let { data ->
+                    videoAdapter.submit(data)
+                    videoAdapter.notifyDataSetChanged()
+                }
             }
         }
     }

@@ -14,53 +14,58 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/sort_by"
+        android:fontFamily="@font/graduate"
         android:textSize="20sp" />
 
-    <LinearLayout
+    <RadioGroup
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/btn_sort_by_name"
+        <RadioButton
+            android:id="@+id/btn_sort_by_name_up"
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:buttonTint="@color/white"
             android:text="@string/name"
-            android:drawableStart="@drawable/sort_by_alpha"
-            android:drawableEnd="@drawable/ic_up"/>
+            android:drawableStart="@drawable/ic_up"
+            android:drawableEnd="@drawable/sort_by_alpha"/>
 
 
-
-        <TextView
-            android:id="@+id/btn_sort_by_duration"
+        <RadioButton
+            android:id="@+id/btn_sort_by_name_down"
             style="@style/BottomMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/duration"
-            android:drawableStart="@drawable/timelapse"
-            android:drawableEnd="@drawable/ic_up"/>
+            android:text="@string/name"
+            android:buttonTint="@color/white"
+            android:drawableStart="@drawable/ic_down"
+            android:drawableEnd="@drawable/sort_by_alpha"/>
 
-        <TextView
-            android:id="@+id/btn_sort_by_creation"
-            style="@style/BottomMenuItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/created_at"
-            android:drawableStart="@drawable/ic_creation"
-            android:drawableEnd="@drawable/ic_up"/>
+<!--        <RadioButton-->
+<!--            android:id="@+id/btn_sort_by_creation"-->
+<!--            style="@style/BottomMenuItem"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/created_at"-->
+<!--            android:buttonTint="@color/white"-->
+<!--            android:checked="true"-->
+<!--            android:drawableStart="@drawable/ic_creation"-->
+<!--            android:drawableEnd="@drawable/ic_up"/>-->
 
-        <TextView
-            android:id="@+id/btn_sort_by_recent"
-            style="@style/BottomMenuItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/recent"
-            android:drawableStart="@drawable/ic_recent"
-            android:drawableEnd="@drawable/ic_up"/>
+<!--        <RadioButton-->
+<!--            android:id="@+id/btn_sort_by_recent"-->
+<!--            style="@style/BottomMenuItem"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/recent"-->
+<!--            android:buttonTint="@color/white"-->
+<!--            android:drawableStart="@drawable/ic_recent"-->
+<!--            android:drawableEnd="@drawable/ic_up"/>-->
 
-    </LinearLayout>
+    </RadioGroup>
 
 </LinearLayout>

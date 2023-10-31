@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.core.os.bundleOf
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -23,6 +25,7 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
     private val map by lazy { HashMap<Int, Boolean>() }
     private var onInitialView: OnInitialView? = null
     private var viewGones = ArrayList<Int>()
+    private var checkedViewId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +65,9 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         })
+        if(container is RadioGroup && checkedViewId != -1) {
+            container.check(checkedViewId)
+        }
     }
 
     fun setOnInitialView(listener: OnInitialView): MenuMoreOptionFragment {
@@ -90,6 +96,12 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
     fun setViewState(viewId: Int, isSelected: Boolean): MenuMoreOptionFragment {
         Log.d(TAG, "setSelectedView() called with: viewId = $viewId, isSelected = $isSelected")
         map[viewId] = isSelected
+        return this
+    }
+
+    fun setCheckedId(viewId: Int): MenuMoreOptionFragment {
+        Log.d(TAG, "setCheckedId() called with: viewId = $viewId")
+        this.checkedViewId = viewId
         return this
     }
 

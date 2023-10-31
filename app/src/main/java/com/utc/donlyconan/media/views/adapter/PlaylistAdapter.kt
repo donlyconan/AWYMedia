@@ -86,6 +86,7 @@ class PlaylistAdapter(var context: Context,
                 .load(video?.videoUri)
                 .placeholder(R.drawable.im_loading)
                 .error(R.drawable.img_error)
+                .optionalCircleCrop()
                 .circleCrop()
                 .into(binding.thumbnailCard)
 

@@ -21,13 +21,12 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
-import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.components.getMediaUri
-import com.utc.donlyconan.media.views.fragments.MainDisplayFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.VideoTask
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import kotlinx.coroutines.CoroutineExceptionHandler

@@ -1,9 +1,7 @@
-package com.utc.donlyconan.media.views.fragments
+package com.utc.donlyconan.media.views.fragments.maindisplay
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -12,7 +10,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -20,6 +17,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
@@ -28,8 +26,6 @@ import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
-import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
-import com.utc.donlyconan.media.views.fragments.maindisplay.PlaylistFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,7 +55,8 @@ class MainDisplayFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
+        Log.d(
+            TAG, "onCreateView() called with: inflater = $inflater, container = $container, " +
                     "savedInstanceState = $savedInstanceState")
         setHasOptionsMenu(true)
 
@@ -93,7 +90,8 @@ class MainDisplayFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated() called with: view = $view, " + "savedInstanceState = " +
+        Log.d(
+            TAG, "onViewCreated() called with: view = $view, " + "savedInstanceState = " +
                     "$savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
         setUpViewPager()
@@ -171,8 +169,9 @@ class MainDisplayFragment : BaseFragment() {
                 startActivity(intent)
             }
             R.id.it_search -> {
-                val action = MainDisplayFragmentDirections
-                    .actionMainDisplayFragmentToSearchBarFragment(binding.viewPager2.currentItem)
+                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToSearchBarFragment(
+                        binding.viewPager2.currentItem
+                    )
                 findNavController().navigate(action)
             }
             R.id.it_sync_data -> {
@@ -184,13 +183,23 @@ class MainDisplayFragment : BaseFragment() {
                 val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)
                if(fragment is PersonalVideoFragment) {
                    fragment.let { frag ->
-                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, listener = frag)
+                        val checkId = if(settings.sortBy == Settings.SORT_VIDEO_BY_CREATION_UP) {
+                            R.id.btn_sort_by_creation_up
+                        } else {
+                            R.id.btn_sort_by_creation_down
+                        }
+                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_video_option, listener = frag)
+                           .setCheckedId(checkId)
                            .show(supportFragmentManager, TAG)
                    }
                } else if(fragment is PlaylistFragment) {
                    fragment.let { frag ->
+                       val checkId = when(settings.playlistSortBy) {
+                           Settings.SORT_BY_NAME_UP -> R.id.btn_sort_by_name_up
+                           else -> R.id.btn_sort_by_name_down
+                       }
                        MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, listener = frag)
-                           .setVisibility(R.id.btn_sort_by_duration)
+                           .setCheckedId(checkId)
                            .show(supportFragmentManager, TAG)
                    }
                }
