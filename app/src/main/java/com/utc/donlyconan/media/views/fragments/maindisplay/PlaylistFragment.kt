@@ -63,7 +63,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated: ")
-        adapter = PlaylistAdapter(context!!, arrayListOf())
+        adapter = PlaylistAdapter(context!!, arrayListOf(), true)
         adapter.onItemClickListener = this
         adapter.onItemLongClickListener = this
         binding.recyclerView.adapter = adapter
@@ -72,7 +72,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         viewModel.listPlaylist.observe(this) { playlists ->
             lifecycleScope.launch(Dispatchers.IO) {
                 playlists.forEach { playlist: Playlist ->
-                    playlist.itemSize = playlistRepo.countVideos(playlistRepo.countVideos(playlist.playlistId!!))
+                    playlist.itemSize = playlistRepo.countVideos(playlist.playlistId!!)
                     playlist.firstVideo = playlistRepo.getFirstVideo(playlist.playlistId!!)
                 }
                 if(playlists.isEmpty()) {

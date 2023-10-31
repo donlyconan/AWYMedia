@@ -48,7 +48,8 @@ class PrivateFolderFragment : ListVideosFragment() {
             findNavController().navigateUp()
         }
         setHasOptionsMenu(true)
-        unlockMode = true
+        hideViews.clear()
+        hideViews.add(R.id.btn_lock)
     }
 
     override fun onCreateView(

@@ -5,18 +5,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.formatToTime
+import com.utc.donlyconan.media.app.utils.setVideoImage
 import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
 import com.utc.donlyconan.media.databinding.ItemTrashBinding
-import java.text.DateFormat
-import java.util.Objects
 
 
 class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
@@ -78,17 +73,7 @@ class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
                 trash.setSelected(isChecked)
             }
 
-            Glide.with(itemView.context)
-                .applyDefaultRequestOptions(
-                    RequestOptions()
-                        .fallback(R.drawable.ic_baseline_error_24)
-                        .diskCacheStrategy(DiskCacheStrategy.DATA)
-                )
-                .load(trash.videoUri.toUri())
-                .placeholder(R.drawable.im_loading)
-                .error(R.drawable.img_error)
-                .fitCenter()
-                .into(binding.imgThumbnail)
+            binding.imgThumbnail.setVideoImage(trash.videoUri)
 
             if (isLastItem) {
                 binding.container.apply {

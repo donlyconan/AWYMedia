@@ -15,7 +15,8 @@ import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.TAG
 
 class PlaylistAdapter(var context: Context,
-                      var playlists: ArrayList<Playlist>) :
+                      var playlists: ArrayList<Playlist>,
+                      val showOptionMenu: Boolean) :
     ListAdapter<Playlist, PlaylistAdapter.PlaylistHolder>(Playlist.diffUtil), OnItemClickListener {
 
     var onItemLongClickListener: OnItemLongClickListener? = null
@@ -32,7 +33,7 @@ class PlaylistAdapter(var context: Context,
     override fun onBindViewHolder(holder: PlaylistHolder, position: Int) {
         val item = playlists[position]
         holder.onItemLongClickListener = onItemLongClickListener
-        holder.bind(item, item.firstVideo, this, position == itemCount - 1)
+        holder.bind(item, item.firstVideo, this, position == itemCount - 1, showOptionMenu)
     }
 
     override fun getItemCount(): Int {

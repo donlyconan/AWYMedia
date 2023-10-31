@@ -145,7 +145,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 player.apply {
                     setMediaItem(MediaItem.fromUri(video.videoUri))
                     prepare()
-                    play()
+                    viewModel.playWhenReadyMld.value = true
                 }
             }
             speedMld.observe(this@VideoDisplayActivity) { speed ->
@@ -359,7 +359,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 service?.play(player.currentMediaItem!!, player.repeatMode)
                 player.pause()
                 viewModel.viewModelScope.launch {
-                    delay(500)
+                    delay(300)
                     finish()
                 }
             }

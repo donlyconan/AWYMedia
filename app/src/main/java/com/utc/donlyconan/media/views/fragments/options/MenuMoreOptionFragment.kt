@@ -75,6 +75,12 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
         return this
     }
 
+    fun setGoneViews(viewIds: List<Int>): MenuMoreOptionFragment {
+        Log.d(TAG, "setGoneViews() called with: viewIds = $viewIds")
+        viewGones.addAll(viewIds)
+        return this
+    }
+
     override fun onClick(view: View) {
         Log.d(TAG, "onClick() called with: view = $view")
         listener?.onClick(view)

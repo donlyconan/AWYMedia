@@ -111,7 +111,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
 
         override fun onInitialVideo(uri: Uri) {
             Log.d(TAG, "onInitialVideo() called with: uri = $uri")
-            Glide.with(requireContext())
+            Glide.with(requireContext().applicationContext)
                 .load(uri)
                 .circleCrop()
                 .into(binding.fab)
@@ -177,6 +177,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     override fun onDetach() {
         super.onDetach()
         Log.d(TAG, "onDetach() called")
+        application.getAudioService()?.removePlayerListener(listener)
     }
 
     companion object {

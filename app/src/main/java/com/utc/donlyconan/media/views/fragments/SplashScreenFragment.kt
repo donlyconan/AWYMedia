@@ -43,23 +43,6 @@ class SplashScreenFragment : BaseFragment() {
         Log.d(TAG, "onCreate: ")
         (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        // Inflate the layout for this fragment
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onResume() {
-        Log.d(TAG, "onResume() called")
-        super.onResume()
         GlobalScope.launch(Dispatchers.IO) {
             val startPoint = now()
 
@@ -89,6 +72,14 @@ class SplashScreenFragment : BaseFragment() {
                 settings.isWellcome = true
             }
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Inflate the layout for this fragment
+        return binding.root
     }
 
     private suspend fun deleteDataIfNeed() {

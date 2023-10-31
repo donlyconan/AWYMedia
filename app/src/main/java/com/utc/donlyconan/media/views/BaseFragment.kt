@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
+import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
@@ -157,6 +158,11 @@ abstract class BaseFragment : Fragment() {
     fun startPlayMusic(video: Video) {
         Logs.d( "startPlayMusic() called with: video = $video")
         application.getAudioService()?.play(MediaItem.fromUri(video.videoUri))
+    }
+
+    fun startPlayMusic(playlist: List<MediaItem>, index: Int = 0) {
+        Logs.d( "startPlayMusic() called with: playlist = $playlist, index = $index")
+        application.getAudioService()?.play(playlist, index)
     }
 
 

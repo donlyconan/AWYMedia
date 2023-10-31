@@ -28,15 +28,16 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
     
     protected lateinit var videoAdapter: VideoAdapter
     protected var audioService: AudioService? = null
-    protected var unlockMode = false
     @Inject lateinit var videoRepo: VideoRepository
     protected var handlingVideoTask: VideoTask? = null
+    protected val hideViews by lazy { ArrayList<Int>() }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appComponent.inject(this)
         audioService = application.getAudioService()
+        hideViews.add(R.id.btn_unlock)
     }
 
     override fun onItemClick(v: View, position: Int) {
@@ -65,7 +66,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                         Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
                     }
                 }
-            }.setVisibility(if (unlockMode) R.id.btn_lock else R.id.btn_unlock)
+            }.setGoneViews(hideViews)
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {

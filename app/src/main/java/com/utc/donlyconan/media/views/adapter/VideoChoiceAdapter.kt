@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
+import com.utc.donlyconan.media.app.utils.setVideoImage
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemVideoChoiceBinding
 import com.utc.donlyconan.media.extension.widgets.TAG
@@ -77,9 +77,8 @@ class VideoChoiceAdapter(var context: Context, var videos: ArrayList<Video>) :
             Log.d(TAG, "bind() called with: video = $video, isLastItem = $isLastItem")
             binding.tvTitle.text = video.title
             binding.tvSize.text = video.size.convertToStorageData()
-            Glide.with(itemView.context)
-                .load(video.videoUri)
-                .into(binding.imgThumbnail)
+
+            binding.imgThumbnail.setVideoImage(video.videoUri)
             if (isLastItem) {
                 binding.container.apply {
                     val paddingBottom =
