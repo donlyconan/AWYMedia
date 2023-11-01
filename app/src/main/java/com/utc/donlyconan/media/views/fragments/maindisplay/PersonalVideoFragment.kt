@@ -1,32 +1,32 @@
 package com.utc.donlyconan.media.views.fragments.maindisplay
 
 import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
-import com.utc.donlyconan.media.app.utils.Logs
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 /**
@@ -100,6 +100,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             audioService.registerPlayerListener(listener)
             binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
         }
+        binding.fab.setOnTouchListener(onTouchEvent)
 
     }
 
@@ -143,15 +144,6 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     override fun onClick(v: View) {
         Log.d(TAG, "onClick() called with: v = $v")
         when (v.id) {
-            R.id.fab -> {
-                application.getAudioService()?.let { service ->
-                    if(binding.fab.isSelected) {
-                        service.stop()
-                    } else {
-                        service.start()
-                    }
-                }
-            }
             R.id.btn_sort_by_creation_up -> {
                 settings.sortBy = Settings.SORT_VIDEO_BY_CREATION_UP
                 viewModel.videosLd.value?.sortedByCreatedDate(false)?.let { data ->
@@ -168,6 +160,28 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             }
         }
     }
+
+    protected val onTouchEvent = object : OnTouchListener {
+        var expireTime = now()
+        override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+            if(event?.action == MotionEvent.ACTION_UP) {
+                if(expireTime < now() - 300) {
+                    application.getAudioService()?.let { service ->
+                        if(binding.fab.isSelected) {
+                            service.stop()
+                        } else {
+                            service.start()
+                        }
+                    }
+                } else {
+                    requireActivity().sendBroadcast(Intent(AudioService.ACTION_REQUEST_OPEN_ACTIVITY))
+                }
+                expireTime = now()
+            }
+            return true
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
