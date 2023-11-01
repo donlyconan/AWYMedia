@@ -144,11 +144,11 @@ class AudioService : Service() {
     }
 
     fun releasePlayer() {
-        notificationManager.hideNotification()
         player?.apply {
             stop()
             release()
         }
+        notificationManager.hideNotification()
         mediaStateListener.onAudioServiceAvailable(false)
     }
 
@@ -276,6 +276,9 @@ class AudioService : Service() {
         mediaListeners.add(listener)
         mediaListeners.forEach { e ->
             e.onAudioServiceAvailable(isAvailable())
+            player?.currentMediaItem?.localConfiguration?.uri?.let {uri ->
+                e.onInitialVideo(uri)
+            }
         }
     }
 

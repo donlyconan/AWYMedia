@@ -58,8 +58,9 @@
         <item name="android:windowIsFloating">true</item>
     </style>
 
-    <style name="SheetDialogFullScreen" parent="SheetDialog">
+    <style name="SheetDialogFullScreen" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@color/transparent</item>
     </style>
 
     <style name="SpeedOption">

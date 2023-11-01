@@ -21,7 +21,6 @@ class VideoDisplayViewModel : ViewModel() {
     var isFinished = false
     var isInitialized = true
     var videoId: Int = 0
-    var isResetPosition = false
     var continued: Boolean = false
 
     var playlistId: Int = -1
@@ -29,7 +28,7 @@ class VideoDisplayViewModel : ViewModel() {
     private val _videoMld: MutableLiveData<Video> = MutableLiveData<Video>()
     val videoMld: LiveData<Video> get() = _videoMld
 
-    var playlist = listOf<Video>()
+    var playlist: List<Video>? = null
     private val _playlistMld: MutableLiveData<List<Video>> = MutableLiveData()
     val playlistMld: LiveData<List<Video>> get() = _playlistMld
 
@@ -64,11 +63,11 @@ class VideoDisplayViewModel : ViewModel() {
             } else {
                 _events.value = Result.VideoNotFound()
             }
-
             playlist = playlistWithVideosDao.get(playlistId)?.videos
             if(playlist != null) {
+                playlist!!.forEach { e -> e.playedTime = 0 }
                 _playlistMld.value = playlist
-                playingIndexMld.value = playlist.indexOfFirst { it.videoId == videoId }
+                playingIndexMld.value = playlist!!.indexOfFirst { it.videoId == videoId }
             } else {
                 playingIndexMld.value = 0
             }
@@ -78,29 +77,20 @@ class VideoDisplayViewModel : ViewModel() {
 
     fun replaceVideo(videoId: Int) {
         Log.d(TAG, "replaceVideo() called with: videoId = $videoId")
-        playlist.forEachIndexed { index, video ->
-            if(video.videoId == videoId) {
-                _videoMld.value = video
-                playingIndexMld.value = index
+        if(videoMld.value?.videoId != videoId) {
+            playlist?.forEachIndexed { index, video ->
+                if(video.videoId == videoId) {
+                    _videoMld.value = video
+                    playingIndexMld.value = index
+                }
             }
         }
     }
 
-    fun hasNext() = playingIndexMld.value!! < (playlist?.size ?: 0)
+    fun hasNext() = playingIndexMld.value!! < (playlist?.size ?: 0) - 1
 
     fun hasPrev() =  playingIndexMld.value!! > 0
 
-    /**
-     * Set status finish for playing operation and save video state
-     */
-    suspend fun finish() {
-        Log.d(TAG, "endVideo() called")
-        isFinished = true
-        videoMld.value?.let { video ->
-            video.playedTime = 0
-            videoRepo.update(video)
-        }
-    }
 
     suspend fun save(position: Long = 0L) {
         Log.d(TAG, "save() called with: position = $position")
@@ -108,6 +98,16 @@ class VideoDisplayViewModel : ViewModel() {
         video?.apply {
             playedTime = if(isFinished) 0L else position
             videoRepo.update(this)
+        }
+    }
+
+    fun saveTempState(position: Long) {
+        val index = playingIndexMld.value!!
+        Log.d(TAG, "saveTempState() called with: index = $index")
+        if(isListMode() && index >= 0 && index < playlist!!.size) {
+            playlist!!.get(index).let { video ->
+                video.playedTime = position
+            }
         }
     }
 
@@ -119,24 +119,40 @@ class VideoDisplayViewModel : ViewModel() {
 
     fun moveNext() {
         var index = playingIndexMld.value!!
-        index++
-        if(index < playlist.size) {
-            _videoMld.value = playlist[index]
+        if(hasNext()) {
+            index++
+            _videoMld.value = playlist!!.get(index)
+            playingIndexMld.value = index
+            if(continued) {
+                playingTimeMld.value = videoMld.value!!.playedTime
+            }
+        } else {
+            _events.postValue(Result.CanNotMoveNext)
         }
-        playingIndexMld.value = index
     }
 
     fun movePrevious() {
         var index = playingIndexMld.value!!
-        index--
-        if(index >= 0) {
-            _videoMld.value = playlist[index]
+        if(hasPrev()) {
+            index--
+            _videoMld.value = playlist!!.get(index)
+            playingIndexMld.value = index
+            if(continued) {
+                playingTimeMld.value = videoMld.value!!.playedTime
+            }
+        } else {
+            _events.postValue(Result.CanNotMovePrevious)
         }
-        playingIndexMld.value = index
+    }
+
+    fun isListMode(): Boolean {
+        return playlist?.isNotEmpty() == true
     }
 
     sealed class Result {
         class VideoNotFound(): Result()
+        object CanNotMoveNext: Result()
+        object CanNotMovePrevious: Result()
     }
 
 }

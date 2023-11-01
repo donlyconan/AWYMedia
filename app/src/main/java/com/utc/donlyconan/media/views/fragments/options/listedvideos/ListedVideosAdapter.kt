@@ -36,6 +36,7 @@ class ListedVideosAdapter(
         override fun bind(value: Any) {
             val video = value as Video
             binding.tvTitle.text = video.title
+            binding.imgChecked.isChecked = video.isChecked
             Glide.with(itemView.context)
                 .load(video.videoUri)
                 .centerCrop()

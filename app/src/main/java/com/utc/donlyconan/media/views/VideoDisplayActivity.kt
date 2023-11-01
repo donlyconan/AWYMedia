@@ -1,7 +1,7 @@
 package com.utc.donlyconan.media.views
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.app.SharedElementCallback.OnSharedElementsReadyListener
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -9,19 +9,16 @@ import android.content.res.Configuration
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.*
-import android.util.DisplayMetrics
 import android.util.Log
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
-import android.widget.FrameLayout
+import android.view.View.OnTouchListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
+import androidx.core.app.SharedElementCallback
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -35,9 +32,11 @@ import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.androidFile
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
 import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
+import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.VideoDisplayViewModel
 import com.utc.donlyconan.media.views.fragments.options.SpeedOptionFragment
 import com.utc.donlyconan.media.views.fragments.options.VideoMenuMoreFragment
@@ -47,12 +46,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 
 /**
  * Lớp cung cấp các phương tiện chức năng hỗ trợ cho việc phát video
  */
-class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
+class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListener, GestureDetector.OnGestureListener,
+    GestureDetector.OnDoubleTapListener {
 
     companion object {
         const val EXTRA_VIDEO_ID = "media.EXTRA_VIDEO_ID"
@@ -111,6 +112,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
 
+    lateinit var gestureDetector: GestureDetector
+    var expireBackTime: Long = now()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -138,6 +143,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         }
 
         binding.player.player = player
+        gestureDetector = GestureDetector(this, this)
         player.addListener(listener)
 
         with(viewModel) {
@@ -184,6 +190,17 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                     customBinding.btnPrev?.setEnabledState(true)
                 }
             }
+            events.observe(this@VideoDisplayActivity) { event ->
+                when(event) {
+                    VideoDisplayViewModel.Result.CanNotMoveNext -> {
+                        showMessage("Đã di chuyển hết danh sách")
+                    }
+                    VideoDisplayViewModel.Result.CanNotMovePrevious -> {
+                        showMessage("Đã di chuyển hết danh sách")
+                    }
+                    else -> null
+                }
+            }
         }
         initializeViews()
     }
@@ -192,23 +209,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         super.onNewIntent(intent)
         Log.d(TAG, "onNewIntent: ")
         viewModel.isInitialized = false
-    }
-
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun setupScreenFeature() {
-        Logs.d("setupScreenFeature() called")
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-//        val insetController = WindowCompat.getInsetsController(window, window.decorView)
-//        insetController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH
-//        window.decorView.setOnApplyWindowInsetsListener { v, insets ->
-//            if(insets.isVisible(WindowInsetsCompat.Type.navigationBars()) or
-//                insets.isVisible(WindowInsetsCompat.Type.statusBars())) {
-//                insetController.hide(WindowInsetsCompat.Type.statusBars())
-//                insetController.hide(WindowInsetsCompat.Type.navigationBars())
-//            }
-//            v.onApplyWindowInsets(insets)
-//        }
     }
 
     // Generate a media item with a subtitle preparing
@@ -230,10 +230,18 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
 
     private fun showPlaylist(playlistId: Int) {
         Logs.d(TAG, "showPlaylist() called with: playlistId = $playlistId")
-        val dialog = ListedVideosDialog.newInstance(playlistId, object : OnSelectedChangeListener {
+        val currentState = player.playWhenReady
+        player.pause()
+        val dialog = ListedVideosDialog.newInstance(playlistId, viewModel.playingIndexMld.value!!, object : OnSelectedChangeListener {
             override fun onSelectionChanged(videoId: Int) {
                 Logs.d(TAG, "onSelectionChanged() called with: videoId = $videoId")
+                player.playWhenReady = currentState
                 viewModel.replaceVideo(videoId)
+            }
+
+            override fun onBackPress() {
+                Log.d(TAG, "onBackPress() called")
+                requestExist()
             }
         })
         dialog.show(supportFragmentManager, TAG)
@@ -280,7 +288,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         Log.d(TAG, "initialize() called with: landscapeMode = $landscapeMode")
         with(customBinding) {
             exoLoop?.setOnClickListener(listener)
-            exoLock?.setOnClickListener(listener)
+            exoLock.setOnClickListener(listener)
             btnNext?.setOnClickListener(listener)
             exoPlaybackSpeed?.setOnClickListener(listener)
             btnPrev?.setOnClickListener(listener)
@@ -377,10 +385,8 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             }
 
             R.id.exo_play_music -> {
-                finish()
                 val position = player.currentPosition
-                GlobalScope.launch {
-                    delay(100)
+                lifecycleScope.launch {
                     var playlist = viewModel.playlist?.map { it.videoUri }?.toTypedArray()
                     if (playlist == null) {
                         playlist = arrayOf(viewModel.videoMld.value!!.videoUri)
@@ -395,6 +401,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                         )
                     )
                 }
+                finish()
             }
             R.id.exo_subtitles -> {
                 player.pause()
@@ -418,6 +425,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         // put flag inhere to prevent #onIsPlayingChanged
         val value = super.dispatchTouchEvent(ev)
+        gestureDetector.onTouchEvent(ev!!)
         return value
     }
 
@@ -483,6 +491,12 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        return true
+    }
+
+
+
     @SuppressLint("InlinedApi")
     private fun hideSystemUi() {
         Log.d(TAG, "hideSystemUi() called")
@@ -499,6 +513,97 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
                 window.decorView.systemUiVisibility = systemFlags
             }
         }
+
+    override fun onDown(e: MotionEvent): Boolean {
+        Log.d(TAG, "GestureDetector#onDown() called with: e = $e")
+        // location in x must be under 50 and time
+        val land = requestedOrientation == Configuration.ORIENTATION_LANDSCAPE
+        val requestDistance = if(land) 100 else 50
+        if(e.x < requestDistance && viewModel.isListMode()) {
+            showPlaylist(viewModel.playlistId)
+            return true
+        }
+        return false
+    }
+
+    override fun onShowPress(e: MotionEvent) {
+        Log.d(TAG, "GestureDetector#onShowPress() called with: e = $e")
+    }
+
+    override fun onSingleTapUp(e: MotionEvent): Boolean {
+        Log.d(TAG, "GestureDetector#onSingleTapUp() called with: e = $e")
+        return true
+    }
+
+    override fun onScroll(
+        e1: MotionEvent,
+        e2: MotionEvent,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
+        return true
+    }
+
+    override fun onLongPress(e: MotionEvent) {
+        Log.d(TAG, "GestureDetector#onLongPress() called with: e = $e")
+    }
+
+    override fun onFling(
+        e1: MotionEvent,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
+        Log.d(TAG, "GestureDetector#onFling() called with: e1 = $e1, e2 = $e2, velocityX = $velocityX, velocityY = $velocityY")
+        // velocity is above -4000
+        binding.player.hideController()
+        if(abs(velocityX) > 5000 && viewModel.isListMode()) {
+            if (e2.x - e1.x > 300) {
+                Log.d(TAG, "onFling: Move next")
+                viewModel.continued = true
+                viewModel.saveTempState(player.currentPosition)
+                viewModel.moveNext()
+            }
+
+            if(e1.x - e2.x > 300){
+                Log.d(TAG, "onFling: Move down")
+                viewModel.continued = true
+                viewModel.saveTempState(player.currentPosition)
+                viewModel.movePrevious()
+            }
+        }
+        return true
+    }
+
+    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+        Log.d(TAG, "GestureDetector#onSingleTapConfirmed() called with: e = $e")
+        return true
+    }
+
+    override fun onDoubleTap(e: MotionEvent): Boolean {
+        Log.d(TAG, "GestureDetector#onDoubleTap() called with: e = $e")
+        return true
+    }
+
+    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
+        return true
+    }
+
+
+    override fun onBackPressed() {
+        requestExist()
+    }
+
+    private fun requestExist() {
+        Log.d(TAG, "requestExist() called allowBackPress=$${expireBackTime >= now()}")
+        if (expireBackTime >= now()) {
+            onBackPressedDispatcher.onBackPressed()
+        } else {
+            showMessage("Back again to exit")
+            expireBackTime = now() + 2000
+        }
+    }
+
 }
 
 fun View.setEnabledState(isEnabled: Boolean) {

@@ -82,59 +82,11 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
             videoAdapter.submit(videoPl.videos)
             binding.title.text = videoPl.playlist.title
         }
+        hideViews.add(R.id.btn_unlock)
     }
 
-
-    override fun onItemClick(v: View, position: Int) {
-        Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = videoAdapter.getItem(position) as Video
-
-        if (v.id == R.id.img_menu_more) {
-            MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
-                when (view.id) {
-                    R.id.btn_play -> {
-                        startVideoDisplayActivity(video.videoId, video.videoUri, -1)
-                    }
-                    R.id.btn_play_music -> {
-                        application.getAudioService()?.play(MediaItem.fromUri(video.videoUri))
-                    }
-                    R.id.btn_favorite -> {
-                        video.isFavorite = !video.isFavorite
-                        videoRepo.update(video)
-                        videoAdapter.notifyItemChanged(position)
-                    }
-                    R.id.btn_delete -> {
-                        playlistRepo.deleteFromPlaylist(video.videoId, args.playlistId)
-                    }
-                    R.id.btn_share -> {
-                        val intent = Intent(Intent.ACTION_SEND)
-                        intent.type = getString(R.string.type_all_video)
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
-                        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.shared_file))
-                        startActivity(Intent.createChooser(intent, getString(R.string.share_file)))
-                    }
-                    else -> {
-                        Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
-                    }
-                }
-            }
-                .setOnInitialView(object : MenuMoreOptionFragment.OnInitialView {
-
-                    override fun onInitial(v: View) {
-                        Log.d(TAG, "onInitial() called with: v = $v")
-                        v.findViewById<TextView>(R.id.btn_delete)
-                            .apply {
-                                text = getString(R.string.remove_from_play_list)
-                            }
-                    }
-
-                })
-                .setViewState(R.id.btn_favorite, video.isFavorite)
-                .show(parentFragmentManager, PersonalVideoFragment.TAG)
-        } else {
-            val intent = VideoDisplayActivity.newIntent(requireContext(), video.videoId, video.videoUri, args.playlistId)
-            startActivity(intent)
-        }
+    override fun getPlaylistId(): Int {
+        return args.playlistId
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

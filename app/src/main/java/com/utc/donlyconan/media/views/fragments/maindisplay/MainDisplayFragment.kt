@@ -102,13 +102,6 @@ class MainDisplayFragment : BaseFragment() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume: ")
-        // Release service media if need
-        application.getAudioService()?.releasePlayer()
-    }
-
     private fun setUpViewPager() {
         Log.d(TAG, "setUpViewPager() called")
         mainDisplayAdapter = MainDisplayAdapter(this)

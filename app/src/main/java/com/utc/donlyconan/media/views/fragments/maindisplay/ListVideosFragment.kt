@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.FileManager
 import com.utc.donlyconan.media.app.services.AudioService
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.components.getMediaUri
 import com.utc.donlyconan.media.views.BaseFragment
@@ -45,8 +46,17 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
-                    R.id.btn_play -> startVideoDisplayActivity(video.videoId, video.videoUri)
-                    R.id.btn_play_music -> playMusic(video)
+                    R.id.btn_play -> startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId())
+                    R.id.btn_play_music -> {
+                        if(getPlaylistId() < 0) {
+                            playMusic(video)
+                        } else {
+                            val videos = videoAdapter.getData().filterIsInstance<Video>()
+                            val index = videos.indexOfFirst { vd -> vd.videoId == video.videoId }
+                            val items = videos.map { MediaItem.fromUri(it.videoUri) }
+                            startPlayMusic(items, index)
+                        }
+                    }
                     R.id.btn_favorite -> {
                         video.isFavorite = !video.isFavorite
                         videoRepo.update(video)
@@ -70,6 +80,10 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         } else {
             startVideoDisplayActivity(video.videoId, video.videoUri)
         }
+    }
+
+    open fun getPlaylistId(): Int {
+        return -1
     }
 
 
