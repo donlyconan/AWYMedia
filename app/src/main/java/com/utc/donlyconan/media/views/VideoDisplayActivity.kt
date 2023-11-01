@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.views
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -8,11 +9,16 @@ import android.content.res.Configuration
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.*
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -29,7 +35,6 @@ import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.androidFile
-import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
 import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
@@ -114,7 +119,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             com.inject(this)
             com.inject(viewModel)
         }
-
         service?.releasePlayer()
 
         playerControlBinding =
@@ -188,6 +192,23 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
         super.onNewIntent(intent)
         Log.d(TAG, "onNewIntent: ")
         viewModel.isInitialized = false
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun setupScreenFeature() {
+        Logs.d("setupScreenFeature() called")
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+//        val insetController = WindowCompat.getInsetsController(window, window.decorView)
+//        insetController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH
+//        window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+//            if(insets.isVisible(WindowInsetsCompat.Type.navigationBars()) or
+//                insets.isVisible(WindowInsetsCompat.Type.statusBars())) {
+//                insetController.hide(WindowInsetsCompat.Type.statusBars())
+//                insetController.hide(WindowInsetsCompat.Type.navigationBars())
+//            }
+//            v.onApplyWindowInsets(insets)
+//        }
     }
 
     // Generate a media item with a subtitle preparing
@@ -356,11 +377,23 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
             }
 
             R.id.exo_play_music -> {
-                service?.play(player.currentMediaItem!!, player.repeatMode)
-                player.pause()
-                viewModel.viewModelScope.launch {
-                    delay(300)
-                    finish()
+                finish()
+                val position = player.currentPosition
+                GlobalScope.launch {
+                    delay(100)
+                    var playlist = viewModel.playlist?.map { it.videoUri }?.toTypedArray()
+                    if (playlist == null) {
+                        playlist = arrayOf(viewModel.videoMld.value!!.videoUri)
+                    }
+                    sendBroadcast(
+                        AudioService.createIntent(
+                            playlist,
+                            viewModel.playingIndexMld.value!!,
+                            viewModel.repeatModeMld.value!!,
+                            viewModel.speedMld.value!!,
+                            position
+                        )
+                    )
                 }
             }
             R.id.exo_subtitles -> {
@@ -453,8 +486,8 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("InlinedApi")
     private fun hideSystemUi() {
         Log.d(TAG, "hideSystemUi() called")
-        window.decorView.systemUiVisibility = systemFlags
-        window.decorView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener)
+//        window.decorView.systemUiVisibility = systemFlags
+//        window.decorView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener)
     }
 
 

@@ -5,6 +5,7 @@ import androidx.room.*
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.views.adapter.Selectable
+import java.io.File
 
 @Entity(tableName = "trashes", indices = [Index(value = ["video_uri"], unique = true)])
 data class Trash(
@@ -66,10 +67,14 @@ data class Trash(
     }
 
     fun convertToVideo(): Video {
-        return Video(videoId, title, videoUri, duration, size, type, 0, createdAt, now(), isFavorite, isSecured, subtitleUri)
+        return Video(videoId!!, title, videoUri, duration, size, type, 0, createdAt, now(), isFavorite, isSecured, subtitleUri)
     }
 
     companion object {
+        fun fromFile(file: File): Trash {
+            return Trash(-1, file.name, file.name, 0, file.length(), file.extension, file.lastModified())
+        }
+
         val diffUtil = object : DiffUtil.ItemCallback<Any>() {
             override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
                 return if (oldItem is Trash && newItem is Trash) {

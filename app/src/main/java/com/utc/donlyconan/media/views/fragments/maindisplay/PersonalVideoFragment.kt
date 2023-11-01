@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
@@ -16,12 +17,15 @@ import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -95,6 +99,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             audioService.registerPlayerListener(listener)
             binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
         }
+
     }
 
 

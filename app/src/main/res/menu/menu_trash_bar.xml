@@ -6,4 +6,9 @@
         android:icon="@drawable/ic_baseline_delete_24"
         android:title="@string/remove_all"
         app:showAsAction="always"/>
+
+    <item android:id="@+id/it_restore"
+        android:icon="@drawable/ic_baseline_restore_24"
+        android:title="@string/restore"
+        app:showAsAction="always"/>
 </menu>

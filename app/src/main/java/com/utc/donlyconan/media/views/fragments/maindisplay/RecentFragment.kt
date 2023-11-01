@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
+import com.utc.donlyconan.media.app.utils.sortedByUpdatedDate
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentRecentBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
@@ -31,6 +32,7 @@ class RecentFragment : ListVideosFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
+        hideViews.add(R.id.btn_unlock)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -54,7 +56,7 @@ class RecentFragment : ListVideosFragment() {
             } else {
                 hideLoading()
             }
-            val sortedData = videos.sortedByCreatedDate(true)
+            val sortedData = videos.sortedByUpdatedDate(true)
             videoAdapter.submit(sortedData)
         }
     }

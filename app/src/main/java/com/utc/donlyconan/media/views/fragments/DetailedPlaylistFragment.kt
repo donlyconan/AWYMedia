@@ -65,7 +65,7 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
-        binding.title.text = "Untitled"
+        binding.title.setText(R.string.untitled)
 
         videoAdapter = VideoAdapter(requireContext(), arrayListOf())
         videoAdapter.setOnItemClickListener(this)

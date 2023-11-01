@@ -5,7 +5,6 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.view.View.OnLongClickListener
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.fragment.app.viewModels
@@ -15,7 +14,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.FileManager
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.convertToStorageData
@@ -27,11 +25,11 @@ import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.BaseFragment
-import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.RecycleBinAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -70,6 +68,9 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(true)
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            trashRepo.sync()
         }
     }
 
@@ -133,6 +134,7 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
         }.show(requireActivity().supportFragmentManager, TAG)
     }
 
+
     override fun onDeletedResult(result: ActivityResult) {
         Logs.d("onDeletedResult() called with: result = $result")
         if(result.resultCode == Activity.RESULT_OK) {
@@ -165,18 +167,41 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
                 AlertDialogManager.createDeleteAlertDialog(
                     requireContext(), getString(R.string.app_name), "Would you like to remove ${items.size} files") {
                     showLoadingScreen()
-                    items.filter { it is Trash }
-                        .map { it as Trash }
-                        .forEach { trash ->
-                            lifecycleScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        items.filter { it is Trash }
+                            .map { it as Trash }
+                            .forEach { trash ->
                                 if (context?.deleteFile(trash.title) == true) {
                                     viewModel.delete(trash)
                                 }
-                                hideLoading()
                             }
-                        }
+                        hideLoading()
+                    }
 
                 }.show()
+            }
+
+            R.id.it_restore -> {
+                val items = adapter.getSelectedItems()
+                if(items.isEmpty()) {
+                    Log.d(TAG, "onOptionsItemSelected: video list is empty!")
+                    requireContext().showMessage("You need to choose at least one item.")
+                    return true
+                }
+                showLoadingScreen()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    items.filterIsInstance<Trash>().forEach { trash ->
+                        if(trash.isSecured) {
+                            viewModel.restore(trash)
+                        } else {
+                            fileManager.removeFromInternal(trash.title!!) {
+                                viewModel.restore(trash)
+                            }
+                        }
+                    }
+                    hideLoading()
+                }
+
             }
         }
         return super.onOptionsItemSelected(item)

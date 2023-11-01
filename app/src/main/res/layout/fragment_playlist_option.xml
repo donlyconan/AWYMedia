@@ -20,6 +20,15 @@
         android:text="@string/view" />
 
     <TextView
+        android:id="@+id/btn_play_music"
+        style="@style/BottomMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/outline_audiotrack_24"
+        android:text="@string/play_sound" />
+
+
+    <TextView
         android:id="@+id/btn_add"
         style="@style/BottomMenuItem"
         android:layout_width="match_parent"

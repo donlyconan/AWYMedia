@@ -1,5 +1,6 @@
 package com.utc.donlyconan.media.views
 
+import android.app.Activity
 import android.app.RecoverableSecurityException
 import android.content.Intent
 import android.content.IntentSender
@@ -26,12 +27,15 @@ import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.components.getMediaUri
+import com.utc.donlyconan.media.extension.components.getVideoInfo
 import com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.VideoTask
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.LinkedList
+import kotlin.math.log
 
 
 /**
@@ -47,9 +51,8 @@ abstract class BaseFragment : Fragment() {
     // loading screen
     protected var lsBinding: LoadingDataScreenBinding? = null
     protected val settings by lazy { appComponent.getSettings() }
-    protected var handlingTask: VideoTask? = null
-
-
+    protected val tasks: LinkedList<VideoTask?> by lazy { LinkedList() }
+    protected var videoTask: VideoTask? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,11 +63,13 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    protected val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+
+
+    private val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         onDeletedResult(result)
     }
 
-    protected val requestPermissionResult = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+    private val requestPermissionResult = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         onPermissionResult(result)
     }
 
@@ -81,8 +86,7 @@ abstract class BaseFragment : Fragment() {
             } catch (e: Exception) {
                 val intentSender: IntentSender? = when {
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                        MediaStore
-                            .createDeleteRequest(contentResolver, uris.toList())
+                        MediaStore.createDeleteRequest(contentResolver, uris.toList())
                             .intentSender
                     }
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
@@ -102,19 +106,27 @@ abstract class BaseFragment : Fragment() {
 
     fun showLoadingScreen() {
         Log.d(MainDisplayFragment.TAG, "showLoadingScreen() called")
-        lsBinding?.apply {
-            llLoading.visibility = View.VISIBLE
-            tvNoData.visibility = View.INVISIBLE
-            frameContainer.visibility = View.VISIBLE
+        lifecycleScope.launch(Dispatchers.Main) {
+            lsBinding?.apply {
+                llLoading.visibility = View.VISIBLE
+                tvNoData.visibility = View.INVISIBLE
+                frameContainer.setBackgroundResource(R.color.loading_dim_color)
+                frameContainer.visibility = View.VISIBLE
+                lsBinding!!.frameContainer.setOnTouchListener { v, event ->  true }
+            }
         }
     }
 
     fun showNoDataScreen() {
         Log.d(ListVideosFragment.TAG, "showNoDataScreen() called")
-        lsBinding?.apply {
-            llLoading.visibility = View.INVISIBLE
-            tvNoData.visibility = View.VISIBLE
-            frameContainer.visibility = View.VISIBLE
+        lifecycleScope.launch(Dispatchers.Main) {
+            lsBinding?.apply {
+                llLoading.visibility = View.INVISIBLE
+                tvNoData.visibility = View.VISIBLE
+                frameContainer.visibility = View.VISIBLE
+                frameContainer.setBackgroundResource(R.color.transparent)
+                frameContainer.setOnTouchListener(null)
+            }
         }
     }
 
@@ -136,7 +148,18 @@ abstract class BaseFragment : Fragment() {
     }
 
     open fun onDeletedResult(result: ActivityResult) {
-        Logs.d( "onDeletedResult() called with: result = $result")
+        Log.d(ListVideosFragment.TAG, "onDeletedResult() called with: result = ${result.resultCode == Activity.RESULT_OK}")
+        try {
+            if(result.resultCode == Activity.RESULT_OK) {
+                videoTask?.succeed?.run()
+            } else {
+                videoTask?.error?.run()
+            }
+        } catch (e: Exception) {
+            Log.e(ListVideosFragment.TAG, "onDeletedResult: ", e)
+            showToast(R.string.toast_when_failed_user_action)
+        }
+        videoTask = null
     }
 
     open fun onPermissionResult(result: Map<String, Boolean>) {
@@ -199,13 +222,14 @@ abstract class BaseFragment : Fragment() {
                 Log.d(ListVideosFragment.TAG, "onItemClick: MediaUri=${video.videoUri.toUri()}")
                 deleteVideoFromExternalStorage(video.videoUri.toUri())
                 val newVideo = video.copy(isSecured = true, videoUri = uri.toString(), title = newName)
-                handlingTask = VideoTask.from(newVideo, succeed = {
+                val video = VideoTask.from(newVideo, succeed = {
                     Log.d(ListVideosFragment.TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
                     // Update the video in the database
                     repository.update(newVideo)
                 }, error = {
                     showToast(R.string.request_action_again)
                 })
+                enqueueVideoTask(video)
             } catch (e: Exception) {
                 showToast(R.string.toast_when_failed_user_action)
             }
@@ -238,7 +262,7 @@ abstract class BaseFragment : Fragment() {
             fileManager.saveIntoInternal(videoUri, video.title!!) { uri, name ->
                 deleteVideoFromExternalStorage(videoUri)
                 val newVideo = video.copy(videoUri = uri.toString(), title = name)
-                handlingTask = VideoTask(listOf(newVideo), succeed = {
+                val video = VideoTask(listOf(newVideo), succeed = {
                     Log.d(ListVideosFragment.TAG, "handle succeeded items")
                     showToast("The file is moved into the Recycle Bin!")
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -249,8 +273,14 @@ abstract class BaseFragment : Fragment() {
                     showToast("Can't delete the file!")
                     context?.deleteFile(newVideo.videoUri)
                 })
+                enqueueVideoTask(video)
             }
         }
+    }
+
+    private fun enqueueVideoTask(videoTask: VideoTask?) {
+        this.videoTask = videoTask
+        tasks.push(videoTask)
     }
 
 }

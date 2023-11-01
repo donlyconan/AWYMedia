@@ -86,9 +86,9 @@ class VideoDisplayViewModel : ViewModel() {
         }
     }
 
-    fun hasNext() = videoId < playlist.size - 1
+    fun hasNext() = playingIndexMld.value!! < (playlist?.size ?: 0)
 
-    fun hasPrev() = videoId > 0
+    fun hasPrev() =  playingIndexMld.value!! > 0
 
     /**
      * Set status finish for playing operation and save video state

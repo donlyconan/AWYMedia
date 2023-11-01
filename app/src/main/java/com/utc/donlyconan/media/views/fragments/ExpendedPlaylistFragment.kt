@@ -13,6 +13,8 @@ import androidx.navigation.fragment.navArgs
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
+import com.utc.donlyconan.media.data.models.Playlist
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.models.VideoPlaylistCrossRef
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
@@ -31,6 +33,7 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
     @Inject lateinit var listVideoRepo: ListVideoRepository
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
     @Inject lateinit var playlistRepo: PlaylistRepository
+    var playlist = mutableListOf<Video>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,12 +65,15 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
         binding.recyclerView.adapter = adapter
         showLoadingScreen()
         listVideoRepo.getAllVideosNotInPlaylist(args.playlistId).observe(this) { videos ->
-            if(videos.isEmpty()) {
-                showNoDataScreen()
-            } else {
-                hideLoading()
-            }
-            adapter.submit(videos)
+            playlist = videos.toMutableList()
+           if(binding.searchBar.query.isNullOrEmpty()) {
+               if(videos.isEmpty()) {
+                   showNoDataScreen()
+               } else {
+                   hideLoading()
+               }
+               adapter.submit(videos)
+           }
         }
         binding.btnDone.setOnClickListener(this)
         binding.searchBar.setOnQueryTextListener(onQueryTextListener)
@@ -81,9 +87,9 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
 
         override fun onQueryTextChange(newText: String?): Boolean {
             Log.d(SearchBarFragment.TAG, "onQueryTextChange() called with: newText = $newText")
-            showLoadingScreen()
-            listVideoRepo.findAllVideos("%$newText%")
-                .observe(this@ExpendedPlaylistFragment) { videos ->
+            if(!newText.isNullOrEmpty()) {
+                showLoadingScreen()
+                playlist.filter { it.title!!.contains(newText!!) }.let { videos ->
                     if(videos.isEmpty()) {
                         showNoDataScreen()
                     } else {
@@ -91,6 +97,9 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
                     }
                     adapter.submit(videos)
                 }
+            } else {
+                adapter.submit(playlist)
+            }
             return true
         }
     }
@@ -111,12 +120,12 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
         Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
         val video = adapter.videos[position]
         video.isChecked = !video.isChecked
-        adapter.notifyItemChanged(position)
+        playlist.remove(video)
+        adapter.videos.remove(video)
 
         val videoCross = VideoPlaylistCrossRef(video.videoId, args.playlistId, video.videoUri)
         playlistWithVideosDao.insert(videoCross)
-        adapter.notifyItemRemoved(position)
-        adapter.notifyItemRangeChanged(position, adapter.videos.size)
+        adapter.notifyDataSetChanged()
     }
 
     companion object {

@@ -24,6 +24,7 @@ class VideoMenuMoreFragment : EGMBaseSheetFragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewCreated() called with: isSelected=$isSelected")
         super.onViewCreated(view, savedInstanceState)
+        binding.exoLock.visibility = View.GONE
         binding.exoLock.setOnClickListener(this)
         binding.exoLoop.setOnClickListener(this)
         binding.btnPrev.setOnClickListener(this)

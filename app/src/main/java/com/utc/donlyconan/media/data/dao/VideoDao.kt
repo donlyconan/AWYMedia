@@ -1,9 +1,7 @@
 package com.utc.donlyconan.media.data.dao
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import kotlinx.coroutines.flow.Flow
 
@@ -34,26 +32,17 @@ interface VideoDao {
     @Query("Select * from videos where video_uri = :uri")
     fun get(uri: String): Video?
 
-    @Query("Select * from videos")
+    @Query("Select * from videos where secured = 0")
     fun getAll(): LiveData<List<Video>>
 
-    @Query("Select * from videos")
-    fun getAllAsFlow(): Flow<List<Video>>
+    @Query("Select * from videos where secured = 0")
+    fun getAllOnThread(): List<Video>
 
     @Query("Select * from videos where secured=:isSecured")
     fun getAllVideosBySecuring(isSecured: Boolean): LiveData<List<Video>>
 
-    @Query("Select * from videos where is_favorite=:isFavorite")
+    @Query("Select * from videos where is_favorite=:isFavorite and secured = 0")
     fun getAllFavorites(isFavorite: Boolean = false): LiveData<List<Video>>
-
-    @Query("Select * from videos where video_id > :fromId order by video_id asc limit 1")
-    fun getNextVideo(fromId: Int): Video
-
-    @Query("Select * from videos where video_id < :fromId order by video_id desc limit 1")
-    fun getPreviousVideo(fromId: Int): Video
-
-    @Query("Select count(video_id) from videos where video_uri=:path")
-    fun countPath(path: String): Int
 
     @Query("Select * from videos where video_uri=:path limit 1")
     fun getVideoInfo(path: String): Video
@@ -63,5 +52,8 @@ interface VideoDao {
 
     @Query("Delete from videos where secured = :isSecured")
     fun clearVideosWith(isSecured: Boolean = false): Int
+
+    @Query("Select video_name from videos where secured = 1")
+    fun getAllTitlesInPrivateFolder(): List<String>
 
 }

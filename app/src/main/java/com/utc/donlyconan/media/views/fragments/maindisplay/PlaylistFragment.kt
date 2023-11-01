@@ -11,6 +11,7 @@ import android.view.WindowManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.models.Playlist
@@ -106,6 +107,15 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     }
 
                 }
+                R.id.btn_play_music -> lifecycleScope.launch(Dispatchers.IO) {
+                    playlistRepo.playlistWithVideosDao .get(item.playlistId!!)
+                        .videos.map { MediaItem.fromUri(it.videoUri) }
+                        .let { uris ->
+                           withContext(Dispatchers.Main) {
+                               startPlayMusic(uris)
+                           }
+                        }
+                }
                 R.id.btn_add -> {
                     val action = MainDisplayFragmentDirections
                             .actionMainDisplayFragmentToExpendedPlaylistFragment(item.playlistId!!)
@@ -144,16 +154,6 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                 adapter.playlists.sortWith { u, v -> u.compareTo(v, Settings.SORT_BY_NAME_DOWN) }
                 adapter.notifyDataSetChanged()
             }
-//            R.id.btn_sort_by_creation -> {
-//                settings.playlistSortBy = Settings.SORT_BY_CREATION
-//                adapter.playlists.sortWith { u, v -> u.compareTo(v, Settings.SORT_BY_CREATION) }
-//                adapter.notifyDataSetChanged()
-//            }
-//            R.id.btn_sort_by_recent -> {
-//                settings.playlistSortBy = Settings.SORT_BY_RECENT
-//                adapter.playlists.sortWith { u, v -> u.compareTo(v, Settings.SORT_BY_RECENT) }
-//                adapter.notifyDataSetChanged()
-//            }
         }
     }
 
@@ -168,7 +168,7 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
     }
 
 
-    inner class AddedPlaylistDialog(context: Context, isEditMode: Boolean, currentName: String? = null,
+    class AddedPlaylistDialog(context: Context, isEditMode: Boolean, currentName: String? = null,
                                     val listener: (text: String, isEditMode: Boolean) -> Unit) : Dialog(context) {
 
         private val binding by lazy { DialogAddPlaylistBinding.inflate(layoutInflater) }

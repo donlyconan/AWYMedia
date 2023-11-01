@@ -57,5 +57,6 @@
     <color name="text_color_hint">#C5C8C8</color>
     <color name="gray_10_per">#46484C</color>
     <color name="_303132_tools_bar">#303132</color>
+    <color name="loading_dim_color">#802A2C2C</color>
 
 </resources>

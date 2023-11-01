@@ -11,7 +11,6 @@ import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.utc.donlyconan.media.R
@@ -19,9 +18,7 @@ import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.data.models.Video
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val NOW_PLAYING_CHANNEL_ID = "com.utc.donlyconan.media.app.services.NOW_PLAYING_CHANNEL_ID"
 const val NOW_PLAYING_NOTIFICATION_ID = 100
@@ -30,7 +27,7 @@ internal class AudioNotificationManager(
     private val context: Context,
     sessionToken: MediaSessionCompat.Token,
     notificationListener: PlayerNotificationManager.NotificationListener,
-    listMode: Boolean = false) {
+    private var listMode: Boolean = false) {
 
     private val notificationManager: PlayerNotificationManager
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -55,9 +52,18 @@ internal class AudioNotificationManager(
             setMediaSessionToken(sessionToken)
             setSmallIcon(R.drawable.ic_logo)
             setUseNextAction(listMode)
-            setUseChronometer(true)
             setUsePreviousAction(listMode)
+            setUseChronometer(true)
             setPriority(NotificationCompat.PRIORITY_HIGH)
+        }
+    }
+
+    fun setListMode(listMode: Boolean) {
+        Log.d(TAG, "setListMode() called with: listMode = $listMode")
+        this.listMode = listMode
+        with(notificationManager) {
+            setUseNextAction(listMode)
+            setUsePreviousAction(listMode)
         }
     }
 
@@ -78,7 +84,7 @@ internal class AudioNotificationManager(
 
 
         override fun createCurrentContentIntent(player: Player): PendingIntent {
-            val intent = Intent(AudioService.ACTION_MUSIC_SERVICE_RECEIVE)
+            val intent = Intent(AudioService.ACTION_REQUEST_OPEN_ACTIVITY)
             return PendingIntent.getBroadcast(context, AudioService.REQUEST_OPEN_DISPLAY_ACTIVITY, intent, PendingIntent.FLAG_MUTABLE)
         }
 

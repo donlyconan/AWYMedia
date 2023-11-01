@@ -43,7 +43,7 @@ class SplashScreenFragment : BaseFragment() {
         Log.d(TAG, "onCreate: ")
         (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             val startPoint = now()
 
             // Load all data from the device

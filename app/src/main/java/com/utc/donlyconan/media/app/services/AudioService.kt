@@ -17,7 +17,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.utc.donlyconan.media.app.EGMApplication
-import kotlin.math.log
+import com.utc.donlyconan.media.views.VideoDisplayActivity
 
 
 /**
@@ -27,8 +27,28 @@ class AudioService : Service() {
 
     companion object {
         val TAG: String = AudioService::class.java.simpleName
-        const val ACTION_MUSIC_SERVICE_RECEIVE = "com.utc.donlyconan.media.app.services.ACTION_MUSIC_SERVICE_RECEIVE"
+        const val ACTION_PLAY_MUSIC = "com.utc.donlyconan.media.app.services.ACTION_PLAY_MUSIC"
+        const val ACTION_REQUEST_OPEN_ACTIVITY = "com.utc.donlyconan.media.app.services.ACTION_REQUEST_OPEN_ACTIVITY"
         const val REQUEST_OPEN_DISPLAY_ACTIVITY = 11
+        const val EXTRA_INDEX = "EXTRA_INDEX"
+        const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
+        const val EXTRA_REPEAT_MODE = "EXTRA_REPEATE_MODE"
+        const val EXTRA_SPEED = "EXTRA_SPEED"
+        const val EXTRA_POSITION = "EXTRA_POSITION"
+
+        fun createIntent(
+            playlist: Array<String>,
+            index: Int = 0,
+            repeatMode: Int = Player.REPEAT_MODE_OFF,
+            speed: Float = 1.0f,
+            position: Long = 0,
+        ) = Intent(ACTION_PLAY_MUSIC).apply {
+            putExtra(EXTRA_INDEX, index)
+            putExtra(EXTRA_PLAYLIST, playlist)
+            putExtra(EXTRA_REPEAT_MODE, repeatMode)
+            putExtra(EXTRA_POSITION, position)
+        }
+
     }
     private var isForegroundService: Boolean = false
     private lateinit var mediaSession: MediaSessionCompat
@@ -52,7 +72,12 @@ class AudioService : Service() {
         mediaSession.isActive = true
         notificationManager = AudioNotificationManager(this, mediaSession.sessionToken, PlayerNotificationListener())
         mediaSessionConnector = MediaSessionConnector(mediaSession)
-        registerReceiver(broadcastReceiver, IntentFilter(ACTION_MUSIC_SERVICE_RECEIVE))
+        registerReceiver(broadcastReceiver, IntentFilter().apply {
+            addAction(ACTION_REQUEST_OPEN_ACTIVITY)
+            addAction(ACTION_PLAY_MUSIC)
+        })
+
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -73,7 +98,7 @@ class AudioService : Service() {
         unregisterReceiver(broadcastReceiver)
     }
 
-    fun setupPlayer() {
+    private fun setupPlayer() {
         Log.d(TAG, "setupPlayer() called")
        player = ExoPlayer.Builder(this)
             .setAudioAttributes(audioAttributes, true)
@@ -86,22 +111,32 @@ class AudioService : Service() {
         play(listOf(item), 0 , repeatMode)
     }
 
-    fun play(items: List<MediaItem>, index: Int = 0, repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF) {
+    fun play(
+        items: List<MediaItem>,
+        index: Int = 0,
+        repeatMode: Int = ExoPlayer.REPEAT_MODE_OFF,
+        speed: Float = 1.0f,
+        position: Long = 0,
+    ) {
         Log.d(TAG, "playlist() with player is available = ${isAvailable()}")
         if(index >= items.size) {
             Log.d(TAG, "playlist() called with: check index again.")
             return
         }
-        releasePlayer()
+        if(player != null) {
+            releasePlayer()
+        }
         setupPlayer()
         mediaSessionConnector.setPlayer(player)
         player?.apply {
             setMediaItems(items)
-            seekTo(index, 0L)
+            seekTo(index, position)
             this.repeatMode = repeatMode
+            setPlaybackSpeed(speed)
             addListener(mediaStateListener)
             prepare()
             playWhenReady = true
+            notificationManager.setListMode(items.size > 1)
             notificationManager.showNotificationForPlayer(this)
         }
         mediaStateListener.onAudioServiceAvailable(true)
@@ -119,7 +154,37 @@ class AudioService : Service() {
 
     private val broadcastReceiver = object  : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "onReceive: player is available [${player == null}]")
+            Log.d(TAG, "onReceive: action = ${intent?.action}, player is available [${player != null}]")
+            when(intent?.action) {
+                ACTION_PLAY_MUSIC -> {
+                    val index = intent.getIntExtra(EXTRA_INDEX, 0)
+                    val speed = intent.getFloatExtra(EXTRA_SPEED, 1.0f)
+                    val repeatMode = intent.getIntExtra(EXTRA_REPEAT_MODE, Player.REPEAT_MODE_OFF)
+                    val position = intent.getLongExtra(EXTRA_POSITION, 0)
+                    intent.getStringArrayExtra(EXTRA_PLAYLIST)?.let { playlist ->
+                        val items = playlist.map { MediaItem.fromUri(it) }
+                        if(items.isNotEmpty()) {
+                            play(items, index, repeatMode, speed, position)
+                        }
+                    }
+
+                }
+                ACTION_REQUEST_OPEN_ACTIVITY -> {
+                    player?.currentMediaItem?.localConfiguration?.uri?.let { uri->
+                        val position = player!!.currentPosition
+                        val videoRepo = (context!!.applicationContext as EGMApplication).applicationComponent()
+                            .getVideoRepository()
+                        videoRepo.get(uri.toString())?.let {video ->
+                            video.playedTime = position
+                            videoRepo.update(video)
+                            startActivity(VideoDisplayActivity.newIntent(context, video.videoId, video.videoUri, continued = true).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            })
+                        }
+                    }
+                }
+                else -> {}
+            }
         }
     }
 

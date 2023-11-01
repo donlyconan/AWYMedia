@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
@@ -33,6 +34,7 @@ class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
+        hideViews.add(R.id.btn_unlock)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

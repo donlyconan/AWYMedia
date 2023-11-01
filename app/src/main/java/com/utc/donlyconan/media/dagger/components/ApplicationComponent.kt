@@ -7,6 +7,7 @@ import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
 import com.utc.donlyconan.media.dagger.modules.SettingsModule
 import com.utc.donlyconan.media.data.dao.PlaylistDao
+import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
@@ -61,6 +62,8 @@ interface ApplicationComponent {
     fun getVideoDao(): VideoDao
     fun getPlaylistDao(): PlaylistDao
     fun getFileManager(): FileManager
+    fun getPlaylistWithVideoDao(): PlaylistWithVideosDao
+
 
 
 

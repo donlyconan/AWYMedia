@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.utc.donlyconan.media.views.fragments.SearchBarFragment
 
 
 abstract class BaseAdapter<T>(differ: ItemCallback<T>, private var data: List<T>):

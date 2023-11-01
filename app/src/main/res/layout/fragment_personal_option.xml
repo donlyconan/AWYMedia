@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_favorite"
-        android:text="@string/favorite"
+        android:text="Mark as Favour"
         style="@style/BottomMenuItem"
         />
 

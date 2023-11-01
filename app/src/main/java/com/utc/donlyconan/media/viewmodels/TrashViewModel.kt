@@ -28,7 +28,7 @@ class TrashViewModel(val trashDao: TrashDao, val videoDao: VideoDao, val playlis
         Log.d(TAG, "delete() called with: trash = $item")
         viewModelScope.launch(Dispatchers.IO) {
             trashDao.delete(item)
-            playlistDao.removeVideoFromPlaylist(item.videoId)
+            playlistDao.removeVideoFromPlaylist(item.videoId!!)
         }
     }
 

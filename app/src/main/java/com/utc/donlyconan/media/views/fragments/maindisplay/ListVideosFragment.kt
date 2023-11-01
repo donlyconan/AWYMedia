@@ -29,9 +29,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
     protected lateinit var videoAdapter: VideoAdapter
     protected var audioService: AudioService? = null
     @Inject lateinit var videoRepo: VideoRepository
-    protected var handlingVideoTask: VideoTask? = null
     protected val hideViews by lazy { ArrayList<Int>() }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,21 +70,6 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         } else {
             startVideoDisplayActivity(video.videoId, video.videoUri)
         }
-    }
-
-    override fun onDeletedResult(result: ActivityResult) {
-        Log.d(TAG, "onDeletedResult() called with: result = ${result.resultCode == Activity.RESULT_OK}")
-        try {
-            if(result.resultCode == Activity.RESULT_OK) {
-                handlingVideoTask?.succeed?.run()
-            } else {
-                handlingVideoTask?.error?.run()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "onDeletedResult: ", e)
-            showToast(R.string.toast_when_failed_user_action)
-        }
-        handlingVideoTask = null
     }
 
 

@@ -1,51 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/frame_container"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    android:gravity="center"
-    android:paddingStart="50dp"
-    android:paddingEnd="50dp"
-    android:paddingTop="20dp"
-    android:paddingBottom="20dp"
-    android:background="@drawable/bg_loading_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:elevation="@dimen/space_20"
+    android:background="@color/loading_dim_color"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <LinearLayout
-        android:id="@+id/ll_loading"
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:visibility="visible"
-        android:layout_gravity="center">
+        android:paddingStart="50dp"
+        android:paddingEnd="50dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_loading_screen">
 
-        <ProgressBar
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:indeterminate="true"/>
-
-        <TextView
-            android:layout_marginStart="12dp"
+        <LinearLayout
+            android:id="@+id/ll_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/loading_data"
+            android:gravity="center"
+            android:visibility="visible"
+            android:layout_gravity="center">
+
+            <ProgressBar
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:indeterminate="true"/>
+
+            <TextView
+                android:layout_marginStart="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/loading_data"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_no_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="@string/no_data"
+            android:fontFamily="sans-serif"
+            android:layout_gravity="center"
+            android:drawablePadding="@dimen/spacing_8"
             android:textSize="16sp"
-            android:fontFamily="sans-serif"/>
+            app:drawableStartCompat="@drawable/outline_movie_24" />
 
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_no_data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:text="@string/no_data"
-        android:fontFamily="sans-serif"
-        android:layout_gravity="center"
-        android:drawablePadding="@dimen/spacing_8"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/outline_movie_24" />
+    </FrameLayout>
 
 </FrameLayout>
