@@ -58,7 +58,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                     }
 
                     R.id.btn_share -> share(video)
-                    R.id.btn_lock -> lockVideo(video, videoRepo)
+                    R.id.btn_lock -> lockVideo(video, videoRepo, appComponent.getPlaylistWithVideoDao())
                     R.id.btn_unlock -> unlockVideo(video, videoRepo)
                     else -> {
                         Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")

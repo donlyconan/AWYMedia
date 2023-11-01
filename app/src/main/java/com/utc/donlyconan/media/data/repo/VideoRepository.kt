@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.data.repo
 import android.content.ContentResolver
 import android.provider.MediaStore
 import android.util.Log
+import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Video
@@ -14,7 +15,11 @@ import javax.inject.Singleton
 
 
 @Singleton
-class VideoRepository @Inject constructor(private val videoDao: VideoDao, val contentResolver: ContentResolver, val trashDao: TrashDao) : VideoDao by videoDao {
+class VideoRepository @Inject constructor(
+    val contentResolver: ContentResolver,
+    private val videoDao: VideoDao ,
+    val trashDao: TrashDao,
+    val playlistWithVideosDao: PlaylistWithVideosDao) : VideoDao by videoDao {
     companion object {
         val TAG: String = VideoRepository::class.java.simpleName
     }
@@ -55,9 +60,10 @@ class VideoRepository @Inject constructor(private val videoDao: VideoDao, val co
     }
 
 
-    suspend fun moveToRecyleBin(video: Video) {
+    suspend fun moveToRecycleBin(video: Video) {
         Log.d(TAG, "moveToTrash() called with: video = $video")
         val trash = video.convertToTrash()
+        playlistWithVideosDao.removeVideo(video.videoId)
         trashDao.insert(trash)
         videoDao.delete(video.videoId)
     }

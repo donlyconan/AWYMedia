@@ -170,24 +170,33 @@ class AudioService : Service() {
 
                 }
                 ACTION_REQUEST_OPEN_ACTIVITY -> {
-                    player?.currentMediaItem?.localConfiguration?.uri?.let { uri->
-                        val position = player!!.currentPosition
-                        val videoRepo = (context!!.applicationContext as EGMApplication).applicationComponent()
-                            .getVideoRepository()
-                        videoRepo.get(uri.toString())?.let {video ->
-                            video.playedTime = position
-                            videoRepo.update(video)
-                            startActivity(VideoDisplayActivity.newIntent(context, video.videoId, video.videoUri, continued = true).apply {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            })
-                        }
-                    }
+                    openVideoDisplay(context)
                 }
                 else -> {}
             }
         }
     }
 
+    fun openVideoDisplay(context: Context?) {
+        player?.currentMediaItem?.localConfiguration?.uri?.let { uri ->
+            val position = player!!.currentPosition
+            val videoRepo = (context!!.applicationContext as EGMApplication).applicationComponent()
+                .getVideoRepository()
+            videoRepo.get(uri.toString())?.let { video ->
+                video.playedTime = position
+                videoRepo.update(video)
+                startActivity(
+                    VideoDisplayActivity.newIntent(
+                        context,
+                        video.videoId,
+                        video.videoUri,
+                        continued = true
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    })
+            }
+        }
+    }
 
 
     /**

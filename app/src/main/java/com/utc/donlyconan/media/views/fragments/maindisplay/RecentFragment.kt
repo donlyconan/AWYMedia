@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.app.utils.sortedByUpdatedDate
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentRecentBinding
@@ -80,7 +79,7 @@ class RecentFragment : ListVideosFragment() {
                     }
                     R.id.btn_delete -> {
                         lifecycleScope.launch(Dispatchers.IO) {
-                            videoRepo.moveToRecyleBin(video)
+                            videoRepo.moveToRecycleBin(video)
                         }
                     }
                     R.id.btn_share -> {

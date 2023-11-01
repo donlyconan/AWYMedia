@@ -162,7 +162,7 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
                             }
 
                             R.id.btn_share -> share(item)
-                            R.id.btn_lock -> lockVideo(item, videoRepo)
+                            R.id.btn_lock -> lockVideo(item, videoRepo, appComponent.getPlaylistWithVideoDao())
                             R.id.btn_unlock -> unlockVideo(item, videoRepo)
                             else -> {
                                 Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")

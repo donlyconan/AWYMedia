@@ -23,19 +23,20 @@ import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.utils.Logs
+import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.extension.components.getMediaUri
-import com.utc.donlyconan.media.extension.components.getVideoInfo
 import com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment
 import com.utc.donlyconan.media.views.fragments.VideoTask
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
+import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
+import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.LinkedList
-import kotlin.math.log
 
 
 /**
@@ -215,7 +216,7 @@ abstract class BaseFragment : Fragment() {
     }
 
 
-    fun lockVideo(video: Video, repository: VideoRepository) {
+    fun lockVideo(video: Video, repository: VideoRepository, playlistWithVideosDao: PlaylistWithVideosDao) {
         Logs.d("lockVideo() called with: video = $video")
         fileManager.saveIntoInternal(video.videoUri.toUri(), video.title ?: "no_name") { uri, newName ->
             try {
@@ -226,6 +227,7 @@ abstract class BaseFragment : Fragment() {
                     Log.d(ListVideosFragment.TAG, "onItemClick() file is locked = ${newVideo.videoUri}")
                     // Update the video in the database
                     repository.update(newVideo)
+                    playlistWithVideosDao.removeVideo(video.videoId)
                 }, error = {
                     showToast(R.string.request_action_again)
                 })
@@ -256,7 +258,7 @@ abstract class BaseFragment : Fragment() {
     suspend fun deleteVideo(video: Video, repository: VideoRepository) {
         Logs.d("deleteVideo() called with: video = $video")
         if(video.isSecured) {
-            repository.moveToRecyleBin(video)
+            repository.moveToRecycleBin(video)
         } else {
             val videoUri = video.videoUri.toUri()
             fileManager.saveIntoInternal(videoUri, video.title!!) { uri, name ->
@@ -266,7 +268,7 @@ abstract class BaseFragment : Fragment() {
                     Log.d(ListVideosFragment.TAG, "handle succeeded items")
                     showToast("The file is moved into the Recycle Bin!")
                     lifecycleScope.launch(Dispatchers.IO) {
-                        repository.moveToRecyleBin(video)
+                        repository.moveToRecycleBin(video)
                     }
                 }, error = {
                     Log.d(ListVideosFragment.TAG, "handle error items")

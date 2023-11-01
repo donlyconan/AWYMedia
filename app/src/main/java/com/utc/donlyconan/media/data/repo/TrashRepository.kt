@@ -1,8 +1,6 @@
 package com.utc.donlyconan.media.data.repo
 
 import android.app.Application
-import android.content.Context
-import android.util.Log
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
@@ -23,6 +21,18 @@ class TrashRepository @Inject constructor(val context: Application,val videoDao:
         trashes?.let { trashes ->
             trashDao.insert(*trashes.toTypedArray())
         }
+        removeWhenFileIsUnavailable()
+    }
+
+    suspend fun removeWhenFileIsUnavailable() {
+        Logs.d( "removeWhenFileIsUnavailable() called")
+        val fileList = context.fileList()
+        val trashes = trashDao.getAllTrashes()
+            .filter {
+                !fileList.any { fileName -> fileName == it.title }
+            }
+        Logs.d("removeWhenFileIsUnavailable: has ${trashes.size} that is not found!")
+        trashDao.delete(*trashes.toTypedArray())
     }
 
 }

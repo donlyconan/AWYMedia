@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.app.utils.Logs
@@ -31,6 +32,7 @@ import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -176,6 +178,10 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
                                 }
                             }
                         hideLoading()
+                        withContext(Dispatchers.Main) {
+                            Snackbar.make(binding.root, "The files is deleted.", Snackbar.LENGTH_SHORT)
+                                .show()
+                        }
                     }
 
                 }.show()
@@ -200,6 +206,10 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
                         }
                     }
                     hideLoading()
+                    withContext(Dispatchers.Main) {
+                        Snackbar.make(binding.root, "The files is restored.", Snackbar.LENGTH_SHORT)
+                            .show()
+                    }
                 }
 
             }

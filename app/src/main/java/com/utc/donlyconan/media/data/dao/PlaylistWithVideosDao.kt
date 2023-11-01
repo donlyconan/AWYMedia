@@ -33,4 +33,6 @@ interface PlaylistWithVideosDao {
     @Query("Select * from videos where " +
             "video_id=(Select video_id from video_playlist where playlist_id=:playlistId limit 1)")
     fun getFirstVideo(playlistId: Int): Video?
+    @Query("Delete from video_playlist where video_id = :videoId")
+    fun removeVideo(videoId: Int)
 }
