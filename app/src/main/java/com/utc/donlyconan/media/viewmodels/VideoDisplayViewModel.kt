@@ -4,18 +4,23 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.ExoPlayer
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.widgets.TAG
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class VideoDisplayViewModel : ViewModel() {
+    companion object {
+        const val ACTION_PREVIOUS = 1
+        const val NO_ACTION = 0
+        const val ACTION_NEXT = 2
+    }
+
     @Inject lateinit var videoRepo: VideoRepository
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
     var isFinished = false
@@ -43,7 +48,7 @@ class VideoDisplayViewModel : ViewModel() {
 
     private val _events = MutableLiveData<Result>()
     val events get() = _events
-    var isMovedNext: Boolean = false
+    var currentAction: Int = NO_ACTION
 
 
     fun initialize(videoId: Int, playlistId: Int, continued: Boolean) {
@@ -92,6 +97,16 @@ class VideoDisplayViewModel : ViewModel() {
     fun hasPrev() =  playingIndexMld.value!! > 0
 
 
+    fun save(subtitle: String) {
+        Log.d(TAG, "save() called with: subtitle = $subtitle")
+        _videoMld.value = _videoMld.value?.let { video ->
+            video.copy(subtitleUri = subtitle)
+        }
+        viewModelScope.launch {
+            videoRepo.update(videoMld.value!!)
+        }
+    }
+
     suspend fun save(position: Long = 0L) {
         Log.d(TAG, "save() called with: position = $position")
         val video = videoMld.value
@@ -120,7 +135,7 @@ class VideoDisplayViewModel : ViewModel() {
             if(continued) {
                 playingTimeMld.postValue(videoMld.value!!.playedTime)
             }
-            isMovedNext = true
+            currentAction = ACTION_NEXT
         } else {
             _events.postValue(Result.CanNotMoveNext)
         }
@@ -135,7 +150,7 @@ class VideoDisplayViewModel : ViewModel() {
             if(continued) {
                 playingTimeMld.postValue(videoMld.value!!.playedTime)
             }
-            isMovedNext = false
+            currentAction = ACTION_PREVIOUS
         } else {
             _events.postValue(Result.CanNotMovePrevious)
         }

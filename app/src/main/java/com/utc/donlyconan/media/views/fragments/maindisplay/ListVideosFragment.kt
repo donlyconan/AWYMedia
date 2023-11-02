@@ -48,7 +48,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                 when (view.id) {
                     R.id.btn_play -> startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId())
                     R.id.btn_play_music -> {
-                        if(getPlaylistId() < 0) {
+                        if(getPlaylistId() == -1) {
                             playMusic(video)
                         } else {
                             val videos = videoAdapter.getData().filterIsInstance<Video>()

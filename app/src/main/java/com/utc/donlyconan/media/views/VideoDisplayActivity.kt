@@ -13,6 +13,9 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnimationUtils
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.net.toUri
@@ -44,6 +47,8 @@ import com.utc.donlyconan.media.views.fragments.options.listedvideos.ListedVideo
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.OnSelectedChangeListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -60,9 +65,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
         const val EXTRA_CONTINUE = "media.EXTRA_CONTINUE"
         const val EXTRA_PLAYLIST = "media.EXTRA_PLAYLIST"
         val TAG: String = VideoDisplayActivity::class.java.simpleName
-
-        const val ACTION_CONTINUE_PLAYING_MEDIA = "media.ACTION_CONTINUE_PLAYING_MEDIA"
-        const val ACTION_REPLAY_BY_NOTIFICATION = "media.ACTION_REPLAY_BY_NOTIFICATION"
 
         fun newIntent(
             context: Context,
@@ -102,6 +104,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
 
     private val activityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         Log.d(TAG, "handleMessage() called with: result = ${result.data}")
+        if(result.resultCode == RESULT_OK && result.data != null) {
+            moveJob?.cancel()
+            val subUri = intent.data.toString()
+            viewModel.save(subUri)
+        }
     }
 
     private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
@@ -113,6 +120,8 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
 
     lateinit var gestureDetector: GestureDetector
     private var expireBackTime: Long = now()
+    private var flinging: Boolean = false
+    private var moveJob: Job? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,11 +160,17 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             videoMld.observe(this@VideoDisplayActivity) { video ->
                 Logs.d(TAG, "video View Model: video=$video")
                 customBinding.headerTv.text = video.title
+                val mediaItem = if(video.subtitleUri == null) {
+                    MediaItem.fromUri(video.videoUri)
+                } else {
+                    generateMediaItem(video.videoUri, video.subtitleUri!!)
+                }
                 player.apply {
-                    setMediaItem(MediaItem.fromUri(video.videoUri))
+                    setMediaItem(mediaItem)
                     prepare()
                     viewModel.playWhenReadyMld.value = true
                 }
+                flinging = false
             }
             speedMld.observe(this@VideoDisplayActivity) { speed ->
                 Log.d(TAG, "speedMld: speed = $speed")
@@ -176,7 +191,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             }
             playingIndexMld.observe(this@VideoDisplayActivity) { index ->
                 val videos = playlistMld.value
-                Log.d(TAG, "playingIndexMld: has list = ${videos != null}")
+                Log.d(TAG, "playingIndexMld: $index, has list = ${videos != null}")
                 if(videos == null) {
                     customBinding.btnNext?.setEnabledState(false)
                     customBinding.btnPrev?.setEnabledState(false)
@@ -188,6 +203,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                     customBinding.btnNext?.setEnabledState(true)
                     customBinding.btnPrev?.setEnabledState(true)
                 }
+                moveJob?.cancel()
             }
             playlistMld.observe(this@VideoDisplayActivity) { videos ->
                 customBinding.autoPlay.visibility = if(isListMode()) View.VISIBLE else View.GONE
@@ -196,9 +212,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                 when(event) {
                     VideoDisplayViewModel.Result.CanNotMoveNext -> {
                         showMessage("Đã di chuyển hết danh sách")
+                        flinging = false
                     }
                     VideoDisplayViewModel.Result.CanNotMovePrevious -> {
                         showMessage("Đã di chuyển hết danh sách")
+                        flinging = false
                     }
                     else -> null
                 }
@@ -214,18 +232,16 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
     }
 
     // Generate a media item with a subtitle preparing
-    private fun generateMediaItem(videoUri: Uri, subtitleUri: Uri? = null): MediaItem {
-        val subtitle = subtitleUri?.let {
-            SubtitleConfiguration.Builder(subtitleUri!!)
+    private fun generateMediaItem(videoUri: String, subtitleUri: String): MediaItem {
+        val subtitle = subtitleUri.let {
+            SubtitleConfiguration.Builder(subtitleUri.toUri())
                 .setMimeType(MimeTypes.APPLICATION_SUBRIP)
                 .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
                 .build()
         }
         val builder = MediaItem.Builder()
             .setUri(videoUri)
-        if (subtitle != null) {
-            builder.setSubtitleConfigurations(ImmutableList.of(subtitle))
-        }
+        builder.setSubtitleConfigurations(ImmutableList.of(subtitle))
         return builder.build()
     }
 
@@ -459,12 +475,13 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                 }
             }
             viewModel.isFinished = playbackState == Player.STATE_ENDED
-            if (playWhenReady && playbackState == Player.STATE_ENDED) {
+            if (playWhenReady && playbackState == Player.STATE_ENDED && !flinging) {
                 val autoPlay = customBinding.autoPlay.isChecked && customBinding.autoPlay.isVisible
                 Log.d(TAG, "onPlayerStateChanged: move next video? ${autoPlay}!")
-                lifecycleScope.launch(Dispatchers.Default) {
+                moveJob = lifecycleScope.launch(Dispatchers.Default) {
                     viewModel.save(0L)
                     if (autoPlay) {
+                        delay(1000)
                         viewModel.moveNext()
                     }
                 }
@@ -573,17 +590,19 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
         if(abs(velocityX) > 4000 && viewModel.isListMode()) {
             if (e2.x - e1.x > 200) {
                 Log.d(TAG, "onFling: Move next")
+                flinging = true
                 viewModel.continued = true
                 viewModel.saveTempState(player.currentPosition)
                 viewModel.moveNext()
             }
-
             if(e1.x - e2.x > 200){
                 Log.d(TAG, "onFling: Move down")
+                flinging = true
                 viewModel.continued = true
                 viewModel.saveTempState(player.currentPosition)
                 viewModel.movePrevious()
             }
+
         }
         return true
     }
