@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_weight="0"
-                android:checked="true"
+                android:checked="false"
                 android:layout_marginEnd="5dp"
                 android:layout_gravity="top"
                 android:thumbTint="@color/white"
@@ -235,14 +235,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/btExpand"
-        android:layout_width="25dp"
-        android:layout_height="70dp"
-        android:layout_gravity="center_vertical|right"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:layout_width="match_parent"

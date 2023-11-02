@@ -39,11 +39,11 @@ class VideoDisplayViewModel : ViewModel() {
     var repeatModeMld = MutableLiveData(ExoPlayer.REPEAT_MODE_OFF)
     var currentPlayWhenReadyState = false
     var shouldRotate: Boolean = true
+    var lockModeMdl: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val _events = MutableLiveData<Result>()
     val events get() = _events
-    private val job = Job()
-    private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
+    var isMovedNext: Boolean = false
 
 
     fun initialize(videoId: Int, playlistId: Int, continued: Boolean) {
@@ -111,21 +111,16 @@ class VideoDisplayViewModel : ViewModel() {
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        Logs.d(TAG, "onCleared() called")
-        job.cancel()
-    }
-
     fun moveNext() {
         var index = playingIndexMld.value!!
         if(hasNext()) {
             index++
-            _videoMld.value = playlist!!.get(index)
-            playingIndexMld.value = index
+            _videoMld.postValue(playlist!!.get(index))
+            playingIndexMld.postValue(index)
             if(continued) {
-                playingTimeMld.value = videoMld.value!!.playedTime
+                playingTimeMld.postValue(videoMld.value!!.playedTime)
             }
+            isMovedNext = true
         } else {
             _events.postValue(Result.CanNotMoveNext)
         }
@@ -135,11 +130,12 @@ class VideoDisplayViewModel : ViewModel() {
         var index = playingIndexMld.value!!
         if(hasPrev()) {
             index--
-            _videoMld.value = playlist!!.get(index)
-            playingIndexMld.value = index
+            _videoMld.postValue(playlist!!.get(index))
+            playingIndexMld.postValue(index)
             if(continued) {
-                playingTimeMld.value = videoMld.value!!.playedTime
+                playingTimeMld.postValue(videoMld.value!!.playedTime)
             }
+            isMovedNext = false
         } else {
             _events.postValue(Result.CanNotMovePrevious)
         }

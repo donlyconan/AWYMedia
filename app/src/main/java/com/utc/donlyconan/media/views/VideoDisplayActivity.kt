@@ -16,6 +16,7 @@ import android.view.View.OnTouchListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -111,7 +112,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
 
     lateinit var gestureDetector: GestureDetector
-    var expireBackTime: Long = now()
+    private var expireBackTime: Long = now()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,6 +188,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                     customBinding.btnNext?.setEnabledState(true)
                     customBinding.btnPrev?.setEnabledState(true)
                 }
+            }
+            playlistMld.observe(this@VideoDisplayActivity) { videos ->
+                customBinding.autoPlay.visibility = if(isListMode()) View.VISIBLE else View.GONE
             }
             events.observe(this@VideoDisplayActivity) { event ->
                 when(event) {
@@ -300,7 +304,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             autoPlay.setOnCheckedChangeListener { buttonView, isChecked ->
                 settings.autoPlayMode = isChecked
             }
-            btExpand.setOnClickListener(listener)
+            autoPlay.visibility = if(viewModel.isListMode()) View.VISIBLE else View.GONE
         }
     }
 
@@ -333,11 +337,13 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             R.id.exo_unlock -> {
                 playerControlBinding.layoutPlayerControlView.rootView.visibility = View.VISIBLE
                 playerControlBinding.layoutScrim.visibility = View.INVISIBLE
+                viewModel.lockModeMdl.value = false
             }
 
             R.id.exo_lock -> {
                 playerControlBinding.layoutPlayerControlView.rootView.visibility = View.INVISIBLE
                 playerControlBinding.layoutScrim.visibility = View.VISIBLE
+                viewModel.lockModeMdl.value = true
             }
 
             R.id.exo_option -> {
@@ -411,10 +417,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                 }
                 activityResult.launch(intent)
             }
-            R.id.btExpand -> {
-                showPlaylist(viewModel.playlistId)
-            }
-
             else -> {
                 Log.d(TAG, "onClick: $msgId not found the action, please check again")
             }
@@ -424,7 +426,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         // put flag inhere to prevent #onIsPlayingChanged
         val value = super.dispatchTouchEvent(ev)
-        gestureDetector.onTouchEvent(ev!!)
+        if(!viewModel.lockModeMdl.value!! && viewModel.isListMode()) {
+            gestureDetector.onTouchEvent(ev!!)
+        }
         return value
     }
 
@@ -455,6 +459,16 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                 }
             }
             viewModel.isFinished = playbackState == Player.STATE_ENDED
+            if (playWhenReady && playbackState == Player.STATE_ENDED) {
+                val autoPlay = customBinding.autoPlay.isChecked && customBinding.autoPlay.isVisible
+                Log.d(TAG, "onPlayerStateChanged: move next video? ${autoPlay}!")
+                lifecycleScope.launch(Dispatchers.Default) {
+                    viewModel.save(0L)
+                    if (autoPlay) {
+                        viewModel.moveNext()
+                    }
+                }
+            }
         }
     }
 
@@ -517,7 +531,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
         Log.d(TAG, "GestureDetector#onDown() called with: e = $e")
         // location in x must be under 50 and time
         val land = requestedOrientation == Configuration.ORIENTATION_LANDSCAPE
-        val requestDistance = if(land) 100 else 50
+        val requestDistance = if(land) 120 else 50
         if(e.x < requestDistance && viewModel.isListMode()) {
             showPlaylist(viewModel.playlistId)
             return true
@@ -556,15 +570,15 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
         Log.d(TAG, "GestureDetector#onFling() called with: e1 = $e1, e2 = $e2, velocityX = $velocityX, velocityY = $velocityY")
         // velocity is above -4000
         binding.player.hideController()
-        if(abs(velocityX) > 5000 && viewModel.isListMode()) {
-            if (e2.x - e1.x > 300) {
+        if(abs(velocityX) > 4000 && viewModel.isListMode()) {
+            if (e2.x - e1.x > 200) {
                 Log.d(TAG, "onFling: Move next")
                 viewModel.continued = true
                 viewModel.saveTempState(player.currentPosition)
                 viewModel.moveNext()
             }
 
-            if(e1.x - e2.x > 300){
+            if(e1.x - e2.x > 200){
                 Log.d(TAG, "onFling: Move down")
                 viewModel.continued = true
                 viewModel.saveTempState(player.currentPosition)

@@ -333,13 +333,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/btExpand"
-        android:layout_width="25dp"
-        android:layout_height="70dp"
-        android:layout_gravity="center_vertical|right"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 </FrameLayout>

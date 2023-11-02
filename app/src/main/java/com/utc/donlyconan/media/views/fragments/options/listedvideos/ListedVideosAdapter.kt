@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.utils.formatShortTime
+import com.utc.donlyconan.media.app.utils.setVideoImage
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemSimpleVideoViewBinding
 import com.utc.donlyconan.media.views.adapter.BaseAdapter
@@ -37,11 +39,11 @@ class ListedVideosAdapter(
             val video = value as Video
             binding.tvTitle.text = video.title
             binding.imgChecked.isChecked = video.isChecked
-            Glide.with(itemView.context)
-                .load(video.videoUri)
-                .centerCrop()
-                .error(R.drawable.ic_baseline_error_24)
-                .into(binding.imgThumbnail)
+            binding.imgThumbnail.setVideoImage(video.videoUri)
+            binding.progress.visibility = View.VISIBLE
+            binding.progress.progress = video.playedTime.toInt()
+            binding.progress.max = video.duration
+            binding.tvDuration.text = (video.duration / 1000).formatShortTime()
         }
 
     }

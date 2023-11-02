@@ -62,7 +62,8 @@ class ListedVideosDialog: DialogFragment(), OnItemClickListener {
         val playlistId = arguments?.getInt(EXTRA_PLAYLIST_ID)
         val currentIndex = arguments?.getInt(EXTRA_CURRENT_INDEX)
         if(playlistId != null) {
-            val videos = playlistWithVideosDao.get(playlistId)?.videos
+            val playlist = playlistWithVideosDao.get(playlistId)
+            val videos = playlist?.videos
             videos.filterIndexed { index, video ->
                 video.setSelected(index == currentIndex)
                 index == currentIndex
@@ -71,6 +72,7 @@ class ListedVideosDialog: DialogFragment(), OnItemClickListener {
             adapter.setOnItemClickListener(this)
             binding.rcvVideos.adapter = adapter
             binding.tvSize.text = "(${videos.size})"
+            binding.playlistName.text = playlist.playlist.title
         }
         binding.root.setOnClickListener { dismiss() }
     }

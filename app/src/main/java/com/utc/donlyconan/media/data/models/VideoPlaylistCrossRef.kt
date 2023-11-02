@@ -10,18 +10,6 @@ import com.utc.donlyconan.media.app.utils.now
 @Entity(
     tableName = "video_playlist",
     primaryKeys = ["video_id", "playlist_id"],
-    foreignKeys = [
-        ForeignKey(
-            entity = Video::class,
-            parentColumns = arrayOf("video_id"),
-            childColumns = arrayOf("video_id"),
-        ),
-        ForeignKey(
-            entity = Playlist::class,
-            parentColumns = arrayOf("playlist_id"),
-            childColumns = arrayOf("playlist_id"),
-        )
-    ]
 )
 data class VideoPlaylistCrossRef(
     @ColumnInfo(name = "video_id")
