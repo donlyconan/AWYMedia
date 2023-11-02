@@ -25,7 +25,7 @@ const val NOW_PLAYING_NOTIFICATION_ID = 100
 
 internal class AudioNotificationManager(
     private val context: Context,
-    sessionToken: MediaSessionCompat.Token,
+    private val sessionToken: MediaSessionCompat.Token,
     notificationListener: PlayerNotificationManager.NotificationListener,
     private var listMode: Boolean = false) {
 

@@ -77,12 +77,11 @@ abstract class BaseFragment : Fragment() {
     fun deleteVideoFromExternalStorage(vararg uris: Uri) {
         Log.d(ListVideosFragment.TAG, "deleteVideoFromExternalStorage() called with: uri = $uris")
         val contentResolver = requireContext().contentResolver
-        lifecycleScope.launch(Dispatchers.IO +
-                CoroutineExceptionHandler {_, e -> showToast(R.string.toast_when_failed_user_action) }
-        ) {
+        val exception = CoroutineExceptionHandler {_, e -> showToast(R.string.toast_when_failed_user_action)}
+        lifecycleScope.launch(Dispatchers.IO +  exception) {
             try {
                 uris.forEach { uri ->
-                    contentResolver.delete(uri, null, null) > 0
+                    contentResolver.delete(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null)
                 }
             } catch (e: Exception) {
                 val intentSender: IntentSender? = when {
@@ -94,7 +93,10 @@ abstract class BaseFragment : Fragment() {
                         val exception = e as? RecoverableSecurityException
                         exception?.userAction?.actionIntent?.intentSender
                     }
-                    else -> null
+                    else -> {
+                        Log.d(ListVideosFragment.TAG, "deleteVideoFromExternalStorage() cannot delete uri = $uris")
+                        null
+                    }
                 }
                 intentSender?.let { intent ->
                     intentSenderForResult.launch(

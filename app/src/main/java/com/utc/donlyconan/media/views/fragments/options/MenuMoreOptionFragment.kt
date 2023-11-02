@@ -30,6 +30,7 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.SheetDialog)
+        isCancelable = true
     }
 
     override fun onCreateView(

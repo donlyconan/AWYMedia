@@ -20,7 +20,6 @@ class FileService : Service() {
         override fun onEvent(event: Int, path: String?) {
             Log.d(TAG, "onEvent() called with: event = $event, path = $path")
         }
-
     }
 
     override fun onCreate() {

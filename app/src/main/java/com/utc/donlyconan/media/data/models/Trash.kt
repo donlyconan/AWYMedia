@@ -11,7 +11,7 @@ import java.io.File
 data class Trash(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
-    var videoId: Int,
+    var videoId: Int = 0,
     @ColumnInfo(name = "video_name")
     var title: String?,
     @ColumnInfo(name = "video_uri")
@@ -72,7 +72,7 @@ data class Trash(
 
     companion object {
         fun fromFile(file: File): Trash {
-            return Trash(-1, file.name, file.name, 0, file.length(), file.extension, file.lastModified())
+            return Trash(0, file.name, file.name, 0, file.length(), file.extension, file.lastModified())
         }
 
         val diffUtil = object : DiffUtil.ItemCallback<Any>() {

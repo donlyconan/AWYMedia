@@ -1,7 +1,6 @@
 package com.utc.donlyconan.media.views
 
 import android.annotation.SuppressLint
-import android.app.SharedElementCallback.OnSharedElementsReadyListener
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -16,7 +15,6 @@ import android.view.View
 import android.view.View.OnTouchListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.app.SharedElementCallback
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.C
@@ -31,6 +29,7 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
+import com.utc.donlyconan.media.app.utils.TYPE_SUBTITLE
 import com.utc.donlyconan.media.app.utils.androidFile
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
@@ -44,7 +43,6 @@ import com.utc.donlyconan.media.views.fragments.options.listedvideos.ListedVideo
 import com.utc.donlyconan.media.views.fragments.options.listedvideos.OnSelectedChangeListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -324,6 +322,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             R.id.exo_back -> finish()
             R.id.exo_rotate -> {
                 viewModel.playingTimeMld.value = player.currentPosition
+                viewModel.playWhenReadyMld.value = player.playWhenReady
                 requestedOrientation =
                     if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
                         ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -408,7 +407,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                 val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     data = androidFile(Environment.DIRECTORY_DCIM).toUri()
-                    type = "*/*"
+                    type = TYPE_SUBTITLE
                 }
                 activityResult.launch(intent)
             }

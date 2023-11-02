@@ -15,7 +15,7 @@ class TrashRepository @Inject constructor(val context: Application,val videoDao:
         val titles = videoDao.getAllTitlesInPrivateFolder()
         val trashItems = trashDao.getAllTrashes()
         val trashes = context.filesDir?.listFiles { file ->
-            !titles.contains(file.name) && trashItems.any { file.name == it.title }
+            titles.any { it == file.name } && trashItems.any { file.name == it.title }
         }?.map { Trash.fromFile(it) }
         Logs.d("sync: ${trashes?.size} special files.")
         trashes?.let { trashes ->

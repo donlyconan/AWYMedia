@@ -1,20 +1,38 @@
 package com.utc.donlyconan.media.views.fragments.options
 
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.FragmentVideoMenuMoreBinding
 
 
 class VideoMenuMoreFragment : EGMBaseSheetFragment(), View.OnClickListener {
 
     val binding by lazy { FragmentVideoMenuMoreBinding.inflate(layoutInflater) }
-    var listener: View.OnClickListener ?= null
+    var listener: View.OnClickListener? = null
     var isSelected = false
     var hasNext = false
     var hasPrev = false
+    var runnable: Runnable? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isCancelable = true
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return BottomSheetDialog(requireActivity(), R.style.SheetDialogFullScreen).apply {
+            isCancelable = true
+            setCanceledOnTouchOutside(true)
+            setOnCancelListener { runnable?.run() }
+            setOnDismissListener { runnable?.run()}
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

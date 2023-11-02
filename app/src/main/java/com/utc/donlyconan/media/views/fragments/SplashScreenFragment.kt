@@ -44,30 +44,21 @@ class SplashScreenFragment : BaseFragment() {
         (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
         lifecycleScope.launch(Dispatchers.IO) {
-            val startPoint = now()
-
             // Load all data from the device
             launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
                 Log.e(TAG, "onResume: ", e)
             }) {
                 videoRepo.sync()
             }
-
-            val currentTime = now()
-            val remainingTime = currentTime - startPoint
-            Log.d(TAG, "onResume() called startPoint=$startPoint, currentTime=$currentTime, remainingTime=$remainingTime")
-            if(remainingTime < LIMITED_FOR_SPLASH_SCREEN) {
-                val delayedTime = LIMITED_FOR_SPLASH_SCREEN - remainingTime
-                Log.d(TAG, "onResume: delayed time = $delayedTime")
-                delay(delayedTime)
-            }
-            activity.runOnUiThread {
-                val action = SplashScreenFragmentDirections.actionSplashScreenFragmentToMainDisplayFragment()
-                val navOptions: NavOptions = NavOptions.Builder()
-                    .setPopUpTo(R.id.splashScreenFragment, true)
-                    .build()
-                findNavController().navigate(action, navOptions)
-            }
+        }
+        lifecycleScope.launch(Dispatchers.Main) {
+            delay(600)
+            val action =
+                SplashScreenFragmentDirections.actionSplashScreenFragmentToMainDisplayFragment()
+            val navOptions: NavOptions = NavOptions.Builder()
+                .setPopUpTo(R.id.splashScreenFragment, true)
+                .build()
+            findNavController().navigate(action, navOptions)
             if(!settings.isWellcome) {
                 settings.isWellcome = true
             }

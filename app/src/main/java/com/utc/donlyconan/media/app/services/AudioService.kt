@@ -95,6 +95,9 @@ class AudioService : Service() {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
         releasePlayer()
+        mediaSession.isActive = false
+        mediaSession.release()
+        mediaSessionConnector.setPlayer(null)
         unregisterReceiver(broadcastReceiver)
     }
 
@@ -219,11 +222,9 @@ class AudioService : Service() {
         override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
             Log.d(TAG, "onNotificationCancelled() called with: notificationId = $notificationId, " +
                     "dismissedByUser = $dismissedByUser")
-            if(dismissedByUser) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                isForegroundService = false
-                stopSelf()
-            }
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            isForegroundService = false
+            stopSelf()
         }
     }
 
