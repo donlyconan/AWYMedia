@@ -21,16 +21,16 @@ fun now(): Long {
     return Calendar.getInstance().timeInMillis
 }
 
-fun ImageView.setVideoImage(uri: String) {
-    Glide.with(context.applicationContext)
-        .applyDefaultRequestOptions(
-            RequestOptions()
-                .fallback(R.drawable.ic_baseline_error_24)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-        )
-        .load(uri.toUri())
+fun ImageView.setVideoImage(uri: String?, circle: Boolean = false) {
+    val request = Glide.with(context.applicationContext)
+        .load(uri?.toUri())
         .placeholder(R.drawable.im_loading)
+        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
         .error(R.drawable.img_error)
+        .frame(1000L)
         .fitCenter()
-        .into(this)
+    if(circle) {
+        request.circleCrop()
+    }
+    request.into(this)
 }

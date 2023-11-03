@@ -1,19 +1,12 @@
 package com.utc.donlyconan.media.views
 
-import android.app.Activity
-import android.app.RecoverableSecurityException
 import android.content.Intent
-import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -32,6 +25,7 @@ import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
@@ -162,10 +156,11 @@ abstract class BaseFragment : Fragment() {
         val videoUri = video.videoUri.toUri()
         executeOnFileService {
             val (newName, uri) = saveIntoInternal(videoUri, video.title ?: "no_name")
-            requestDeletedFile(videoUri)
+            requestDeletingFile(videoUri)
             val newVideo = video.copy(isSecured = true, videoUri = uri.toString(), title = newName)
             playlistWithVideosDao.deleteByVideoId(video.videoId)
             repository.update(newVideo)
+        }?.invokeOnCompletion {
             showSnackBar("The file is stored in the app, you can remove it from the external storage.")
         }
     }
@@ -192,7 +187,7 @@ abstract class BaseFragment : Fragment() {
                 val (filename, uri) = saveIntoInternal(videoUri, video.title!!)
                 val newVideo = video.copy(title = filename, videoUri = uri.toString())
                 repository.moveToRecycleBin(newVideo)
-                requestDeletedFile(videoUri)
+                requestDeletingFile(videoUri)
                 showSnackBar("The file is moved into Recycle Bin, let's remove it from the external storage.")
             }
 
@@ -205,13 +200,14 @@ abstract class BaseFragment : Fragment() {
     }
 
 
-    fun executeOnFileService(func: suspend FileService.() -> Unit) {
+    fun executeOnFileService(func: suspend FileService.() -> Unit): Job? {
         val instance = application.getFileService()
         if(instance != null) {
-            instance.runIO(func)
+            return instance.runIO(func)
         } else {
             showToast(R.string.file_service_is_not_available)
         }
+        return null
     }
 
 

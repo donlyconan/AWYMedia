@@ -19,14 +19,12 @@ import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.databinding.FragmentTrashBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
-import com.utc.donlyconan.media.extension.widgets.showMessage
 import com.utc.donlyconan.media.viewmodels.TrashViewModel
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.RecycleBinAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -71,8 +69,8 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
 
     private val onFileServiceListener = object : FileService.OnFileServiceListener {
 
-        override fun onError(e: Throwable) {
-            hideLoading()
+        override fun onError(e: Throwable?) {
+            Log.d(TAG, "onError() called with: e = $e")
         }
     }
 
@@ -151,7 +149,7 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
         val items = adapter.getSelectedItems()
         if(items.isEmpty()) {
             Log.d(TAG, "onOptionsItemSelected: video list is empty!")
-            requireContext().showMessage("You need to choose at least one item.")
+            showToast("You need to choose at least one item.")
             return true
         }
         if(item.itemId == R.id.it_trash) {
@@ -165,11 +163,10 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
                     .toTypedArray()
                 executeOnFileService {
                     viewModel.delete(this, *trashes)
-                    withContext(Dispatchers.Main) {
-                        hideLoading()
-                        Snackbar.make(binding.root, "The files is deleted.", Snackbar.LENGTH_SHORT)
-                            .show()
-                    }
+                }?.invokeOnCompletion {
+                    hideLoading()
+                    Snackbar.make(binding.root, "The files is deleted.", Snackbar.LENGTH_SHORT)
+                        .show()
                 }
 
             }.show()
@@ -179,14 +176,18 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
             executeOnFileService {
                 showLoadingScreen()
                 viewModel.restore(this, *items.filterIsInstance<Trash>().toTypedArray())
-                withContext(Dispatchers.Main) {
-                    hideLoading()
-                    Snackbar.make(binding.root, "The files is restored.", Snackbar.LENGTH_SHORT)
+            }?.invokeOnCompletion {
+                hideLoading()
+                if(it?.cause is IOException) {
+                    showToast(R.string.have_had_some_problems_when_moving_files)
+                } else {
+                    Snackbar.make(binding.root, R.string.the_files_is_restored, Snackbar.LENGTH_SHORT)
                         .show()
                 }
+
             }
         }
-       return super.onOptionsItemSelected(item)
+       return true
     }
 
 

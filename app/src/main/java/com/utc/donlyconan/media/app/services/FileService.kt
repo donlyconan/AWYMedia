@@ -113,6 +113,7 @@ class FileService : Service() {
             // sync data from external into local data
             syncJob?.cancel()
             syncJob = coroutineScope.launch(Dispatchers.IO) {
+                deletingJob?.join()
                 videoRepository.sync()
             }
         }
@@ -122,7 +123,7 @@ class FileService : Service() {
         listeners.forEach { listener -> listener.onError(e) }
         Log.d(TAG, "generateExceptionHandler() called with: v = $v, e = $e")
         coroutineScope.launch(Dispatchers.Main) {
-            context.showMessage(R.string.toast_when_failed_user_action, duration = Toast.LENGTH_LONG)
+            context.showMessage(R.string.toast_when_failed_user_action, duration = Toast.LENGTH_SHORT)
         }
     }
 
@@ -192,12 +193,16 @@ class FileService : Service() {
      * Allow to sync video between the app and android systems
      */
     fun sync() = runIO {
-        videoRepository.sync()
+        if (deletingJob?.isActive == false) {
+            videoRepository.sync()
+        }
     }
 
     fun syncRecycleBin() = runIO {
         Log.d(TAG, "syncRecycleBin() called")
-        trashRepository.sync()
+        if(deletingJob?.isActive == false) {
+            trashRepository.sync()
+        }
     }
 
 
@@ -214,7 +219,7 @@ class FileService : Service() {
         }
     }
 
-    fun requestDeletedFile(uri: Uri) {
+    fun requestDeletingFile(uri: Uri) {
         Log.d(TAG, "requestDelete() called with: uri = $uri")
         if (deletingJob?.isActive == true) {
             deletingJob?.cancel()
@@ -236,7 +241,7 @@ class FileService : Service() {
      */
     fun runIO(runnable: suspend FileService.() -> Unit) = coroutineScope.launch(Dispatchers.IO + generateExceptionHandler()) {
         runnable.invoke(this@FileService)
-    }.apply { start() }
+    }
 
 
     interface OnFileServiceListener {
@@ -244,7 +249,7 @@ class FileService : Service() {
         fun onDiskSizeNotEnough() {}
 
         fun onDeletedFileError(uris: List<Uri>,e: Exception) {}
-        fun onError(e: Throwable) {}
+        fun onError(e: Throwable?) {}
 
     }
 }

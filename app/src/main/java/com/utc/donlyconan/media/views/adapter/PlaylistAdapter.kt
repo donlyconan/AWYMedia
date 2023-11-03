@@ -6,11 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.bumptech.glide.Glide
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.utils.setVideoImage
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
-import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.extension.widgets.TAG
 
@@ -81,14 +80,7 @@ class PlaylistAdapter(var context: Context,
             binding.imgMenuMore.setOnClickListener {
                 onItemLongClickListener?.onItemLongClick(it, absoluteAdapterPosition)
             }
-
-            Glide.with(itemView.context)
-                .load(video?.videoUri)
-                .placeholder(R.drawable.im_loading)
-                .error(R.drawable.img_error)
-                .optionalCircleCrop()
-                .circleCrop()
-                .into(binding.thumbnailCard)
+            binding.thumbnailCard.setVideoImage(video?.videoUri, true)
 
             if (isLastItem) {
                 binding.container.apply {
