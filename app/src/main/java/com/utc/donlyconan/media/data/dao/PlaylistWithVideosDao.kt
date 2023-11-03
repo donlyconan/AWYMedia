@@ -12,9 +12,6 @@ interface PlaylistWithVideosDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(vararg records: VideoPlaylistCrossRef)
 
-    @Query("Delete from video_playlist where playlist_id in (:playlistId)")
-    fun delete(vararg playlistId: Int)
-
     @Query("Delete from video_playlist where video_id=:videoId and playlist_id=:playlistId")
     fun deleteFromPlaylist(videoId: Int, playlistId: Int)
 
@@ -33,6 +30,10 @@ interface PlaylistWithVideosDao {
     @Query("Select * from videos where " +
             "video_id=(Select video_id from video_playlist where playlist_id=:playlistId limit 1)")
     fun getFirstVideo(playlistId: Int): Video?
-    @Query("Delete from video_playlist where video_id = :videoId")
-    fun removeVideo(videoId: Int)
+
+    @Query("Delete from video_playlist where video_id in (:videoId)")
+    fun deleteByVideoId(vararg videoId: Int)
+
+    @Query("Delete from video_playlist where playlist_id in (:playlistId)")
+    fun deleteByPlaylistId(vararg playlistId: Int)
 }

@@ -14,6 +14,9 @@ interface TrashDao {
     @Delete
     fun delete(vararg trash: Trash)
 
+    @Query("Delete from trashes where video_name in (:video_name)")
+    fun delete(vararg video_name: String)
+
     @Update
     fun update(vararg trash: Trash)
 

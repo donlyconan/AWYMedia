@@ -25,7 +25,7 @@ import javax.inject.Inject
  */
 class FileManager @Inject constructor(val context: Context) {
 
-    val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private fun generateExceptionHandler() = CoroutineExceptionHandler { _, e ->
         coroutineScope.launch(Dispatchers.Main) {
@@ -33,9 +33,7 @@ class FileManager @Inject constructor(val context: Context) {
         }
     }
 
-    @WorkerThread
-    fun saveIntoInternal(
-        uri: Uri, filename: String, onFinished:(uri: Uri, newName: String) -> Unit = { uri: Uri, name: String -> }) {
+    fun saveIntoInternal(uri: Uri, filename: String, onFinished:(uri: Uri, newName: String) -> Unit = { uri: Uri, name: String -> }) {
         Logs.d( "save() called with: uri = $uri, filename = $filename")
         coroutineScope.launch (generateExceptionHandler()) {
             val file = File(filename)

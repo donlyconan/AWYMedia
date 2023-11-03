@@ -14,8 +14,9 @@ class TrashRepository @Inject constructor(val context: Application,val videoDao:
     suspend fun sync() {
         val titles = videoDao.getAllTitlesInPrivateFolder()
         val trashItems = trashDao.getAllTrashes()
-        val trashes = context.filesDir?.listFiles { file ->
-            titles.any { it == file.name } && trashItems.any { file.name == it.title }
+        val trashes = context.filesDir?.listFiles()?.filter { file ->  file.isFile }
+            ?.filterNot { file->
+            titles.any { it == file.name } || trashItems.any { it.title == file.name }
         }?.map { Trash.fromFile(it) }
         Logs.d("sync: ${trashes?.size} special files.")
         trashes?.let { trashes ->
@@ -29,7 +30,7 @@ class TrashRepository @Inject constructor(val context: Application,val videoDao:
         val fileList = context.fileList()
         val trashes = trashDao.getAllTrashes()
             .filter {
-                !fileList.any { fileName -> fileName == it.title }
+                !fileList.any() { fileName -> fileName == it.title }
             }
         Logs.d("removeWhenFileIsUnavailable: has ${trashes.size} that is not found!")
         trashDao.delete(*trashes.toTypedArray())

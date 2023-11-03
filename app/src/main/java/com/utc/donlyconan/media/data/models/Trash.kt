@@ -11,7 +11,7 @@ import java.io.File
 data class Trash(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "video_id")
-    var videoId: Int = 0,
+    var trashId: Int = 0,
     @ColumnInfo(name = "video_name")
     var title: String?,
     @ColumnInfo(name = "video_uri")
@@ -26,14 +26,14 @@ data class Trash(
     var createdAt: Long,
     @ColumnInfo(name = "updated_at")
     var updatedAt: Long = now(),
-    @ColumnInfo(name = "deleted_at")
-    var deletedAt: Long = now(),
     @ColumnInfo(name = "is_favorite")
     var isFavorite: Boolean = false,
     @ColumnInfo(name = "secured")
     var isSecured: Boolean = false,
     @ColumnInfo(name = "subtitle_uri")
     var subtitleUri: String? = null,
+    @ColumnInfo(name = "deleted_at")
+    var deletedAt: Long = now(),
 ): Selectable {
     @Ignore
     var isChecked: Boolean = false
@@ -42,15 +42,12 @@ data class Trash(
         Settings.SORT_BY_CREATION -> {
             (createdAt - v.createdAt).toInt()
         }
-
         Settings.SORT_BY_DURATION -> {
             duration - v.duration
         }
-
         Settings.SORT_BY_RECENT -> {
             (updatedAt - v.updatedAt).toInt()
         }
-
         else -> {
             val fch = title!!.first()
             val sch = v.title!!.first()
@@ -67,7 +64,7 @@ data class Trash(
     }
 
     fun convertToVideo(): Video {
-        return Video(videoId!!, title, videoUri, duration, size, type, 0, createdAt, now(), isFavorite, isSecured, subtitleUri)
+        return Video(trashId!!, title, videoUri, duration, size, type, 0, createdAt, now(), isFavorite, isSecured, subtitleUri)
     }
 
     companion object {
@@ -78,7 +75,7 @@ data class Trash(
         val diffUtil = object : DiffUtil.ItemCallback<Any>() {
             override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
                 return if (oldItem is Trash && newItem is Trash) {
-                    oldItem.videoId == newItem.videoId
+                    oldItem.trashId == newItem.trashId
                 } else if (oldItem is String && newItem is String) {
                     oldItem == newItem
                 } else {

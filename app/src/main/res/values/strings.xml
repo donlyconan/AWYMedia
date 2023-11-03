@@ -119,6 +119,8 @@
     <string name="type_all_video">video/*</string>
     <string name="request_action_again">The action is failed. Please try again!</string>
     <string name="untitled">Untitled</string>
+    <string name="file_service_is_not_available">File service is not available.</string>
+    <string name="can_t_delete_the_file">Can\'t delete the file.</string>
 
     <string-array name="language_entries">
         <item>English</item>

@@ -31,7 +31,7 @@ val FOLDERS = listOf(
 /**
  * Get all videos in the device
  */
-fun ContentResolver.loadAllVideos(mediaUri: Uri, selection: String? = null, sortOrder: String? = null): List<Video> {
+suspend fun ContentResolver.loadAllVideos(mediaUri: Uri, selection: String? = null, sortOrder: String? = null): List<Video> {
     Log.d(TAG, "getAllVideos() called with: uri = $mediaUri, selection = $selection, sortOrder = $sortOrder")
 
     val projection = arrayOf(
@@ -61,13 +61,12 @@ fun ContentResolver.loadAllVideos(mediaUri: Uri, selection: String? = null, sort
                 val updatedAt = cursor.getLong(updatedAtColumn) * 1000
                 val size = cursor.getLong(sizeColumn)
                 val type = title.split('.').last()
-                val data =
-                    ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, videoId)
+                val data = ContentUris.withAppendedId(mediaUri, videoId)
                 if (createdAt == 0L) {
                     createdAt = now()
                 }
                 videoList += Video(
-                    videoId = videoId.toInt(),
+                    videoId = 0,
                     title = title,
                     videoUri = data.toString(),
                     duration = duration,
@@ -106,7 +105,7 @@ suspend fun ContentResolver.getVideoInfo(uri: Uri): Video? {
             val updatedAtColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)
             val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
 
-            while (cursor.moveToNext()) {
+            while (cursor.moveToFirst()) {
                 val videoId = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
                 val duration = cursor.getInt(durationColumn)
@@ -114,11 +113,20 @@ suspend fun ContentResolver.getVideoInfo(uri: Uri): Video? {
                 val updatedAt = cursor.getLong(updatedAtColumn) * 1000
                 val size = cursor.getLong(sizeColumn)
                 val type = title.split('.').last()
+                val data = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, videoId)
                 if (createdAt == 0L) {
-                    createdAt = System.currentTimeMillis()
+                    createdAt = now()
                 }
-                return Video(videoId.toInt(), title, uri.toString(), duration, size, type, 0L,
-                    createdAt, updatedAt)
+                return Video(
+                    videoId = 0,
+                    title = title,
+                    videoUri = data.toString(),
+                    duration = duration,
+                    size = size,
+                    type = type,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt
+                )
             }
         }
     return null

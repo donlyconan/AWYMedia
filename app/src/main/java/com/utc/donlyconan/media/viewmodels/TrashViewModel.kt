@@ -3,32 +3,39 @@ package com.utc.donlyconan.media.viewmodels
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.utc.donlyconan.media.data.dao.PlaylistDao
+import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.views.fragments.RecycleBinFragment.Companion.TAG
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-class TrashViewModel(val trashDao: TrashDao, val videoDao: VideoDao, val playlistDao: PlaylistDao) : ViewModel()  {
+class TrashViewModel(val trashDao: TrashDao, val videoDao: VideoDao) : ViewModel()  {
     var videosMdl: LiveData<List<Trash>> = trashDao.getTrashes()
 
-    fun restore(trash: Trash) {
-        Log.d(TAG, "restore() called with: trash = $trash")
-        val video = trash.convertToVideo()
-        viewModelScope.launch(Dispatchers.IO) {
-            videoDao.insert(video)
-            trashDao.delete(trash)
-        }
+    suspend fun restore(fileService: FileService, vararg trash: Trash) {
+        Log.d(TAG, "restore() called with: trash = ${trash.size}")
+        trash.filter { it.isSecured }
+            .apply {
+                trashDao.delete(*toTypedArray())
+            }
+            .map { it.convertToVideo() }
+            .apply {
+                videoDao.insert(*toTypedArray())
+            }
+        val externalItems = trash.filter { !it.isSecured }
+        externalItems.map { it.title!! }
+            .forEach { fname ->
+                fileService.saveIntoExternal(fname) { _, _, _ ->
+                    trashDao.delete(fname)
+                }
+            }
     }
 
-    fun delete(item: Trash) {
+    suspend fun delete(fileService: FileService, vararg item: Trash) {
         Log.d(TAG, "delete() called with: trash = $item")
-        viewModelScope.launch(Dispatchers.IO) {
-            trashDao.delete(item)
-            playlistDao.removeVideoFromPlaylist(item.videoId!!)
+        val names = item.map { it.title!! }.toTypedArray()
+        if(fileService.deleteFileFromLocalData(*names) > 0) {
+            trashDao.delete(*item)
         }
     }
 

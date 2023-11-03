@@ -17,7 +17,7 @@ class PlaylistRepository @Inject constructor(val playlistDao: PlaylistDao,
     override fun delete(vararg playlists: Playlist) {
         val playlistIds = playlists.map { it.playlistId!! }
             .toIntArray()
-        playlistWithVideosDao.delete(*playlistIds)
+        playlistWithVideosDao.deleteByPlaylistId(*playlistIds)
         playlistDao.delete(*playlists)
     }
 

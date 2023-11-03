@@ -37,7 +37,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>{
         viewModelFactory {
-            initializer { PersonalVideoViewModel(appComponent.getVideoRepository(), context!!.contentResolver) }
+            initializer { PersonalVideoViewModel(appComponent.getVideoRepository()) }
         }
     }
 
@@ -76,7 +76,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(checkPermission(Manifest.permission.READ_MEDIA_VIDEO)) {
                 Log.d(TAG, "onViewCreated: loading...")
-                viewModel.sync()
+                application.getFileService()?.sync()
             } else {
                 requestPermissionIfNeed(
                     Manifest.permission.READ_MEDIA_VIDEO,
@@ -87,14 +87,13 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         } else {
             if(checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 Log.d(TAG, "onViewCreated: loading...")
-                viewModel.sync()
+                application.getFileService()?.sync()
             } else {
                 requestPermissionIfNeed(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 )
             }
-
         }
         application.getAudioService()?.let { audioService ->
             audioService.registerPlayerListener(listener)
@@ -108,9 +107,9 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     override fun onPermissionResult(result: Map<String, Boolean>) {
         Log.d(TAG, "onPermissionResult() called with: result = $result")
         if (result.values.isNotEmpty()) {
-            viewModel.sync()
+            application.getFileService()?.sync()
         } else {
-            activity.finish()
+            requireActivity().finish()
         }
     }
 

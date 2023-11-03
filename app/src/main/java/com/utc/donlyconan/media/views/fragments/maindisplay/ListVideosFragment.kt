@@ -1,25 +1,17 @@
 package com.utc.donlyconan.media.views.fragments.maindisplay
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.result.ActivityResult
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.FileManager
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
-import com.utc.donlyconan.media.extension.components.getMediaUri
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.VideoTask
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

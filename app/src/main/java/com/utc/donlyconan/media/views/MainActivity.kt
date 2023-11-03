@@ -1,39 +1,63 @@
 package com.utc.donlyconan.media.views
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.content.res.Configuration
+import android.app.Activity
+import android.app.RecoverableSecurityException
+import android.content.IntentSender
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
+import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.FileService
-import java.util.*
+import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 
 
 class MainActivity : BaseActivity() {
 
-    private var fileService: FileService? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
         setContentView(R.layout.activity_main)
-        val fileServiceIntent = Intent(this, FileService::class.java)
-        bindService(fileServiceIntent, fileServiceConnection, Context.BIND_AUTO_CREATE)
+        application.getFileService()?.registerOnFileServiceListener(onFileServiceListener)
     }
 
-    private val fileServiceConnection = object : ServiceConnection {
+    override fun onDestroy() {
+        application.getFileService()?.unregisterOnFileServiceListener(onFileServiceListener)
+        super.onDestroy()
+    }
 
-        override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
-            Log.d(EGMApplication.TAG, "onServiceConnected() called with: name = $name, binder = $binder")
-            fileService = (binder as? FileService.LocalBinder)?.getService()
+    private val onFileServiceListener = object : FileService.OnFileServiceListener {
+
+        override fun onDeletedFileError(uris: List<Uri>, e: Exception) {
+            Log.d(TAG, "onDeletedFileError() called with: uris = $uris, e = $e")
+            val intentSender: IntentSender? = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                    MediaStore.createDeleteRequest(contentResolver, uris)
+                        .intentSender
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                    val exception = e as? RecoverableSecurityException
+                    exception?.userAction?.actionIntent?.intentSender
+                }
+                else -> {
+                    Log.d(ListVideosFragment.TAG, "onDeletedFileError() cannot delete uri = $uris")
+                    null
+                }
+            }
+            intentSender?.let { intent ->
+                intentSenderForResult.launch(IntentSenderRequest.Builder(intent).build())
+            }
         }
+    }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-            Log.d(EGMApplication.TAG, "onServiceDisconnected() called with: name = $name")
+    private val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        Log.d(TAG, "onDeletedResult() called with: result = ${result.resultCode == Activity.RESULT_OK}")
+        if(result.resultCode == Activity.RESULT_OK) {
+            Toast.makeText(this, R.string.can_t_delete_the_file, Toast.LENGTH_SHORT)
         }
     }
 

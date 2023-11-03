@@ -126,6 +126,7 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
                 }
             } else {
                 hideLoading()
+                adapter.submit(listOf())
             }
             return true
         }

@@ -1,6 +1,5 @@
 package com.utc.donlyconan.media.app.utils
 
-import android.media.ThumbnailUtils
 import android.os.Environment
 import android.widget.ImageView
 import androidx.core.net.toUri

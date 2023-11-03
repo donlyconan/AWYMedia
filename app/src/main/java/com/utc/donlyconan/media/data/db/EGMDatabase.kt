@@ -23,6 +23,7 @@ abstract class EGMDatabase: RoomDatabase() {
             if(instance == null) {
                 instance = Room.databaseBuilder(context, EGMDatabase::class.java, DATABASE_NAME)
                     .allowMainThreadQueries()
+                    .fallbackToDestructiveMigration()
                     .build()
             }
             instance!!

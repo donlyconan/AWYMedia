@@ -20,8 +20,8 @@ interface VideoDao {
     @Update
     fun update(vararg video: Video): Int
 
-    @Query("Delete from videos where video_id = :videoId")
-    suspend fun delete(videoId: Int): Int
+    @Query("Delete from videos where video_id in (:videoId)")
+    suspend fun delete(vararg videoId: Int): Int
 
     @Query("Delete from videos where video_uri in (:uris)")
     suspend fun delete(vararg uris: String): Int

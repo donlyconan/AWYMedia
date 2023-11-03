@@ -43,14 +43,6 @@ class SplashScreenFragment : BaseFragment() {
         Log.d(TAG, "onCreate: ")
         (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
-        lifecycleScope.launch(Dispatchers.IO) {
-            // Load all data from the device
-            launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-                Log.e(TAG, "onResume: ", e)
-            }) {
-                videoRepo.sync()
-            }
-        }
         lifecycleScope.launch(Dispatchers.Main) {
             delay(600)
             val action =

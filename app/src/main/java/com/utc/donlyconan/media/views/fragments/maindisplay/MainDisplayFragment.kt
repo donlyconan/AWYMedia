@@ -10,7 +10,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
@@ -24,11 +23,10 @@ import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.DialogAboutBinding
 import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
 import com.utc.donlyconan.media.views.BaseFragment
+import com.utc.donlyconan.media.views.MainActivity
 import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -168,9 +166,7 @@ class MainDisplayFragment : BaseFragment() {
                 findNavController().navigate(action)
             }
             R.id.it_sync_data -> {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    videoRepo.sync()
-                }
+                application.getFileService()?.sync()
             }
             R.id.it_sort_by -> {
                 val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)

@@ -2,6 +2,7 @@ package com.utc.donlyconan.media.dagger.components
 
 import com.utc.donlyconan.media.app.FileManager
 import com.utc.donlyconan.media.app.services.AudioService
+import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
 import com.utc.donlyconan.media.dagger.modules.DatabaseModule
@@ -65,9 +66,6 @@ interface ApplicationComponent {
     fun getPlaylistWithVideoDao(): PlaylistWithVideosDao
 
 
-
-
-
     fun inject(fragment: PersonalVideoFragment)
     fun inject(fragment: DetailedPlaylistFragment)
     fun inject(fragment: ExpendedPlaylistFragment)
@@ -87,4 +85,5 @@ interface ApplicationComponent {
     fun inject(listedVideosDialog: ListedVideosDialog)
     fun inject(viewModel: TrashViewModel)
     fun inject(listVideosFragment: ListVideosFragment)
+    fun inject(fileService: FileService)
 }

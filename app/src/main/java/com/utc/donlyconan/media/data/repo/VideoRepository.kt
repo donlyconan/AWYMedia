@@ -37,24 +37,27 @@ class VideoRepository @Inject constructor(
         Log.d(TAG, "sync() called: syncing...")
         val localVideos = videoDao.getAllPublicVideos()
         val allVideos = loadAllVideos()
+        // filter videos that is already in the storage and not contains in the db
         val filteredVideos = allVideos.dropWhile { video ->
-            localVideos.firstOrNull() { it.videoUri == video.videoUri }?.also { vd ->
-                if(!vd.equals(video)) {
+            localVideos.any { vd ->
+                if(vd.videoUri == video.videoUri) {
                     vd.copyFrom(video)
                     videoDao.update(vd)
                 }
-            } != null
+                vd.videoUri == video.videoUri
+            }
         }.toList()
-        Log.d(TAG, "sync: insert size = ${filteredVideos.size}")
         videoDao.insert(*filteredVideos.toTypedArray())
+        Log.d(TAG, "sync: inserted size = ${filteredVideos.size}")
 
         // remove all videos that don't exist in the devices
         withContext(Dispatchers.IO) {
-            val noExistedVideos = localVideos.filterNot { video ->
+            val videoIds = localVideos.filterNot { video ->
                 allVideos.any { it.videoUri == video.videoUri }
-            }.map { it.videoUri }.toList()
-            Log.d(TAG, "sync: remove the list no longer exist:  $noExistedVideos")
-            videoDao.delete(*noExistedVideos.toTypedArray())
+            }.map { it.videoId }.toIntArray()
+            Log.d(TAG, "sync: remove the list no longer exist:  $videoIds")
+            videoDao.delete(*videoIds)
+            playlistWithVideosDao.deleteByVideoId(* videoIds)
         }
         return filteredVideos.isNotEmpty()
     }
@@ -63,7 +66,7 @@ class VideoRepository @Inject constructor(
     suspend fun moveToRecycleBin(video: Video) {
         Log.d(TAG, "moveToTrash() called with: video = $video")
         val trash = video.convertToTrash()
-        playlistWithVideosDao.removeVideo(video.videoId)
+        playlistWithVideosDao.deleteByVideoId(video.videoId)
         trashDao.insert(trash)
         videoDao.delete(video.videoId)
     }

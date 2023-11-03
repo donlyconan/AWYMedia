@@ -10,8 +10,8 @@ import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.manager.TrashRemovalWorker
+import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit
 class EGMApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
     private var audioService: AudioService? = null
+    private var fileService: FileService? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -42,6 +43,23 @@ class EGMApplication: Application() {
             .build()
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
+
+        connectToFileService()
+    }
+
+
+
+    private val fileServiceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
+            Log.d(TAG, "onServiceConnected() called with: name = $name, binder = $binder")
+            fileService = (binder as? FileService.LocalBinder)?.getService()
+    }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d(TAG, "onServiceDisconnected() called with: name = $name")
+            connectToFileService()
+        }
     }
 
     private val connection = object : ServiceConnection {
@@ -55,6 +73,16 @@ class EGMApplication: Application() {
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.d(TAG, "onServiceDisconnected() called with: name = $name")
         }
+    }
+
+    private fun connectToFileService() {
+        Log.d(TAG, "connectToFileService() called")
+        val fileServiceIntent = Intent(this, FileService::class.java)
+        bindService(fileServiceIntent, fileServiceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    fun getFileService(): FileService? {
+        return fileService
     }
 
     fun getAudioService(): AudioService? {
