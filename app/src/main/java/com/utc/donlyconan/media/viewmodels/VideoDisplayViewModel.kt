@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Video
@@ -45,6 +46,7 @@ class VideoDisplayViewModel : ViewModel() {
     var currentPlayWhenReadyState = false
     var shouldRotate: Boolean = true
     var lockModeMdl: MutableLiveData<Boolean> = MutableLiveData(false)
+    var resizeModeMdl: MutableLiveData<Int> = MutableLiveData(AspectRatioFrameLayout.RESIZE_MODE_FIT)
 
     private val _events = MutableLiveData<Result>()
     val events get() = _events

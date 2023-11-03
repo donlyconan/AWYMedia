@@ -1,30 +1,38 @@
 package com.utc.donlyconan.media.views.fragments.options
 
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.View.OnClickListener
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.os.bundleOf
-import androidx.fragment.app.DialogFragment
+import androidx.core.view.children
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.databinding.SpeedOptionFragmentBinding
 import com.utc.donlyconan.media.extension.widgets.hideSystemUi
-import com.utc.donlyconan.media.views.adapter.OnItemClickListener
-import com.utc.donlyconan.media.views.adapter.SpeedOptionAdapter
 
 
-class SpeedOptionFragment : DialogFragment(), OnItemClickListener {
+class SpeedOptionFragment : EGMBaseSheetFragment(), OnClickListener {
 
     private val binding by lazy { SpeedOptionFragmentBinding.inflate(layoutInflater) }
     private var onSelectedSpeedChangeListener: OnSelectedSpeedChangeListener? = null
-    private val currentSpeed by lazy { arguments?.getFloat(KEY_CURRENT_SPEED) ?: -1f }
-    private val speedList = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
+    private val currentSpeed by lazy { arguments?.getFloat(KEY_CURRENT_SPEED) ?: 1.0f }
+    private val speedLevel = listOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2f)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_FRAME, R.style.SheetDialogFullScreen)
-        dialog?.window?.decorView?.setOnClickListener {
-            dismiss()
+        isCancelable = true
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return BottomSheetDialog(requireActivity(), R.style.SheetDialogFullScreen).apply {
+            isCancelable = true
+            setCanceledOnTouchOutside(true)
         }
     }
 
@@ -37,26 +45,17 @@ class SpeedOptionFragment : DialogFragment(), OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated() called with: view = $view, " + "savedInstanceState = " +
                     savedInstanceState)
-        val adapter = SpeedOptionAdapter(requireContext(), speedList)
-        adapter.onItemClickListener = this
-        adapter.selectedItem = currentSpeed
-        binding.recyclerView.adapter = adapter
-    }
-
-    override fun onItemClick(v: View, position: Int) {
-        Log.d(TAG, "onItemClick() called with: v = $v, position = $position")
-        val speed = speedList[position]
-        if(currentSpeed != speed) {
-            onSelectedSpeedChangeListener?.onSelectedSpeedChanged(speed)
+        var indexOfSpeed = speedLevel.indexOf(currentSpeed)
+        if(indexOfSpeed < 0) {
+            indexOfSpeed = 2
         }
-        onSelectedSpeedChangeListener?.onSelectedSpeed(speed)
-        dismiss()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-        WindowManager.LayoutParams.MATCH_PARENT)
+        binding.container.children.filterIsInstance<TextView>()
+            .forEachIndexed { ind, v ->
+                v.setOnClickListener(this)
+                if (indexOfSpeed == ind) {
+                    v.isSelected = true
+                }
+            }
     }
 
     override fun onResume() {
@@ -65,10 +64,23 @@ class SpeedOptionFragment : DialogFragment(), OnItemClickListener {
     }
 
 
+    override fun onClick(v: View) {
+        val indexOfView = binding.container.children.filterIsInstance<TextView>()
+            .indexOfFirst { v.id == it.id }
+        val speed = speedLevel[indexOfView]
+        if(speed == currentSpeed) {
+            onSelectedSpeedChangeListener?.onReselectedSpeed(speed)
+        } else {
+            onSelectedSpeedChangeListener?.onSelectedSpeedChanged(speed)
+        }
+        dismiss()
+    }
+
+
     interface OnSelectedSpeedChangeListener {
         fun onSelectedSpeedChanged(speed: Float)
 
-        fun onSelectedSpeed(speed: Float)
+        fun onReselectedSpeed(speed: Float)
     }
 
     companion object {

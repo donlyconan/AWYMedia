@@ -13,20 +13,11 @@
 
     <item android:state_selected="true">
         <shape>
-            <corners android:radius="100dp"/>
-            <stroke
-                android:width="3dp"
-                android:color="@color/color_checked"/>
-            <solid android:color="@color/gray"/>
+            <corners android:radius="100dp" />
+            <stroke android:width="3dp" android:color="@color/color_checked" />
         </shape>
     </item>
 
-
-    <item>
-        <shape>
-            <corners android:radius="100dp"/>
-            <solid android:color="@color/gray"/>
-        </shape>
-    </item>
+    <item android:drawable="@drawable/bg_line"/>
 
 </selector>

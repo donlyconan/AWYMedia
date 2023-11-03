@@ -169,7 +169,7 @@ abstract class BaseFragment : Fragment() {
 
     }
 
-    fun startVideoDisplayActivity(videoId: Int, videoUri: String, playlist: Int = -1, continued: Boolean = true)  {
+    fun startVideoDisplayActivity(videoId: Int, videoUri: String, playlist: Int = -1, continued: Boolean = false)  {
         Log.d(ListVideosFragment.TAG, "startPlayingVideo() called with: videoId = $videoId, videoUri = $videoUri")
         lifecycleScope.launch {
             showLoadingScreen()

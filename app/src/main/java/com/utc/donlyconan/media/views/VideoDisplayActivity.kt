@@ -11,6 +11,7 @@ import android.os.*
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.animation.Animation
@@ -27,6 +28,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.common.collect.ImmutableList
 import com.utc.donlyconan.media.R
@@ -56,8 +58,9 @@ import kotlin.math.abs
 /**
  * Lớp cung cấp các phương tiện chức năng hỗ trợ cho việc phát video
  */
-class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListener, GestureDetector.OnGestureListener,
-    GestureDetector.OnDoubleTapListener {
+class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
+    OnTouchListener, GestureDetector.OnGestureListener,
+    GestureDetector.OnDoubleTapListener, ScaleGestureDetector.OnScaleGestureListener {
 
     companion object {
         const val EXTRA_VIDEO_ID = "media.EXTRA_VIDEO_ID"
@@ -88,6 +91,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
     private lateinit var playerControlBinding: PlayerControlViewBinding
     private lateinit var customBinding: CustomOptionPlayerControlViewBinding
     private val service: AudioService? by lazy { application.getAudioService() }
+    private var touchedScreenTime: Long = 0L
 
     private val audioAttributes = AudioAttributes.Builder()
         .setContentType(C.CONTENT_TYPE_MUSIC)
@@ -122,7 +126,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
     private var expireBackTime: Long = now()
     private var flinging: Boolean = false
     private var moveJob: Job? = null
-
+    lateinit var scaleGestureDetector: ScaleGestureDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -152,6 +156,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
 
         binding.player.player = player
         gestureDetector = GestureDetector(this, this)
+        scaleGestureDetector = ScaleGestureDetector(this, this)
         player.addListener(listener)
 
         with(viewModel) {
@@ -208,6 +213,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             playlistMld.observe(this@VideoDisplayActivity) { videos ->
                 customBinding.autoPlay.visibility = if(isListMode()) View.VISIBLE else View.GONE
             }
+            resizeModeMdl.observe(this@VideoDisplayActivity) {mode ->
+                Log.d(TAG, "resizeModeMdl called with: mode = $mode")
+                binding.player.resizeMode = mode
+                binding.player.hideController()
+            }
             events.observe(this@VideoDisplayActivity) { event ->
                 when(event) {
                     VideoDisplayViewModel.Result.CanNotMoveNext -> {
@@ -263,11 +273,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             }
         })
         dialog.show(supportFragmentManager, TAG)
-    }
-
-    override fun onStart() {
-        hideSystemUi()
-        super.onStart()
     }
 
     override fun onResume() {
@@ -327,7 +332,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         Logs.d(TAG, "onConfigurationChanged() called with: newConfig = $newConfig")
-        hideSystemUi()
     }
 
 
@@ -366,9 +370,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
                 val enabled = this.player.repeatMode != ExoPlayer.REPEAT_MODE_OFF
                 val hasNext = viewModel.hasNext()
                 val hasPrev = viewModel.hasPrev()
-                VideoMenuMoreFragment.newInstance(enabled, hasNext, hasPrev) { v ->
-                    handleMessage(v.id)
-                }.show(supportFragmentManager, TAG)
+                if(!supportFragmentManager.isDestroyed) {
+                    VideoMenuMoreFragment.newInstance(enabled, hasNext, hasPrev) { v ->
+                        handleMessage(v.id)
+                    }.show(supportFragmentManager, TAG)
+                }
             }
 
             R.id.exo_loop -> {
@@ -381,20 +387,18 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             }
 
             R.id.exo_playback_speed -> {
-                player.pause()
-                SpeedOptionFragment.newInstance(
-                    this.player?.playbackParameters?.speed ?: 1f,
-                    object : SpeedOptionFragment.OnSelectedSpeedChangeListener {
-                        override fun onSelectedSpeedChanged(speed: Float) {
-                            Log.d(TAG, "onSelectedSpeedChanged() called with: speed = $speed")
-                            viewModel.speedMld.value = speed
-                            viewModel.playWhenReadyMld.value = true
-                        }
+                if (!supportFragmentManager.isDestroyed) {
+                    SpeedOptionFragment.newInstance(this.player?.playbackParameters?.speed ?: 1f,
+                        object : SpeedOptionFragment.OnSelectedSpeedChangeListener {
+                            override fun onSelectedSpeedChanged(speed: Float) {
+                                Log.d(TAG, "onSelectedSpeedChanged() called with: speed = $speed")
+                                viewModel.speedMld.value = speed
+                            }
 
-                        override fun onSelectedSpeed(speed: Float) {
-                            viewModel.playWhenReadyMld.value = true
-                        }
-                    }).show(supportFragmentManager, TAG)
+                            override fun onReselectedSpeed(speed: Float) {
+                            }
+                        }).show(supportFragmentManager, TAG)
+                }
             }
 
             R.id.btn_next -> {
@@ -439,12 +443,14 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
         }
     }
 
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         // put flag inhere to prevent #onIsPlayingChanged
         val value = super.dispatchTouchEvent(ev)
-        if(!viewModel.lockModeMdl.value!! && viewModel.isListMode()) {
-            gestureDetector.onTouchEvent(ev!!)
+        if(!viewModel.lockModeMdl.value!!) {
+            gestureDetector.onTouchEvent(ev)
+            scaleGestureDetector.onTouchEvent(ev)
         }
+        touchedScreenTime = now()
         return value
     }
 
@@ -526,26 +532,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
     }
 
 
-
-    @SuppressLint("InlinedApi")
-    private fun hideSystemUi() {
-        Log.d(TAG, "hideSystemUi() called")
-//        window.decorView.systemUiVisibility = systemFlags
-//        window.decorView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener)
-    }
-
-
-    private val onSystemUiVisibilityChangeListener =
-        View.OnSystemUiVisibilityChangeListener { visibility ->
-            Log.d(TAG, "onSystemUiVisibilityChange() called with: visibility = $visibility")
-            if (visibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION != 0) {
-                Log.d(TAG, "onSystemUiVisibilityChange() called hide systemui")
-                window.decorView.systemUiVisibility = systemFlags
-            }
-        }
-
     override fun onDown(e: MotionEvent): Boolean {
         Log.d(TAG, "GestureDetector#onDown() called with: e = $e")
+        if(!viewModel.isListMode()) {
+            return true
+        }
         // location in x must be under 50 and time
         val land = requestedOrientation == Configuration.ORIENTATION_LANDSCAPE
         val requestDistance = if(land) 120 else 50
@@ -576,6 +567,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
 
     override fun onLongPress(e: MotionEvent) {
         Log.d(TAG, "GestureDetector#onLongPress() called with: e = $e")
+        handleMessage(R.id.exo_option)
     }
 
     override fun onFling(
@@ -585,6 +577,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
         velocityY: Float
     ): Boolean {
         Log.d(TAG, "GestureDetector#onFling() called with: e1 = $e1, e2 = $e2, velocityX = $velocityX, velocityY = $velocityY")
+        if(!viewModel.isListMode()) {
+            return true
+        }
         // velocity is above -4000
         binding.player.hideController()
         if(abs(velocityX) > 4000 && viewModel.isListMode()) {
@@ -614,6 +609,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
 
     override fun onDoubleTap(e: MotionEvent): Boolean {
         Log.d(TAG, "GestureDetector#onDoubleTap() called with: e = $e")
+        if(touchedScreenTime >= now() - 1000) {
+            handleMessage(R.id.exo_rotate)
+        }
         return true
     }
 
@@ -635,6 +633,21 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener, OnTouchListen
             expireBackTime = now() + 2000
         }
     }
+
+    override fun onScale(detector: ScaleGestureDetector): Boolean {
+        if(detector.scaleFactor > 1.0f) {
+            viewModel.resizeModeMdl.value = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        } else {
+            viewModel.resizeModeMdl.value = AspectRatioFrameLayout.RESIZE_MODE_FIT
+        }
+        return true
+    }
+
+    override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+        return true
+    }
+
+    override fun onScaleEnd(detector: ScaleGestureDetector) { }
 
 }
 
