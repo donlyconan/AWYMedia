@@ -11,7 +11,7 @@ import java.io.File
 import java.util.Calendar
 
 
-const val TYPE_SUBTITLE = "*/.srt"
+const val TYPE_SUBTITLE = "*/*.srt"
 
 fun androidFile(path: String): File {
     return Environment.getExternalStoragePublicDirectory(path)

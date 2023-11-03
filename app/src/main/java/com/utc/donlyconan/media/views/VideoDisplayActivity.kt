@@ -110,17 +110,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
         Log.d(TAG, "handleMessage() called with: result = ${result.data}")
         if(result.resultCode == RESULT_OK && result.data != null) {
             moveJob?.cancel()
-            val subUri = intent.data.toString()
-            viewModel.save(subUri)
+            result.data?.data?.let { uri ->
+                viewModel.save(uri.toString())
+            }
         }
     }
-
-    private val systemFlags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
-            or View.SYSTEM_UI_FLAG_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
 
     lateinit var gestureDetector: GestureDetector
     private var expireBackTime: Long = now()
@@ -243,6 +237,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
 
     // Generate a media item with a subtitle preparing
     private fun generateMediaItem(videoUri: String, subtitleUri: String): MediaItem {
+        Log.d(TAG, "generateMediaItem() called with: videoUri = $videoUri, subtitleUri = $subtitleUri")
         val subtitle = subtitleUri.let {
             SubtitleConfiguration.Builder(subtitleUri.toUri())
                 .setMimeType(MimeTypes.APPLICATION_SUBRIP)
@@ -433,7 +428,8 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
                 val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     data = androidFile(Environment.DIRECTORY_DCIM).toUri()
-                    type = TYPE_SUBTITLE
+                    type = "*/*"
+                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/x-subrip"));
                 }
                 activityResult.launch(intent)
             }

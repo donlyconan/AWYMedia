@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
@@ -73,6 +74,17 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             }
         }
 
+        requestPermissions()
+        application.getAudioService()?.let { audioService ->
+            audioService.registerPlayerListener(listener)
+            binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
+        }
+        binding.fab.setOnTouchListener(onTouchEvent)
+
+    }
+
+    private fun requestPermissions() {
+        Log.d(TAG, "requestPermissions() called")
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(checkPermission(Manifest.permission.READ_MEDIA_VIDEO)) {
                 Log.d(TAG, "onViewCreated: loading...")
@@ -95,21 +107,22 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                 )
             }
         }
-        application.getAudioService()?.let { audioService ->
-            audioService.registerPlayerListener(listener)
-            binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
-        }
-        binding.fab.setOnTouchListener(onTouchEvent)
-
     }
 
 
     override fun onPermissionResult(result: Map<String, Boolean>) {
         Log.d(TAG, "onPermissionResult() called with: result = $result")
-        if (result.values.isNotEmpty()) {
+        val granted = result.entries.count { v -> v.value }
+        if (granted != 0) {
             application.getFileService()?.sync()
         } else {
-            requireActivity().finish()
+            Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.OK) {
+                    requestPermissionIfNeed(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    )
+                }.show()
         }
     }
 

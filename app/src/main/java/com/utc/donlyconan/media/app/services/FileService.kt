@@ -193,14 +193,14 @@ class FileService : Service() {
      * Allow to sync video between the app and android systems
      */
     fun sync() = runIO {
-        if (deletingJob?.isActive == false) {
+        if (deletingJob == null || !deletingJob!!.isActive) {
             videoRepository.sync()
         }
     }
 
     fun syncRecycleBin() = runIO {
         Log.d(TAG, "syncRecycleBin() called")
-        if(deletingJob?.isActive == false) {
+        if(deletingJob == null || !deletingJob!!.isActive) {
             trashRepository.sync()
         }
     }

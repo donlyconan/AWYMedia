@@ -101,9 +101,7 @@ class VideoDisplayViewModel : ViewModel() {
 
     fun save(subtitle: String) {
         Log.d(TAG, "save() called with: subtitle = $subtitle")
-        _videoMld.value = _videoMld.value?.let { video ->
-            video.copy(subtitleUri = subtitle)
-        }
+        _videoMld.value = _videoMld.value?.copy(subtitleUri = subtitle)
         viewModelScope.launch {
             videoRepo.update(videoMld.value!!)
         }
