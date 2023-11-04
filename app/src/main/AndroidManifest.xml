@@ -41,7 +41,8 @@ package="com.utc.donlyconan.media">
         android:configChanges="orientation"
         android:exported="true"
         android:launchMode="singleInstance"
-        android:theme="@style/Activity.Fullscreen">
+        android:theme="@style/Activity.Fullscreen"
+        android:parentActivityName=".views.MainActivity">
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />
 

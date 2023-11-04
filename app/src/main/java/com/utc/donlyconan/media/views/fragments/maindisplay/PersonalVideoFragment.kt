@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.AudioService
@@ -138,7 +139,9 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
 
         override fun onAudioServiceAvailable(available: Boolean) {
             Log.d(TAG, "onAudioServiceAvailable() called with: available = $available")
-            binding.fab.visibility = if(available) View.VISIBLE else View.GONE
+            runOnUIThread {
+                binding.fab.visibility = if(available) View.VISIBLE else View.GONE
+            }
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -148,6 +151,15 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
+            Log.d(TAG, "onMediaItemTransition() called with: mediaItem = $mediaItem, reason = $reason")
+        }
+
+        override fun onPlayerErrorChanged(error: PlaybackException?) {
+            super.onPlayerErrorChanged(error)
+            Log.d(TAG, "onPlayerErrorChanged() called with: error = $error")
+            runOnUIThread {
+                binding.fab.visibility = View.GONE
+            }
         }
 
     }

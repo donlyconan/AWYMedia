@@ -404,22 +404,20 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
 
             R.id.exo_play_music -> {
                 val position = player.currentPosition
+                val repeatMode = player.repeatMode
+                val speed = viewModel.speedMld.value!!
+                val index = viewModel.playingIndexMld.value!!
                 lifecycleScope.launch {
                     var playlist = viewModel.playlist?.map { it.videoUri }?.toTypedArray()
-                    if (playlist == null) {
+                    if (playlist.isNullOrEmpty() || repeatMode == Player.REPEAT_MODE_OFF) {
                         playlist = arrayOf(viewModel.videoMld.value!!.videoUri)
                     }
-                    sendBroadcast(
-                        AudioService.createIntent(
-                            playlist,
-                            viewModel.playingIndexMld.value!!,
-                            viewModel.repeatModeMld.value!!,
-                            viewModel.speedMld.value!!,
-                            position
-                        )
-                    )
+                    val mediaItems = playlist.map { uri -> MediaItem.fromUri(uri) }
+                    application.getAudioService()?.play(mediaItems, index, repeatMode, speed, position)
+                    runOnUiThread {
+                        finish()
+                    }
                 }
-                finish()
             }
             R.id.exo_subtitles -> {
                 player.pause()

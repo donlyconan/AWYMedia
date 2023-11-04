@@ -298,9 +298,10 @@ class AudioService : Service() {
     /**
      * Start to play musics
      */
-    fun start() { 
+    fun start() {
+        Log.d(TAG, "start() called")
         player?.let { player ->
-            if (player.playbackState == Player.STATE_ENDED ) {
+            if (!player.isPlaying) {
                 Log.d(TAG, "start: prepare service. state = ${player.playbackState}")
                 player.prepare()
                 player.seekTo(0L)

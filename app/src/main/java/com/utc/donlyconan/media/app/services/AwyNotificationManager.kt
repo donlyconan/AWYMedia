@@ -89,7 +89,7 @@ internal class AudioNotificationManager(
         }
 
         override fun getCurrentContentText(player: Player): CharSequence {
-            return "The music is playing by Easy Guard Player"
+            return context.getString(R.string.the_music_is_playing_by_easy_guard_player)
         }
 
         override fun getCurrentContentTitle(player: Player): CharSequence {
