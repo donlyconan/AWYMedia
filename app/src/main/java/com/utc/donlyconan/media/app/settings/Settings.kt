@@ -31,18 +31,17 @@ class Settings @Inject constructor(val appContext: Context) {
         }
     }
 
-    var preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
-        private set
+    private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(appContext) }
+
     var language by StringPreferenceDelegate(preferences, "language",
         if(Locale.getDefault().language == "vn" || Locale.getDefault().language == "en")
             Locale.getDefault().language else "en")
     var isWellcome by BooleanPreferenceDelegate(preferences, "wellcome_to_app", false)
     var sortBy by IntPreferenceDelegate(preferences, "sort_by", SORT_VIDEO_BY_CREATION_DOWN)
     var playlistSortBy by IntPreferenceDelegate(preferences, "playlist_sort_by", SORT_BY_NAME_DOWN)
-    var deleteFromStorage by BooleanPreferenceDelegate(preferences, "delete_from_storage", false)
-    var erasureCycle by StringPreferenceDelegate(preferences, "erasure_cycle", "30")
-    var previousDeletionDate by LongPreferenceDelegate(preferences, "deletion_date", 0L)
-
+    var autoRotation by BooleanPreferenceDelegate(preferences, "auto_rotate", true)
+    var restoreVideoState by BooleanPreferenceDelegate(preferences, "restore_state", false)
+    var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)
     var password by StringPreferenceDelegate(preferences, "password")
 
     /**

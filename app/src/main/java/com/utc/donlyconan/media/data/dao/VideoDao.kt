@@ -27,7 +27,7 @@ interface VideoDao {
     suspend fun delete(vararg uris: String): Int
 
     @Query("Select * from videos where video_id = :videoId")
-    fun get(videoId: Int): Video
+    fun get(videoId: Int): Video?
 
     @Query("Select * from videos where video_uri = :uri")
     fun get(uri: String): Video?

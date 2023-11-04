@@ -18,23 +18,6 @@
             android:dialogIcon="@drawable/ic_logo"
             android:dialogTitle="@string/select_language"/>
 
-        <CheckBoxPreference
-            android:title="@string/remove_video_from_devices"
-            android:key="delete_from_storage"
-            app:defaultValue="false"
-            android:summary="@string/remove_video_from_devices_des"
-            />
-
-        <ListPreference
-            android:title="@string/erasure_cycle"
-            android:summary="@string/erase_cycle_summary"
-            android:entries="@array/remove_entries"
-            android:entryValues="@array/remove_values"
-            android:key="erasure_cycle"
-            android:defaultValue="30"
-            android:dialogIcon="@drawable/ic_logo"
-            android:dialogTitle="@string/erasure_cycle_des"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Video">
@@ -48,22 +31,15 @@
         <SwitchPreference
             android:title="@string/auto_rotate"
             android:key="auto_rotate"
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:summary="@string/auto_rotate_des"
             />
 
         <SwitchPreference
             android:title="@string/restore_state"
             android:key="restore_state"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/restore_state_des"
-            />
-
-        <CheckBoxPreference
-            android:title="@string/auto_download"
-            android:key="auto_download"
-            app:defaultValue="true"
-            android:summary="@string/auto_download_des"
             />
 
     </PreferenceCategory>

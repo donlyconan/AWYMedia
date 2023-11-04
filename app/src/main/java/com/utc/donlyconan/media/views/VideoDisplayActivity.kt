@@ -1,27 +1,25 @@
 package com.utc.donlyconan.media.views
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.MediaMetadataRetriever
-import android.net.Uri
-import android.os.*
+import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.View.OnTouchListener
-import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
-import android.view.animation.AnimationUtils
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -35,7 +33,6 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
-import com.utc.donlyconan.media.app.utils.TYPE_SUBTITLE
 import com.utc.donlyconan.media.app.utils.androidFile
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
@@ -86,7 +83,19 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
 
     }
 
-    private val viewModel by viewModels<VideoDisplayViewModel>()
+    private val viewModel by viewModels<VideoDisplayViewModel> {
+        viewModelFactory {
+            initializer {
+                val videoId = intent.getIntExtra(EXTRA_VIDEO_ID, -1)
+                val playlistId = intent.getIntExtra(EXTRA_PLAYLIST, -1)
+                val continued = intent.getBooleanExtra(EXTRA_CONTINUE, false)
+                var videoRepo = appComponent.getVideoRepository()
+                var playlistWithVideosDao = appComponent.getPlaylistWithVideoDao()
+                var settings = appComponent.getSettings()
+                VideoDisplayViewModel(videoId, playlistId, continued, videoRepo, playlistWithVideosDao, settings)
+            }
+        }
+    }
     private val binding by lazy { ActivityVideoDisplayBinding.inflate(layoutInflater) }
     private lateinit var playerControlBinding: PlayerControlViewBinding
     private lateinit var customBinding: CustomOptionPlayerControlViewBinding
@@ -123,30 +132,21 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
     lateinit var scaleGestureDetector: ScaleGestureDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Check rotation if need before calling onCreate
+        (applicationContext as EGMApplication).applicationComponent().inject(this)
+        val videoUri = intent.getStringExtra(EXTRA_VIDEO_URI)
+        if(videoUri != null && viewModel.settings.autoRotation && viewModel.shouldRotate) {
+            requestRotationScreen(videoUri)
+        }
+
         super.onCreate(savedInstanceState)
 
+        // Set content view after checking
         setContentView(binding.root)
-        (applicationContext as EGMApplication).applicationComponent().let { com ->
-            com.inject(this)
-            com.inject(viewModel)
-        }
         service?.releasePlayer()
 
-        playerControlBinding =
-            PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
-        customBinding = CustomOptionPlayerControlViewBinding
-            .bind(playerControlBinding.layoutPlayerControlView.rootView)
-
-        val videoId = intent.getIntExtra(EXTRA_VIDEO_ID, -1)
-        val videoUri = intent.getStringExtra(EXTRA_VIDEO_URI)
-        val playlistId = intent.getIntExtra(EXTRA_PLAYLIST, -1)
-        val continued = intent.getBooleanExtra(EXTRA_CONTINUE, false)
-
-        videoUri?.let { uri->
-            if(viewModel.shouldRotate) {
-                requestRotationScreen(uri)
-            }
-        }
+        playerControlBinding = PlayerControlViewBinding.bind(binding.root.findViewById(R.id.scrim_view))
+        customBinding = CustomOptionPlayerControlViewBinding.bind(playerControlBinding.layoutPlayerControlView.rootView)
 
         binding.player.player = player
         gestureDetector = GestureDetector(this, this)
@@ -154,8 +154,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
         player.addListener(listener)
 
         with(viewModel) {
-            initialize(videoId, playlistId, continued)
-
             videoMld.observe(this@VideoDisplayActivity) { video ->
                 Logs.d(TAG, "video View Model: video=$video")
                 customBinding.headerTv.text = video.title

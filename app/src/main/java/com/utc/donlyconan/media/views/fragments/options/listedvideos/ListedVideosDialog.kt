@@ -64,15 +64,17 @@ class ListedVideosDialog: DialogFragment(), OnItemClickListener {
         if(playlistId != null) {
             val playlist = playlistWithVideosDao.get(playlistId)
             val videos = playlist?.videos
-            videos.filterIndexed { index, video ->
-                video.setSelected(index == currentIndex)
-                index == currentIndex
+            videos?.let { videos->
+                adapter = ListedVideosAdapter(requireContext(), videos)
+                adapter.setOnItemClickListener(this)
+                videos.filterIndexed { index, video ->
+                    video.setSelected(index == currentIndex)
+                    index == currentIndex
+                }
             }
-            adapter = ListedVideosAdapter(requireContext(), videos)
-            adapter.setOnItemClickListener(this)
             binding.rcvVideos.adapter = adapter
-            binding.tvSize.text = "(${videos.size})"
-            binding.playlistName.text = playlist.playlist.title
+            binding.tvSize.text = "(${videos?.size})"
+            binding.playlistName.text = playlist?.playlist?.title
         }
         binding.root.setOnClickListener { dismiss() }
     }

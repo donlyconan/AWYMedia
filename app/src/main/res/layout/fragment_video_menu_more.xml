@@ -38,6 +38,17 @@
         style="@style/BottomMenuItem"
         />
 
+
+    <TextView
+        android:id="@+id/exo_subtitles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/img_subtitles"
+        android:text="@string/subtitles"
+        style="@style/BottomMenuItem"
+        />
+
+
     <TextView
         android:id="@+id/exo_play_music"
         style="@style/BottomMenuItem"

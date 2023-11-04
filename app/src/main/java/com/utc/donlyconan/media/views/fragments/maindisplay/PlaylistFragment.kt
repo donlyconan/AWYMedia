@@ -110,8 +110,8 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                 }
                 R.id.btn_play_music -> lifecycleScope.launch(Dispatchers.IO) {
                     playlistRepo.playlistWithVideosDao .get(item.playlistId!!)
-                        .videos.map { MediaItem.fromUri(it.videoUri) }
-                        .let { uris ->
+                        ?.videos?.map { MediaItem.fromUri(it.videoUri) }
+                        ?.let { uris ->
                            withContext(Dispatchers.Main) {
                                startPlayMusic(uris)
                            }

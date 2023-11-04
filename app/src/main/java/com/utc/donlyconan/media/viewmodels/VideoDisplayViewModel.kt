@@ -7,30 +7,32 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.utc.donlyconan.media.app.utils.Logs
+import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
+import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.widgets.TAG
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class VideoDisplayViewModel : ViewModel() {
+class VideoDisplayViewModel(
+    var videoId: Int,
+    var playlistId: Int = Playlist.NO_PLAYLIST,
+    var continued: Boolean = false,
+    var videoRepo: VideoRepository,
+    var playlistWithVideosDao: PlaylistWithVideosDao,
+    var settings: Settings
+
+) : ViewModel() {
     companion object {
         const val ACTION_PREVIOUS = 1
         const val NO_ACTION = 0
         const val ACTION_NEXT = 2
     }
 
-    @Inject lateinit var videoRepo: VideoRepository
-    @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
     var isFinished = false
     var isInitialized = true
-    var videoId: Int = 0
-    var continued: Boolean = false
 
-    var playlistId: Int = -1
-    private var initialized: Boolean = false
     private val _videoMld: MutableLiveData<Video> = MutableLiveData<Video>()
     val videoMld: LiveData<Video> get() = _videoMld
 
@@ -52,34 +54,27 @@ class VideoDisplayViewModel : ViewModel() {
     val events get() = _events
     var currentAction: Int = NO_ACTION
 
-
-    fun initialize(videoId: Int, playlistId: Int, continued: Boolean) {
-        Logs.d(TAG, "initialize() called with: videoId = $videoId, playlistId = $playlistId, continued = $continued")
-        if(!initialized) {
-            this.videoId = videoId
-            this.continued = continued
-            this.playlistId = playlistId
+    init {
+        viewModelScope.launch {
             val video = videoRepo.get(videoId)
-
             if(video != null) {
-                _videoMld.value = video
-                if(continued) {
-                    playingTimeMld.value = video.playedTime
+                _videoMld.postValue(video!!)
+                if(continued || settings.autoPlay) {
+                    playingTimeMld.postValue(video.playedTime)
                 }
-                playWhenReadyMld.value = true
+                playWhenReadyMld.postValue(settings.autoPlay)
             } else {
                 _events.value = Result.VideoNotFound()
             }
             playlist = playlistWithVideosDao.get(playlistId)?.videos
             if(playlist != null) {
                 playlist!!.forEach { e -> e.playedTime = 0 }
-                _playlistMld.value = playlist
-                playingIndexMld.value = playlist!!.indexOfFirst { it.videoId == videoId }
+                _playlistMld.postValue(playlist)
+                playingIndexMld.postValue(playlist!!.indexOfFirst { it.videoId == videoId })
             } else {
-                playingIndexMld.value = 0
+                playingIndexMld.postValue(0)
             }
         }
-        initialized = true
     }
 
     fun replaceVideo(videoId: Int) {

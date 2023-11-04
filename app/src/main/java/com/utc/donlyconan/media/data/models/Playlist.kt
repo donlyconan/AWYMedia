@@ -28,12 +28,6 @@ data class Playlist(
     var isChecked: Boolean = false
 
     fun compareTo(v: Playlist, sortBy: Int) = when (sortBy) {
-//        Settings.SORT_BY_CREATION -> {
-//            (createdAt - v.createdAt).toInt()
-//        }
-//        Settings.SORT_BY_RECENT -> {
-//            (updatedAt - v.updatedAt).toInt()
-//        }
         Settings.SORT_BY_NAME_UP -> {
             val fch = title.first()
             val sch = v.title.first()
@@ -55,6 +49,9 @@ data class Playlist(
     }
 
     companion object {
+
+        const val NO_PLAYLIST = -1
+        const val PRIVATE_PLAYLIST_FOLDER = Int.MIN_VALUE
 
         var diffUtil =  object : DiffUtil.ItemCallback<Playlist>() {
 

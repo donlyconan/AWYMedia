@@ -204,9 +204,9 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
                     }
                     R.id.btn_play_music -> lifecycleScope.launch(Dispatchers.IO) {
                         playlistRepo.playlistWithVideosDao .get(item.playlistId!!)
-                            .videos.map { MediaItem.fromUri(it.videoUri) }
-                            .let { uris ->
-                                withContext(Dispatchers.Main) {
+                            ?.videos?.map { MediaItem.fromUri(it.videoUri) }
+                            ?.let { uris ->
+                                runOnUIThread {
                                     startPlayMusic(uris)
                                 }
                             }

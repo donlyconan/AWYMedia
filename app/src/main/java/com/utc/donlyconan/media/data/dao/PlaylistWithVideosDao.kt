@@ -25,7 +25,7 @@ interface PlaylistWithVideosDao {
 
     @Transaction
     @Query("Select * from playlist where playlist_id = :playlistId")
-    fun get(playlistId: Int): PlaylistWithVideos
+    fun get(playlistId: Int): PlaylistWithVideos?
 
     @Query("Select * from videos where " +
             "video_id=(Select video_id from video_playlist where playlist_id=:playlistId limit 1)")

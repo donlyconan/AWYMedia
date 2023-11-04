@@ -38,9 +38,9 @@
     <string name="erasure_cycle_des">Set erasure time</string>
     <string name="auto_play">Autoplay</string>
     <string name="auto_play_des">Allows the application to play the video as soon as the video is opened.</string>
-    <string name="auto_rotate">Auto rotate</string>
+    <string name="auto_rotate">Auto rotation</string>
     <string name="auto_rotate_des">Allows to align the screen horizontally or vertically to match the format of the video.</string>
-    <string name="restore_state">Restore state</string>
+    <string name="restore_state">Restore Video\'s state</string>
     <string name="restore_state_des">Restore the playing state of the video according to the previous play.</string>
     <string name="info">Infomation</string>
     <string name="about">Version</string>

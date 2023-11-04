@@ -50,6 +50,7 @@ class VideoMenuMoreFragment : EGMBaseSheetFragment(), View.OnClickListener {
         binding.exoPlayMusic.setOnClickListener(this)
         binding.exoPlaybackSpeed.setOnClickListener(this)
         binding.exoLoop.isSelected = isSelected
+        binding.exoSubtitles.setOnClickListener(this)
 
         if(!hasPrev) {
             binding.btnPrev.alpha = 0.3f
