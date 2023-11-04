@@ -1,6 +1,5 @@
 package com.utc.donlyconan.media.data.models
 
-import android.media.MediaMetadataRetriever
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.ColumnInfo
@@ -9,11 +8,9 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.utc.donlyconan.media.app.settings.Settings
-import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.views.adapter.Selectable
 import java.io.File
-import java.util.Calendar
 
 @Entity(tableName = "videos", indices = [Index(value = ["video_uri"], unique = true)])
 data class Video(
@@ -42,6 +39,8 @@ data class Video(
     var isSecured: Boolean = false,
     @ColumnInfo(name = "subtitle_uri")
     var subtitleUri: String? = null,
+    @ColumnInfo(name = "external_uri")
+    var externalUri: String? = null,
 ) : Selectable {
     @Ignore
     var isChecked: Boolean = false
@@ -64,7 +63,7 @@ data class Video(
     }
 
     fun convertToTrash(): Trash {
-        return Trash(videoId, title, videoUri, duration, size, type, createdAt, isFavorite = isFavorite, isSecured = isSecured, subtitleUri = subtitleUri)
+        return Trash(videoId, title, videoUri = videoUri, duration, size, type, createdAt, isFavorite = isFavorite, isSecured = isSecured, subtitleUri = subtitleUri, externalUri = externalUri)
     }
 
     fun copyFrom(video: Video) {
@@ -75,17 +74,6 @@ data class Video(
         this.type = video.type
         this.createdAt = video.createdAt
         updatedAt = now()
-    }
-
-
-    override fun equals(other: Any?): Boolean {
-        return (other as? Video)?.let { video ->
-            title == video.title &&
-            videoUri == video.videoUri &&
-            duration == video.duration &&
-            type == video.type &&
-            size == video.size
-        } == true
     }
 
     companion object {

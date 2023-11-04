@@ -73,7 +73,8 @@ suspend fun ContentResolver.loadAllVideos(mediaUri: Uri, selection: String? = nu
                     size = size,
                     type = type,
                     createdAt = createdAt,
-                    updatedAt = updatedAt
+                    updatedAt = updatedAt,
+                    externalUri = data.toString()
                 )
             }
         }
@@ -125,7 +126,8 @@ suspend fun ContentResolver.getVideoInfo(uri: Uri): Video? {
                     size = size,
                     type = type,
                     createdAt = createdAt,
-                    updatedAt = updatedAt
+                    updatedAt = updatedAt,
+                    externalUri = data.toString()
                 )
             }
         }

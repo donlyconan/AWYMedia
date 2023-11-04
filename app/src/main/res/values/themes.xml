@@ -19,9 +19,12 @@
     </style>
 
     <style name="MyAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:background">@color/gray</item>
+        <item name="android:background">@drawable/round_follow_primary_color</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:radius">5dp</item>
+        <item name="android:windowDisablePreview">true</item>
     </style>
 
 

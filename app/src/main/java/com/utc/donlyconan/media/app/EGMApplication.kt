@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.app
 
 import android.app.Application
+import android.app.Service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,7 @@ class EGMApplication: Application() {
     private lateinit var appComponent: ApplicationComponent
     private var audioService: AudioService? = null
     private var fileService: FileService? = null
+    private var listener: OnInitializedService? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -54,11 +56,13 @@ class EGMApplication: Application() {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
             Log.d(TAG, "onServiceConnected() called with: name = $name, binder = $binder")
             fileService = (binder as? FileService.LocalBinder)?.getService()
+            listener?.onServiceConnected(fileService)
     }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.d(TAG, "onServiceDisconnected() called with: name = $name")
             connectToFileService()
+            listener?.onServiceDisconnected(fileService)
         }
     }
 
@@ -68,10 +72,12 @@ class EGMApplication: Application() {
             Log.d(TAG, "onServiceConnected() called with: name = $name, binder = $binder")
             val egmBinder = binder as? AudioService.EGMBinder
             audioService = egmBinder?.getService()
+            listener?.onServiceConnected(audioService)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.d(TAG, "onServiceDisconnected() called with: name = $name")
+            listener?.onServiceDisconnected(audioService)
         }
     }
 
@@ -101,13 +107,21 @@ class EGMApplication: Application() {
         Log.d(TAG, "onTerminate() called")
     }
 
+    fun setOnInitializedService(onInitializedService: OnInitializedService) {
+        Log.d(TAG, "setOnInitializedService() called with: onInitializedService = $onInitializedService")
+        listener = onInitializedService
+    }
+
     companion object {
         val TAG: String = EGMApplication.javaClass.simpleName
 
         const val WORK_TAG = "CLEAN_YOUR_TRASH"
         const val REPEATED_INTERVAL_TIME = 15L
 
-        private lateinit var instance: EGMApplication
+    }
 
+    interface OnInitializedService {
+        fun onServiceConnected(service: Service?) {}
+        fun onServiceDisconnected(service: Service?) {}
     }
 }

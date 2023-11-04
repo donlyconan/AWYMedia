@@ -24,9 +24,11 @@ import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -209,6 +211,28 @@ abstract class BaseFragment : Fragment() {
         }
         return null
     }
+
+
+    /**
+     * Execute tasks run on UI Thread
+     */
+    fun runOnUIThread(runnable: Runnable) = lifecycleScope.launch(Dispatchers.Main
+            + CoroutineExceptionHandler { context, e ->  onErrorOccurred(context, e) }) {
+        runnable.run()
+    }
+
+    /**
+     * Execute tasks run on Worker thread
+     */
+    fun runOnWorkerThread(func: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.Default
+            + CoroutineExceptionHandler { context, e ->  onErrorOccurred(context, e) }) {
+        func.invoke()
+    }
+
+    /**
+     * Provide 
+     */
+    protected open fun onErrorOccurred(context: CoroutineContext, e: Throwable) {}
 
 
     fun showSnackBar(msgId: Int) = showSnackBar(getString(msgId))

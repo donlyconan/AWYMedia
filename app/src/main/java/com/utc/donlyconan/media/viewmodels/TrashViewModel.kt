@@ -8,11 +8,12 @@ import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
 import com.utc.donlyconan.media.data.models.Trash
 import com.utc.donlyconan.media.views.fragments.RecycleBinFragment.Companion.TAG
+import java.lang.Exception
 
 class TrashViewModel(val trashDao: TrashDao, val videoDao: VideoDao) : ViewModel()  {
     var videosMdl: LiveData<List<Trash>> = trashDao.getTrashes()
 
-    suspend fun restore(fileService: FileService, vararg trash: Trash) {
+    suspend fun restore(fileService: FileService, vararg trash: Trash, onError: (e: Exception) -> Unit = {e -> }) {
         Log.d(TAG, "restore() called with: trash = ${trash.size}")
         trash.filter { it.isSecured }
             .apply {
@@ -25,8 +26,13 @@ class TrashViewModel(val trashDao: TrashDao, val videoDao: VideoDao) : ViewModel
         val externalItems = trash.filter { !it.isSecured }
         externalItems.map { it.title!! }
             .forEach { fname ->
-                fileService.saveIntoExternal(fname) { _, _, _ ->
-                    trashDao.delete(fname)
+                try {
+                    fileService.saveIntoExternal(fname) { _, _, _ ->
+                        trashDao.delete(fname)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "restore: ", e)
+                    onError?.invoke(e)
                 }
             }
     }
@@ -38,5 +44,4 @@ class TrashViewModel(val trashDao: TrashDao, val videoDao: VideoDao) : ViewModel
             trashDao.delete(*item)
         }
     }
-
 }

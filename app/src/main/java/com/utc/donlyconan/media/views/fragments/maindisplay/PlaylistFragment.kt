@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -126,10 +127,10 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     playlistRepo.removePlaylist(item.playlistId!!)
                 }
                 R.id.btn_rename -> {
-                    AddedPlaylistDialog(requireContext(), true, item.title) { text, _ ->
+                    AddedPlaylistDialog(true, item.title) { text, _ ->
                         val item2 = Playlist(item.playlistId, text)
                         viewModel.playlistRepo.update(item2)
-                    }.show()
+                    }.show(supportFragmentManager, TAG)
                 }
             }
         }.show(supportFragmentManager, TAG)
@@ -139,10 +140,10 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         Log.d(TAG, "onClick: ")
         when(v?.id) {
             R.id.fab -> {
-                AddedPlaylistDialog(requireContext(), false) { text, _ ->
+                AddedPlaylistDialog(false) { text, _ ->
                     val item = Playlist(null, text)
                     viewModel.playlistRepo.insert(item)
-                }.show()
+                }.show(supportFragmentManager, TAG)
             }
             R.id.btn_sort_by_name_up -> {
                 settings.playlistSortBy = Settings.SORT_BY_NAME_UP
@@ -167,21 +168,26 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
         }
     }
 
+    class AddedPlaylistDialog(
+        val isEditMode: Boolean,
+        val currentName: String? = null,
+        val listener: (text: String, isEditMode: Boolean) -> Unit
+    ): DialogFragment(R.layout.dialog_add_playlist) {
 
-    class AddedPlaylistDialog(context: Context, isEditMode: Boolean, currentName: String? = null,
-                                    val listener: (text: String, isEditMode: Boolean) -> Unit) : Dialog(context) {
+        private lateinit var binding: DialogAddPlaylistBinding
 
-        private val binding by lazy { DialogAddPlaylistBinding.inflate(layoutInflater) }
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return super.onCreateDialog(savedInstanceState)
+            setStyle(STYLE_NORMAL, R.style.MyAlertDialog)
+            isCancelable = true
+        }
 
-        init {
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            binding = DialogAddPlaylistBinding.bind(view)
             if(isEditMode){
                 binding.title.setText(R.string.rename)
                 binding.ipName.setText(currentName)
-            }
-            setContentView(binding.root)
-            window?.apply {
-                val width = (context.resources.displayMetrics.widthPixels * 0.90).toInt()
-                setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
             }
             binding.btnOk.setOnClickListener {
                 val tvName = binding.ipName
@@ -189,12 +195,19 @@ class PlaylistFragment : BaseFragment(), View.OnClickListener, OnItemClickListen
                     listener(binding.ipName.text.toString(), isEditMode)
                     dismiss()
                 } else {
-                    context.showMessage("Playlist name is invalid!")
+                    context?.showMessage(R.string.playlist_name_is_invalid)
                 }
             }
             binding.btnCancel.setOnClickListener {
                 dismiss()
             }
+
+            dialog?.window?.apply {
+                val width = (context.resources.displayMetrics.widthPixels * 0.90).toInt()
+                setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
+                setBackgroundDrawableResource(R.color.transparent)
+            }
         }
+
     }
 }

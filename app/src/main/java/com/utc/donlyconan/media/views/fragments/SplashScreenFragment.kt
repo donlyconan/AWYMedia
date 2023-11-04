@@ -44,7 +44,7 @@ class SplashScreenFragment : BaseFragment() {
         (context?.applicationContext as EGMApplication).applicationComponent()
             .inject(this)
         lifecycleScope.launch(Dispatchers.Main) {
-            delay(600)
+            delay(LIMITED_FOR_SPLASH_SCREEN)
             val action =
                 SplashScreenFragmentDirections.actionSplashScreenFragmentToMainDisplayFragment()
             val navOptions: NavOptions = NavOptions.Builder()
@@ -63,30 +63,6 @@ class SplashScreenFragment : BaseFragment() {
     ): View {
         // Inflate the layout for this fragment
         return binding.root
-    }
-
-    private suspend fun deleteDataIfNeed() {
-        Log.d(TAG, "deleteDataIfNeed() called with erasureCycle=${settings.erasureCycle}")
-        val deleteTimePeriod = System.currentTimeMillis() - settings.previousDeletionDate
-        // convert to date
-        val numberDay = deleteTimePeriod / 86400000.0
-        Log.d(TAG, "deleteDataIfNeed: deleteTimePeriod=$deleteTimePeriod, numberDay=$numberDay")
-        if (numberDay >= settings.erasureCycle.toDouble()) {
-            deleteData()
-            settings.previousDeletionDate = System.currentTimeMillis()
-        }
-    }
-
-    private suspend fun deleteData() {
-        Log.d(TAG, "deletingData() called deleteFromStorage=${settings.deleteFromStorage}")
-        val trashes = trashRepo.getAllTrashes()
-        val contentResolver = application.contentResolver
-        if(settings.deleteFromStorage) {
-            trashes.forEach { video ->
-                contentResolver.delete(Uri.parse(video.videoUri), null, null)
-            }
-        }
-        trashRepo.removeAll()
     }
 
     companion object {

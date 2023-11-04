@@ -20,7 +20,8 @@ package="com.utc.donlyconan.media">
     android:label="@string/app_name"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
-    android:theme="@style/Theme.AWYMedia">
+    android:theme="@style/Theme.AWYMedia"
+    android:requestLegacyExternalStorage="true">
 
     <activity
         android:name=".views.MainActivity"

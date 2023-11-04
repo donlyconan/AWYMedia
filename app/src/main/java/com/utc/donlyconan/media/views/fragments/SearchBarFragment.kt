@@ -221,10 +221,10 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
                         playlistRepo.removePlaylist(item.playlistId!!)
                     }
                     R.id.btn_rename -> {
-                        PlaylistFragment.AddedPlaylistDialog(requireContext(), true, item.title) { text, _ ->
+                        PlaylistFragment.AddedPlaylistDialog(true, item.title) { text, _ ->
                             val item2 = Playlist(item.playlistId, text)
                             playlistRepo.update(item2)
-                        }.show()
+                        }.show(supportFragmentManager, PlaylistFragment.TAG)
                     }
                 }
             }.show(supportFragmentManager, PlaylistFragment.TAG)

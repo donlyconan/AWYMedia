@@ -60,44 +60,8 @@ class RecentFragment : ListVideosFragment() {
         }
     }
 
-    override fun onItemClick(v: View, position: Int) {
-        Log.d(PersonalVideoFragment.TAG, "onItemClick() called with: v = $v, position = $position")
-        val video = videoAdapter.getItem(position) as Video
-        Log.d(TAG, "onItemClick: video=$video")
-        if (v.id == R.id.img_menu_more) {
-            MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
-                when (view.id) {
-                    R.id.btn_play -> {
-                        startVideoDisplayActivity(video.videoId, video.videoUri, continued = true)
-                    }
-                    R.id.btn_play_music -> startPlayMusic(video)
-                    R.id.btn_favorite -> {
-                        video.isFavorite = !video.isFavorite
-                        videoRepo.update(video)
-                        videoAdapter.notifyItemChanged(position)
-                    }
-                    R.id.btn_delete -> {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            videoRepo.moveToRecycleBin(video)
-                        }
-                    }
-                    R.id.btn_share -> {
-                        val intent = Intent(Intent.ACTION_SEND)
-                        intent.type = "video/*"
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.videoUri))
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing File")
-                        startActivity(Intent.createChooser(intent, "Share File"))
-                    }
-                    else -> {
-                        Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
-                    }
-                }
-            }
-                .setViewState(R.id.btn_favorite, video.isFavorite)
-                .show(parentFragmentManager, PersonalVideoFragment.TAG)
-        } else {
-            startVideoDisplayActivity(video.videoId, video.videoUri, continued = true)
-        }
+    override fun isContinue(): Boolean {
+        return true
     }
 
     companion object {

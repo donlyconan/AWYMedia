@@ -34,6 +34,8 @@ data class Trash(
     var subtitleUri: String? = null,
     @ColumnInfo(name = "deleted_at")
     var deletedAt: Long = now(),
+    @ColumnInfo(name = "external_uri")
+    var externalUri: String? = null,
 ): Selectable {
     @Ignore
     var isChecked: Boolean = false
@@ -64,7 +66,7 @@ data class Trash(
     }
 
     fun convertToVideo(): Video {
-        return Video(trashId!!, title, videoUri, duration, size, type, 0, createdAt, now(), isFavorite, isSecured, subtitleUri)
+        return Video(trashId!!, title, videoUri = videoUri, duration, size, type, 0, createdAt, now(), isFavorite, isSecured, subtitleUri, externalUri)
     }
 
     companion object {

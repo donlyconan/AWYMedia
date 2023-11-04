@@ -1,7 +1,9 @@
 package com.utc.donlyconan.media.app.services
 
+import android.app.Activity
 import android.app.Service
 import android.content.ContentProviderOperation
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.database.ContentObserver
@@ -15,6 +17,7 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Video.Media
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.core.net.toUri
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
@@ -28,6 +31,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -40,22 +44,25 @@ class FileService : Service() {
     companion object {
         const val TAG = "FileService"
         const val DELAY_BEFORE_DELETING = 5000L
+        const val DELAY_1000S = 1000L
     }
 
     private val binder by lazy { LocalBinder() }
     private val context by lazy { application }
     @Inject lateinit var videoRepository: VideoRepository
     @Inject lateinit var trashRepository: TrashRepository
-    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
+    private val supervisorJob by lazy { SupervisorJob() }
+    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO + supervisorJob) }
     private var syncJob: Job? = null
     private lateinit var listUris: MutableSet<Uri>
-    private val listeners by lazy { mutableListOf<OnFileServiceListener>() }
+    private val listeners by lazy { mutableSetOf<OnFileServiceListener>() }
     private var deletingJob: Job? = null
+    private var updateRecycleBinJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate() called")
-        contentResolver.registerContentObserver(Media.EXTERNAL_CONTENT_URI, false, mediaObserver)
+        contentResolver.registerContentObserver(Media.EXTERNAL_CONTENT_URI, true, mediaObserver)
         (application as EGMApplication)
             .applicationComponent()
             .inject(this)
@@ -81,41 +88,32 @@ class FileService : Service() {
         fun getService(): FileService = this@FileService
     }
 
-//    private var localFileObserver = object : FileObserver(context.filesDir, CREATE or DELETE) {
-//        override fun onEvent(event: Int, path: String?) {
-//            Log.d(TAG, "onEvent() called with: event = $event, path = $path")
-//            when (event) {
-//                CREATE -> {
-//
-//                }
-//                DELETE -> {
-//
-//                }
-//                else -> {
-//                    Log.d(TAG, "onEvent: $event not found.")
-//                }
-//
-//            }
-//        }
-//    }
-
 
     private val mediaObserver =  object : ContentObserver(Handler(Looper.myLooper()!!)){
 
         override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
             super.onChange(selfChange, uri, flags)
-            Log.d(TAG, "onChange() called with: selfChange = $selfChange, uri = $uri, flags = $flags")
+            syncJob?.cancel()
+            syncJob = runIO {
+                delay(DELAY_1000S)
+                deletingJob?.join()
+                videoRepository.sync()
+            }
+
+            if (flags and ContentResolver.NOTIFY_DELETE == 0) {
+                updateRecycleBinJob?.cancel()
+                updateRecycleBinJob = runIO {
+                    delay(DELAY_1000S)
+                    deletingJob?.join()
+                    trashRepository.sync()
+                }
+            }
         }
 
         override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
             super.onChange(selfChange, uris, flags)
             Log.d(TAG, "onChange() called with: selfChange = $selfChange, uris = $uris, flags = $flags")
             // sync data from external into local data
-            syncJob?.cancel()
-            syncJob = coroutineScope.launch(Dispatchers.IO) {
-                deletingJob?.join()
-                videoRepository.sync()
-            }
         }
     }
     
@@ -192,31 +190,33 @@ class FileService : Service() {
     /**
      * Allow to sync video between the app and android systems
      */
-    fun sync() = runIO {
-        if (deletingJob == null || !deletingJob!!.isActive) {
-            videoRepository.sync()
-        }
+    fun syncAllVideos() = runIO {
+        deletingJob?.join()
+        videoRepository.sync()
     }
 
     fun syncRecycleBin() = runIO {
         Log.d(TAG, "syncRecycleBin() called")
-        if(deletingJob == null || !deletingJob!!.isActive) {
-            trashRepository.sync()
-        }
+        deletingJob?.join()
+        trashRepository.sync()
     }
 
 
-    private fun createRequestDelete() = coroutineScope.launch(Dispatchers.IO) {
+    private fun createRequestDelete() = runIO {
         delay(DELAY_BEFORE_DELETING)
         Log.d(TAG, "createRequestDelete: deleting files = $listUris")
         try {
             deleteFileFromExternalStorage(*listUris.toTypedArray())
             Log.d(TAG, "createRequestDelete() cleared ${listUris.size} files")
-            listUris.clear()
-        } catch (e: Exception) {
+        } catch (e: SecurityException) {
             Log.e(TAG, "createRequestDelete:", e)
             listeners.forEach { it.onDeletedFileError(listUris.toList(), e) }
+        } catch (e: Exception) {
+            Log.e(TAG, "createRequestDelete: ", e)
+            syncJob?.cancel()
+            syncJob = syncAllVideos()
         }
+        listUris.clear()
     }
 
     fun requestDeletingFile(uri: Uri) {
@@ -243,11 +243,21 @@ class FileService : Service() {
         runnable.invoke(this@FileService)
     }
 
+    fun notifyDeletedResult(result: ActivityResult) {
+        Log.d(TAG, "notifyDeletedFile() called with: result = $result")
+        if(result.resultCode != Activity.RESULT_OK) {
+            syncJob?.cancel()
+            syncJob = syncAllVideos()
+            context.showMessage(R.string.the_files_have_not_been_deleted)
+        }  else {
+            context.showMessage(R.string.the_files_have_been_moved_to_recycle_bin)
+        }
+    }
+
 
     interface OnFileServiceListener {
 
         fun onDiskSizeNotEnough() {}
-
         fun onDeletedFileError(uris: List<Uri>,e: Exception) {}
         fun onError(e: Throwable?) {}
 

@@ -3,8 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="400dp"
     android:layout_height="wrap_content"
-    android:background="?colorPrimary"
-    android:padding="15dp"
+    android:background="@drawable/round_follow_primary_color"
+    android:paddingStart="@dimen/space_20"
+    android:paddingEnd="@dimen/space_20"
+    android:paddingTop="@dimen/space_20"
+    android:paddingBottom="@dimen/space_30"
     android:orientation="vertical">
 
     <TextView
@@ -37,20 +40,21 @@
         android:layout_marginTop="20dp"
         android:gravity="end">
 
-        <Button
-            android:id="@+id/btn_ok"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/bg_dialog_button"
-            android:text="@string/save" />
 
         <Button
             android:id="@+id/btn_cancel"
             android:layout_width="100dp"
             android:text="@string/cancel"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/bg_dialog_button"
             android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dialog_button"
+            android:text="@string/save" />
 
     </LinearLayout>
 

@@ -88,7 +88,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(checkPermission(Manifest.permission.READ_MEDIA_VIDEO)) {
                 Log.d(TAG, "onViewCreated: loading...")
-                application.getFileService()?.sync()
+                application.getFileService()?.syncAllVideos()
             } else {
                 requestPermissionIfNeed(
                     Manifest.permission.READ_MEDIA_VIDEO,
@@ -99,7 +99,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         } else {
             if(checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 Log.d(TAG, "onViewCreated: loading...")
-                application.getFileService()?.sync()
+                application.getFileService()?.syncAllVideos()
             } else {
                 requestPermissionIfNeed(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -114,7 +114,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         Log.d(TAG, "onPermissionResult() called with: result = $result")
         val granted = result.entries.count { v -> v.value }
         if (granted != 0) {
-            application.getFileService()?.sync()
+            application.getFileService()?.syncAllVideos()
         } else {
             Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.OK) {

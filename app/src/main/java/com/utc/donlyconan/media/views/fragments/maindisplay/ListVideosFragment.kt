@@ -38,7 +38,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         if (v.id == R.id.img_menu_more) {
             MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
                 when (view.id) {
-                    R.id.btn_play -> startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId())
+                    R.id.btn_play -> startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId(), isContinue())
                     R.id.btn_play_music -> {
                         if(getPlaylistId() == -1) {
                             playMusic(video)
@@ -70,12 +70,16 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                 .setViewState(R.id.btn_favorite, video.isFavorite)
                 .show(parentFragmentManager, PersonalVideoFragment.TAG)
         } else {
-            startVideoDisplayActivity(video.videoId, video.videoUri)
+            startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId(), isContinue())
         }
     }
 
     open fun getPlaylistId(): Int {
         return -1
+    }
+
+    open fun isContinue(): Boolean {
+        return false
     }
 
 

@@ -21,5 +21,6 @@
     <dimen name="space_15">15dp</dimen>
     <dimen name="space_50">50dp</dimen>
     <dimen name="space_100">100dp</dimen>
+    <dimen name="space_30">30dp</dimen>
     <item name="scrim_opacity" type="dimen" format="float">0.3</item>
 </resources>

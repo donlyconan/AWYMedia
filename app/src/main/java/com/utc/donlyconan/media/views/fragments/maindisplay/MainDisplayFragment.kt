@@ -23,7 +23,6 @@ import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.DialogAboutBinding
 import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
 import com.utc.donlyconan.media.views.BaseFragment
-import com.utc.donlyconan.media.views.MainActivity
 import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
@@ -166,7 +165,7 @@ class MainDisplayFragment : BaseFragment() {
                 findNavController().navigate(action)
             }
             R.id.it_sync_data -> {
-                application.getFileService()?.sync()
+                application.getFileService()?.syncAllVideos()
             }
             R.id.it_sort_by -> {
                 val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)
