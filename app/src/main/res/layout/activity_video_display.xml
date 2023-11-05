@@ -21,4 +21,20 @@
         app:use_controller="true"
         app:controller_layout_id="@layout/player_control_view"/>
 
+    <FrameLayout
+        android:id="@+id/progressContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/loading_dim_dark_color">
+
+        <ProgressBar
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/live_red"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
+
+
 </FrameLayout>

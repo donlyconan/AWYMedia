@@ -56,4 +56,7 @@ interface VideoDao {
     @Query("Select video_name from videos where secured = 1")
     fun getAllTitlesInPrivateFolder(): List<String>
 
+    @Query("Select * from videos where secured = 1")
+    fun getAllSecuredVideos(): List<Video>
+
 }

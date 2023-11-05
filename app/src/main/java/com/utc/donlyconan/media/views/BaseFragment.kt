@@ -236,7 +236,9 @@ abstract class BaseFragment : Fragment() {
 
 
     fun showSnackBar(msgId: Int) = showSnackBar(getString(msgId))
-    fun showSnackBar(msg: String) = lifecycleScope.launch(Dispatchers.Main) {
-        Snackbar.make(view!!, msg, Snackbar.LENGTH_SHORT)
+    fun showSnackBar(msg: String) = runOnUIThread {
+        view?.apply {
+            Snackbar.make(this, msg, Snackbar.LENGTH_SHORT).show()
+        }
     }
 }

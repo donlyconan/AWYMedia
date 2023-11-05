@@ -20,13 +20,13 @@ fun now(): Long {
     return Calendar.getInstance().timeInMillis
 }
 
-fun ImageView.setVideoImage(uri: String?, circle: Boolean = false) {
+fun ImageView.setVideoImage(uri: String?, circle: Boolean = false, position: Long = 1000L) {
     val request = Glide.with(context.applicationContext)
         .load(uri?.toUri())
         .placeholder(R.drawable.im_loading)
         .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
         .error(R.drawable.img_error)
-        .frame(1000L)
+        .frame(position)
         .fitCenter()
     if(circle) {
         request.circleCrop()

@@ -58,6 +58,7 @@
     <color name="gray_10_per">#46484C</color>
     <color name="_303132_tools_bar">#303132</color>
     <color name="loading_dim_color">#802A2C2C</color>
+    <color name="loading_dim_dark_color">#CC0C0C0C</color>
     <color name="speed_background">#CC000000</color>
 
 </resources>

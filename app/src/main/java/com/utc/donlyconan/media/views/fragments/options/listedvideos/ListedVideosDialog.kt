@@ -1,9 +1,7 @@
 package com.utc.donlyconan.media.views.fragments.options.listedvideos
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +10,17 @@ import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.utils.Logs
-import com.utc.donlyconan.media.dagger.components.ApplicationComponent
-import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Video
+import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.ListedVideosDialogBinding
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -29,7 +30,7 @@ class ListedVideosDialog: DialogFragment(), OnItemClickListener {
     lateinit var binding: ListedVideosDialogBinding
     var listener: OnSelectedChangeListener? = null
     lateinit var adapter: ListedVideosAdapter
-    @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
+    @Inject lateinit var playlistRepository: PlaylistRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.SheetDialogFullScreen)
@@ -61,22 +62,28 @@ class ListedVideosDialog: DialogFragment(), OnItemClickListener {
         Logs.d("onViewCreated: ")
         val playlistId = arguments?.getInt(EXTRA_PLAYLIST_ID)
         val currentIndex = arguments?.getInt(EXTRA_CURRENT_INDEX)
-        if(playlistId != null) {
-            val playlist = playlistWithVideosDao.get(playlistId)
-            val videos = playlist?.videos
-            videos?.let { videos->
-                adapter = ListedVideosAdapter(requireContext(), videos)
-                adapter.setOnItemClickListener(this)
-                videos.filterIndexed { index, video ->
-                    video.setSelected(index == currentIndex)
-                    index == currentIndex
+        adapter = ListedVideosAdapter(requireContext(), arrayListOf())
+        binding.root.setOnClickListener { dismiss() }
+        binding.rcvVideos.adapter = adapter
+        adapter.setOnItemClickListener(this)
+
+        if (playlistId != null) {
+            lifecycleScope.launch {
+                val playlist = playlistRepository.getPlaylistWithVideos(playlistId)
+                val videos = playlist?.videos
+                videos?.let { videos ->
+                    videos.filterIndexed { index, video ->
+                        video.setSelected(index == currentIndex)
+                        index == currentIndex
+                    }
+                    adapter.submit(videos)
+                }
+                withContext(Dispatchers.Main) {
+                    binding.tvSize.text = "(${videos?.size ?: 0})"
+                    binding.playlistName.text = playlist?.playlist?.title
                 }
             }
-            binding.rcvVideos.adapter = adapter
-            binding.tvSize.text = "(${videos?.size})"
-            binding.playlistName.text = playlist?.playlist?.title
         }
-        binding.root.setOnClickListener { dismiss() }
     }
 
     override fun onResume() {

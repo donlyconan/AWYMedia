@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.utc.donlyconan.media.app.settings.Settings
-import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
+import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.widgets.TAG
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ class VideoDisplayViewModel(
     var playlistId: Int = Playlist.NO_PLAYLIST,
     var continued: Boolean = false,
     var videoRepo: VideoRepository,
-    var playlistWithVideosDao: PlaylistWithVideosDao,
+    var playlistRepository: PlaylistRepository,
     var settings: Settings
 
 ) : ViewModel() {
@@ -66,7 +66,7 @@ class VideoDisplayViewModel(
             } else {
                 _events.value = Result.VideoNotFound()
             }
-            playlist = playlistWithVideosDao.get(playlistId)?.videos
+            playlist = playlistRepository.getPlaylistWithVideos(playlistId)?.videos
             if(playlist != null) {
                 playlist!!.forEach { e -> e.playedTime = 0 }
                 _playlistMld.postValue(playlist)

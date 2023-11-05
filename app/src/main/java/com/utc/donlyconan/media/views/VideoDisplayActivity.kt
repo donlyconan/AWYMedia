@@ -24,6 +24,7 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
+import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
@@ -90,9 +91,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
                 val playlistId = intent.getIntExtra(EXTRA_PLAYLIST, -1)
                 val continued = intent.getBooleanExtra(EXTRA_CONTINUE, false)
                 var videoRepo = appComponent.getVideoRepository()
-                var playlistWithVideosDao = appComponent.getPlaylistWithVideoDao()
+                var playlistRepository = appComponent.getPlaylistRepository()
                 var settings = appComponent.getSettings()
-                VideoDisplayViewModel(videoId, playlistId, continued, videoRepo, playlistWithVideosDao, settings)
+                VideoDisplayViewModel(videoId, playlistId, continued, videoRepo, playlistRepository, settings)
             }
         }
     }
@@ -156,6 +157,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
         with(viewModel) {
             videoMld.observe(this@VideoDisplayActivity) { video ->
                 Logs.d(TAG, "video View Model: video=$video")
+                binding.progressContainer.visibility = View.VISIBLE
                 customBinding.headerTv.text = video.title
                 val mediaItem = if(video.subtitleUri == null) {
                     MediaItem.fromUri(video.videoUri)
@@ -320,6 +322,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
             }
             autoPlay.visibility = if(viewModel.isListMode()) View.VISIBLE else View.GONE
         }
+        binding.progressContainer.setOnTouchListener { v, event -> true }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -436,6 +439,10 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        // when loading that every thing can be disabled
+        if(binding.progressContainer.isVisible) {
+            return true
+        }
         // put flag inhere to prevent #onIsPlayingChanged
         val value = super.dispatchTouchEvent(ev)
         if(!viewModel.lockModeMdl.value!!) {
@@ -447,6 +454,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
     }
 
     private val listener = object : Player.Listener {
+
+        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+            super.onMediaMetadataChanged(mediaMetadata)
+            Log.d(TAG, "onMediaMetadataChanged() called with: mediaMetadata = $mediaMetadata")
+        }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             Log.d(TAG, "onMediaItemTransition: mediaItem=$mediaItem")
@@ -471,6 +483,9 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
                     player.playWhenReady = true
                     player.prepare()
                 }
+            }
+            if(playbackState == Player.STATE_READY) {
+                binding.progressContainer.visibility = View.GONE
             }
             viewModel.isFinished = playbackState == Player.STATE_ENDED
             if (playWhenReady && playbackState == Player.STATE_ENDED && !flinging) {

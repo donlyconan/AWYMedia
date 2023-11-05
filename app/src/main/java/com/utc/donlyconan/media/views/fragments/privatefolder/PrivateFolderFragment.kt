@@ -1,17 +1,9 @@
 package com.utc.donlyconan.media.views.fragments.privatefolder
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.biometric.BiometricManager.Authenticators
-import androidx.biometric.BiometricPrompt
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -19,9 +11,9 @@ import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
+import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.databinding.FragmentPrivateFolderBinding
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.RecycleBinFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 
 class PrivateFolderFragment : ListVideosFragment() {
@@ -78,15 +70,19 @@ class PrivateFolderFragment : ListVideosFragment() {
         }
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        Log.d(RecycleBinFragment.TAG, "onCreateOptionsMenu: ")
-        if (menu is MenuBuilder) {
-            menu.setOptionalIconsVisible(true)
-        }
-        inflater.inflate(R.menu.menu_trash_bar, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun getPlaylistId(): Int {
+        return Playlist.PRIVATE_PLAYLIST_FOLDER
     }
+
+//    @SuppressLint("RestrictedApi")
+//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        Log.d(RecycleBinFragment.TAG, "onCreateOptionsMenu: ")
+//        if (menu is MenuBuilder) {
+//            menu.setOptionalIconsVisible(true)
+//        }
+//        inflater.inflate(R.menu.menu_trash_bar, menu)
+//        super.onCreateOptionsMenu(menu, inflater)
+//    }
 
 
 

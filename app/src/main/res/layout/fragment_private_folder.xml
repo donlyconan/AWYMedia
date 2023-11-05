@@ -15,7 +15,6 @@
         android:baselineAligned="false"
         android:gravity="start|center"
         android:theme="@style/MenuStylle"
-        app:menu="@menu/menu_trash_bar"
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         app:title="@string/private_folder"
         app:titleTextColor="@android:color/white" />
