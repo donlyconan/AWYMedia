@@ -5,12 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -22,6 +24,7 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
+import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
@@ -86,16 +89,31 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
 
     private fun requestPermissions() {
         Log.d(TAG, "requestPermissions() called")
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if(checkPermission(Manifest.permission.READ_MEDIA_VIDEO)) {
-                Log.d(TAG, "onViewCreated: loading...")
-                application.getFileService()?.syncAllVideos()
-            } else {
-                requestPermissionIfNeed(
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                )
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val intentLanucher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                Log.d(TAG, "requestPermissions() called with: result = $result")
+               if(Environment.isExternalStorageManager()) {
+                   application.getFileService()?.syncAllVideos()
+               } else if(!isDetached) {
+                   Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
+                       .setAction(R.string.OK) {
+                           requestPermissions()
+                       }.show()
+               }
+            }
+            if(!Environment.isExternalStorageManager()) {
+                AlertDialogManager.createDeleteAlertDialog(
+                    context = requireContext(),
+                    title = getString(R.string.app_name),
+                    msg = "We are need you to provide file access permission for the app. Let's tab ${getString(R.string.app_name)}'s  checkbox.",
+                    onAccept = {
+                        val permissionIntent = Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                        intentLanucher.launch(permissionIntent)
+                    },
+                    onDeny = {
+                        requireActivity().finish()
+                    }
+                ).show()
             }
         } else {
             if(checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -119,10 +137,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         } else {
             Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.OK) {
-                    requestPermissionIfNeed(
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    )
+                    requestPermissions()
                 }.show()
         }
     }

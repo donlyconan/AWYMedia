@@ -225,6 +225,7 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
             Log.d(TAG, "invokeOnCompletion() restoreFiles")
             hideLoading()
             if (it?.cause is IOException || occuredError || trash.isEmpty()) {
+                Log.e(TAG, "restoreFiles: ", it)
                 showToast(R.string.have_had_some_problems_when_restoring_files)
             } else {
                 Snackbar.make(binding.root, R.string.the_files_is_restored, Snackbar.LENGTH_SHORT)
