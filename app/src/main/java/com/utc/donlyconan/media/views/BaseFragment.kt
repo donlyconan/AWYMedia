@@ -190,7 +190,7 @@ abstract class BaseFragment : Fragment() {
                 val newVideo = video.copy(title = filename, videoUri = uri.toString())
                 repository.moveToRecycleBin(newVideo)
                 requestDeletingFile(videoUri)
-                showSnackBar("The file is moved into Recycle Bin, let's remove it from the external storage.")
+                showSnackBar(R.string.show_info_file_move_into_bin)
             }
 
         }

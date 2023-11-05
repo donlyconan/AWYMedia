@@ -130,6 +130,7 @@
     <string name="move_to_trash">Move to Trash</string>
     <string name="playlist_name_is_invalid">Playlist name is invalid!</string>
     <string name="the_music_is_playing_by_easy_guard_player">The music is playing by Easy Guard Player</string>
+    <string name="show_info_file_move_into_bin">The file is moved into Recycle Bin</string>
 
     <string-array name="language_entries">
         <item>English</item>
