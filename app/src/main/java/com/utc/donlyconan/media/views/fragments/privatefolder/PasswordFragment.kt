@@ -55,6 +55,7 @@ class PasswordFragment : BaseFragment() {
                 Log.d(ListVideosFragment.TAG, "onAuthenticationError() called with: errorCode = $errorCode, errString = $errString")
 //                findNavController().navigateUp()
 //                showToast("The authenticated process is failed!")
+                // TODO refactor the error case when releasing
                 val action = PasswordFragmentDirections.actionPasswordFragmentToPrivateFolderFragment()
                 findNavController().navigate(
                     action,

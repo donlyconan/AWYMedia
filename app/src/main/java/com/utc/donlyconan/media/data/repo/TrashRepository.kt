@@ -9,8 +9,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TrashRepository @Inject constructor(val context: Application,val videoDao: VideoDao, val trashDao: TrashDao) : TrashDao by trashDao {
+class TrashRepository @Inject constructor(val context: Application,
+                                          private val videoDao: VideoDao,
+                                          private val trashDao: TrashDao) : TrashDao by trashDao {
 
+    /**
+     * Perform sync all files in the local storage
+     * if files don't have info in the Video table. It's considered as trash items
+     */
     suspend fun sync() {
         val titles = videoDao.getAllTitlesInPrivateFolder()
         val trashItems = trashDao.getAllTrashes()

@@ -126,6 +126,7 @@ class FileService : Service() {
     }
 
     @Throws(IOException::class)
+    @Synchronized
     suspend fun saveIntoInternal(uri: Uri, filename: String): Pair<String, Uri> {
         Logs.d( "save() called with: uri = $uri, filename = $filename")
         val file = File(filename)
@@ -141,6 +142,7 @@ class FileService : Service() {
     }
 
     @Throws(IOException::class)
+    @Synchronized
     suspend fun saveIntoExternal(filename: String, finish: (result: Boolean, file: File?, uri: Uri) -> Unit){
         Logs.d("removeFromInternal() called with: filename = $filename")
         val rootFolder = androidFile(Environment.DIRECTORY_DOWNLOADS)
@@ -175,13 +177,15 @@ class FileService : Service() {
     }
 
     @Throws(SecurityException::class)
+    @Synchronized
     private suspend fun deleteFileFromExternalStorage(vararg uris: Uri): Int {
         Log.d(TAG, "deleteFileFromExternalStorage() called with: uris = $uris")
         val operations = uris.map { uri -> ContentProviderOperation.newDelete(uri).build() }
             .toMutableList()
        return contentResolver.applyBatch(MediaStore.AUTHORITY, ArrayList(operations)).size
     }
-    
+
+    @Synchronized
     suspend fun deleteFileFromLocalData(vararg names: String): Int {
         Log.d(TAG, "deleteFileFromLocalData() called with: filenames = $names")
         return names.count { name -> context.deleteFile(name) }

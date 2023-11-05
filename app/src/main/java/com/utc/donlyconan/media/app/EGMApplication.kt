@@ -41,7 +41,7 @@ class EGMApplication: Application() {
         val intent = Intent(this, AudioService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
         // Register work manager
-        var periodicWorkRequest =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(REPEATED_INTERVAL_TIME, TimeUnit.MINUTES)
+        var periodicWorkRequest =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(1, TimeUnit.HOURS)
             .build()
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
