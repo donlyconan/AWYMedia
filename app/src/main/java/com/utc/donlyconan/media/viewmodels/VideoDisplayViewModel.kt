@@ -53,6 +53,7 @@ class VideoDisplayViewModel(
     private val _events = MutableLiveData<Result>()
     val events get() = _events
     var currentAction: Int = NO_ACTION
+    val video: Video? get() = _videoMld.value
 
     init {
         viewModelScope.launch {
@@ -97,9 +98,10 @@ class VideoDisplayViewModel(
     fun save(subtitle: String) {
         Log.d(TAG, "save() called with: subtitle = $subtitle")
         _videoMld.value = _videoMld.value?.copy(subtitleUri = subtitle)
-        viewModelScope.launch {
-            videoRepo.update(videoMld.value!!)
-        }
+        // Disable this feature
+//        viewModelScope.launch {
+//            videoRepo.update(videoMld.value!!)
+//        }
     }
 
     suspend fun save(position: Long = 0L) {
