@@ -43,6 +43,7 @@ class Settings @Inject constructor(val appContext: Context) {
     var restoreVideoState by BooleanPreferenceDelegate(preferences, "restore_state", false)
     var autoPlay by BooleanPreferenceDelegate(preferences, "auto_play", true)
     var password by StringPreferenceDelegate(preferences, "password")
+    var hideEntrance by BooleanPreferenceDelegate(preferences, "hideEntrance", false)
 
     /**
      * It represent for Auto Play Mode on Video Screen

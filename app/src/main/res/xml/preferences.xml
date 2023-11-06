@@ -18,6 +18,14 @@
             android:dialogIcon="@drawable/ic_logo"
             android:dialogTitle="@string/select_language"/>
 
+
+        <SwitchPreference
+            android:title="@string/hide_the_entrance"
+            android:key="hideEntrance"
+            android:defaultValue="false"
+            android:summary="@string/des_of_hidden_entrance"
+            />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Video">

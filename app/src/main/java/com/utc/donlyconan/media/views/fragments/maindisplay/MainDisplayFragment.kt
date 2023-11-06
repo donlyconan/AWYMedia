@@ -23,6 +23,7 @@ import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.DialogAboutBinding
 import com.utc.donlyconan.media.databinding.FragmentMainDisplayBinding
 import com.utc.donlyconan.media.views.BaseFragment
+import com.utc.donlyconan.media.views.OnClickTimesListener
 import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
@@ -37,6 +38,7 @@ class MainDisplayFragment : BaseFragment() {
     val binding by lazy { FragmentMainDisplayBinding.inflate(layoutInflater) }
     lateinit var mainDisplayAdapter: MainDisplayAdapter
     var sortedMenu: MenuItem? = null
+    var privateFolderEntrance: MenuItem? = null
     private val args by navArgs<MainDisplayFragmentArgs>()
     @Inject lateinit var listVideoRepo: ListVideoRepository
     @Inject lateinit var trashRepo: TrashRepository
@@ -96,7 +98,20 @@ class MainDisplayFragment : BaseFragment() {
         val appCompat = activity
         appCompat.setSupportActionBar(binding.appbar.toolbar)
         appCompat.supportActionBar?.setDisplayShowTitleEnabled(false)
-
+        binding.appbar.toolbar.setOnClickListener(object : OnClickTimesListener() {
+            override fun onClickTimes(v: View, times: Int): Boolean {
+                Log.d(TAG, "onClickTimes() called with: v = $v, times = $times")
+                // Need to click three times before navigating to the private folder
+                return if(times >= 3) {
+                    val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToPrivateFolder()
+                    findNavController().navigate(action)
+                    true
+                } else {
+                    false
+                }
+            }
+        })
+        settings.hideEntrance
     }
 
     private fun setUpViewPager() {
@@ -148,6 +163,8 @@ class MainDisplayFragment : BaseFragment() {
         }
         inflater.inflate(R.menu.menu_bar, menu)
         sortedMenu = menu.findItem(R.id.it_sort_by);
+        privateFolderEntrance = menu.findItem(R.id.it_private_folder)
+        privateFolderEntrance?.isVisible = !settings.hideEntrance
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -215,6 +232,12 @@ class MainDisplayFragment : BaseFragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume() called")
+        privateFolderEntrance?.isVisible = !settings.hideEntrance
     }
 
 
