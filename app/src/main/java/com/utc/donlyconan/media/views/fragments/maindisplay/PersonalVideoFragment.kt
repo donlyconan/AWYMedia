@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
@@ -27,6 +28,7 @@ import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
+import com.utc.donlyconan.media.app.utils.toBannerNumber
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
@@ -42,7 +44,12 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>{
         viewModelFactory {
-            initializer { PersonalVideoViewModel(appComponent.getVideoRepository()) }
+            initializer {
+                PersonalVideoViewModel(
+                    appComponent.getVideoRepository(),
+                    appComponent.getTrashRepository()
+                )
+            }
         }
     }
 
@@ -84,7 +91,14 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
         }
         binding.fab.setOnTouchListener(onTouchEvent)
-
+        viewModel.numberOfTrash.observe(this) { quantity ->
+            binding.fabTrash.isSelected = quantity > 0
+            binding.tvTrashCount.text = quantity.toBannerNumber()
+        }
+        binding.fabTrash.setOnClickListener {
+            val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToTrashFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private fun requestPermissions() {

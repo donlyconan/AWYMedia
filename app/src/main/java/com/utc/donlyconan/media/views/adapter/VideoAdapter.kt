@@ -1,10 +1,14 @@
 package com.utc.donlyconan.media.views.adapter
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.content.Context
 import android.util.Log
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.formatToTime
@@ -15,13 +19,15 @@ import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
 import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.databinding.ItemVideoSingleModeBinding
+import kotlin.math.log
 
 
 class VideoAdapter(
     var context: Context,
     data: List<Video>,
     var showProgress: Boolean = false,
-    var showOptionMenu: Boolean = true
+    var showOptionMenu: Boolean = true,
+    val dragMode: Boolean = false,
 ) : BaseAdapter<Any>(Video.diffUtil, data) {
 
     companion object {
@@ -68,7 +74,7 @@ class VideoAdapter(
         super.onBindViewHolder(holder, position)
         val item = getItem(position)
         if(item is Video && holder is VideoHolder) {
-            holder.bind(item, showProgress, showOptionMenu)
+            holder.bind(item, showProgress, showOptionMenu, dragMode)
             holder.setLastItem(position == getData().size - 1)
         }
         if(item is String && holder is GroupHolder) {
@@ -93,7 +99,7 @@ class VideoAdapter(
             binding.rootLayout.setOnLongClickListener(this)
         }
 
-        fun bind(video: Video, showProgress: Boolean, showOptionMenu: Boolean) {
+        fun bind(video: Video, showProgress: Boolean, showOptionMenu: Boolean, dragMode: Boolean = false) {
             binding.tvTitle.text = video.title
             binding.tvDate.text = video.createdAt.formatToTime()
             binding.tvSize.text = video.size.convertToStorageData()
@@ -113,6 +119,13 @@ class VideoAdapter(
                     progress = video.playedTime.toInt()
                 }
             }
+            binding.rootLayout.setOnLongClickListener { v ->
+                val shadow = View.DragShadowBuilder(binding.imgThumbnail)
+                val data = ClipData(video.videoUri, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), ClipData.Item(video.videoUri.toUri()))
+                v.startDragAndDrop(data, shadow, binding.imgThumbnail, 0)
+                true
+            }
+            binding.rootLayout.setOnDragListener(this)
         }
 
         fun setLastItem(isLastItem: Boolean) {

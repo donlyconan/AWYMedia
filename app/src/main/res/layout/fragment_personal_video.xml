@@ -20,26 +20,71 @@
 
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:backgroundTint="@color/white_gray"
-        android:foreground="@drawable/bg_music_button"
-        android:visibility="invisible"
-        android:foregroundGravity="center"
-        app:fabSize="normal"
-        app:maxImageSize="50dp"
-        app:useCompatPadding="false" />
+        android:layout_margin="@dimen/fab_margin">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabTrash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7dp"
+                android:backgroundTint="@color/white_gray"
+                android:foreground="@drawable/bg_recycle_bin"
+                android:visibility="visible"
+                android:foregroundGravity="center"
+                android:elevation="1dp"
+                app:fabSize="normal"
+                app:maxImageSize="50dp"
+                app:useCompatPadding="false" />
+
+            <TextView
+                android:id="@+id/tvTrashCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:background="@drawable/bg_round_and_read_color"
+                android:elevation="@dimen/space_100"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp"
+                android:textSize="11sp"
+                android:textColor="@color/white"
+                android:text="@string/_0" />
+
+        </RelativeLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white_gray"
+            android:foreground="@drawable/bg_music_button"
+            android:layout_marginBottom="7dp"
+            android:visibility="visible"
+            android:foregroundGravity="center"
+            app:fabSize="normal"
+            app:maxImageSize="50dp"
+            app:useCompatPadding="false" />
+
+
+    </LinearLayout>
 
     <include
         android:id="@+id/icd_loading"
+        layout="@layout/loading_data_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        layout="@layout/loading_data_screen"
-        android:layout_gravity="center"
-        />
+        android:visibility="gone"
+        android:layout_gravity="center" />
 
 </FrameLayout>

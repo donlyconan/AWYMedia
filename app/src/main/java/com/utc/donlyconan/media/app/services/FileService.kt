@@ -34,11 +34,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 
 
+/**
+ * Perform the file managing consist of save, delete files in the local or external storage
+ */
 class FileService : Service() {
 
     companion object {
@@ -210,6 +214,7 @@ class FileService : Service() {
         delay(DELAY_BEFORE_DELETING)
         Log.d(TAG, "createRequestDelete: deleting files = $listUris")
         try {
+            yield()
             deleteFileFromExternalStorage(*listUris.toTypedArray())
             Log.d(TAG, "createRequestDelete() cleared ${listUris.size} files")
         } catch (e: SecurityException) {

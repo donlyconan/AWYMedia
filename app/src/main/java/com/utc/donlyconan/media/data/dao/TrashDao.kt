@@ -32,4 +32,7 @@ interface TrashDao {
     @Query("Select * from trashes where video_id=:videoId")
     fun find(videoId: Int): Trash?
 
+    @Query("Select count(video_id) from trashes")
+    fun count(): LiveData<Int>
+
 }

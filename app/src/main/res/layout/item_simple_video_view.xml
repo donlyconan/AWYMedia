@@ -81,6 +81,9 @@
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:scaleType="centerInside"
         android:checked="false"
+        android:clickable="false"
+        android:longClickable="false"
+        android:enabled="false"
         android:button="@drawable/radio_button_style"
         android:src="@drawable/ic_more_event" />
 

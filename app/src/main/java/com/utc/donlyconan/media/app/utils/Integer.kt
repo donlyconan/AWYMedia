@@ -26,6 +26,14 @@ fun Int.formatShortTime(): String {
         append(if(sec >= 10) sec else "0$sec")
     }.toString()
 }
+
+fun Int.toBannerNumber(): String {
+    if(this < 100) {
+        return this.toString()
+    } else {
+        return "99+"
+    }
+}
 //
 //fun main() {
 ////    println("Unit=" + 300L.convertToStorageData() )
