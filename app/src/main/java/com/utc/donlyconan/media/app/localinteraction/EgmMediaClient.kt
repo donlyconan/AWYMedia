@@ -1,13 +1,19 @@
 package com.utc.donlyconan.media.app.localinteraction
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.net.InetSocketAddress
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.Scanner
+import kotlin.experimental.or
 import kotlin.math.log
 
 class EgmMediaClient: EgmSystem() {
@@ -38,6 +44,36 @@ class EgmMediaClient: EgmSystem() {
 fun main() {
     runBlocking {
         val clientService = EgmMediaClient()
+        var file: File? = null
+        var outputStream: OutputStream? = null
+
+
+        clientService.registerSocketEvent(object : SocketEvent {
+
+            override fun onReceive(command: Command) {
+                Log("onReceive() called with: command = ${command.code}")
+                when(command.code) {
+                    Command.CODE_FILE_START -> {
+                        file = File("A:\\resources",command.get(String::class))
+                        outputStream = FileOutputStream(file)
+                    }
+                    Command.CODE_FILE_START -> {
+                        file = File("A:\\resources",command.get(String::class))
+                        outputStream = FileOutputStream(file)
+                    }
+                    Command.CODE_FILE_SENDING,  Command.CODE_FILE_END -> {
+                        outputStream?.write(command.bytes, )
+                        if (command.code == Command.CODE_FILE_END) {
+                            outputStream?.flush()
+                            outputStream?.close()
+                            outputStream = null
+                        }
+                    }
+                }
+
+            }
+        })
+        delay(1000)
         launch(Dispatchers.IO) {
             Log("setup")
             clientService.apply {
@@ -46,11 +82,7 @@ fun main() {
             }
         }
            Log("socketEvent")
-        clientService.registerSocketEvent(object : SocketEvent {
-            override fun onReceive(command: Command) {
-                Log("Received: " + command.get(String::class))
-            }
-        })
+
         do {
             val scanner = Scanner(System.`in`)
             println("Enter something: ")

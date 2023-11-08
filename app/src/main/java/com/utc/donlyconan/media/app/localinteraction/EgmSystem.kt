@@ -1,11 +1,14 @@
 package com.utc.donlyconan.media.app.localinteraction
 
 import com.utc.donlyconan.media.app.utils.consumeAll
+import kotlinx.coroutines.delay
+import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
+import kotlin.math.min
 
 abstract class EgmSystem {
     companion object {
@@ -77,26 +80,24 @@ abstract class EgmSystem {
     }
 
     open fun doWrite(key: SelectionKey) = key.use { socket, client ->
-        Log("doWrite() called with: client = $client")
         mediumBuffer.clear()
         client?.packages?.iterator()?.consumeAll { data ->
-            mediumBuffer.put(data)
-            mediumBuffer.flip()
+            mediumBuffer.put(data).flip()
             socket.write(mediumBuffer)
         }
     }
 
     open fun doRead(key: SelectionKey) = key.use { socket, client ->
-        Log("doRead() called with: address = ${socket.remoteAddress}")
         mediumBuffer.clear()
-        val quantity = socket.read(mediumBuffer)
-        if(quantity == -1) {
+        var quantity = socket.read(mediumBuffer)
+        if(quantity <= -1) {
             disconnect(key)
         } else {
             mediumBuffer.flip()
             val command = Command.from(mediumBuffer)
             client?.receive(command)
             events.send(command)
+            mediumBuffer.compact()
         }
     }
 
@@ -105,7 +106,7 @@ abstract class EgmSystem {
     }
 
     open fun disconnect(key: SelectionKey) {
-        Log("disconnect() called with: key = $key")
+        Log("disconnect() called with: address = ${key.client?.socket?.remoteAddress}")
         try {
             key.close()
             key.channel().close()
@@ -122,6 +123,37 @@ abstract class EgmSystem {
     }
 
     abstract fun isServer(): Boolean
+
+    fun sendWith(command: Command) {
+        Log("sendAll: command=$command")
+        clients.values.forEach { client ->
+            client.send(command, false)
+        }
+        selector.wakeup()
+    }
+
+    fun send(code: Byte, bytes: ByteArray) {
+        val buffer = ByteBuffer.allocate(CAPACITY_4M)
+        buffer.put(code).put(bytes).flip()
+        clients.forEach { _, client ->
+            client.socket.write(buffer)
+            buffer.rewind()
+        }
+    }
+
+    suspend fun sendFile(destination: Command, inputStream: InputStream) {
+        Log("sendAll: inputStream")
+        send(destination.code, destination.bytes)
+        delay(50)
+        inputStream.use { inp ->
+            while (inp.available() > 0) {
+                var bytes = ByteArray(min(inp.available(), CAPACITY_4M - 1))
+                val code = if (inp.available() > CAPACITY_4M - 1) Command.CODE_FILE_SENDING else Command.CODE_FILE_END
+                inp.read(bytes)
+                send(code, bytes)
+            }
+        }
+    }
 
     fun registerSocketEvent(event: SocketEvent) {
         events.add(event)

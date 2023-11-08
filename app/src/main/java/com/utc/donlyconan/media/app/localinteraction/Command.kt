@@ -1,5 +1,7 @@
 package com.utc.donlyconan.media.app.localinteraction
 
+import com.utc.donlyconan.media.data.models.Video
+import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 
@@ -36,7 +38,7 @@ class Command private constructor(){
 
     inline fun <reified T: Any> get(kClass: KClass<T>): T? {
         return when(kClass) {
-            String::class -> String(bytes) as T
+            String::class -> String(bytes, Charsets.UTF_8).trim() as T
             ByteArray::class -> bytes as? T
             else -> {
                 Log("kClass: $kClass is not found.")
@@ -50,17 +52,20 @@ class Command private constructor(){
     }
 
     companion object {
-        const val CODE_MESSAGE_SEND: Byte = 0x01
-        const val CODE_OBJECT_SEND: Byte = 0x02
-        const val CODE_FILE_START: Byte = 0x03
-        const val CODE_FILE_SENDING: Byte = 0x04
-        const val CODE_FILE_END: Byte = 0x04
+        val CODE_MESSAGE_SEND: Byte = 1
+        val CODE_OBJECT_SEND: Byte = 2
+        val CODE_FILE_START: Byte = 11
+        val CODE_FILE_SENDING: Byte = 12
+        val CODE_FILE_END: Byte = 13
+        val CODE_VIDEO_START: Byte = 14
 
-
+        @JvmStatic
         fun from(buffer: ByteBuffer): Command = Command(buffer)
 
+        @JvmStatic
         fun from(msg: String): Command = Command(CODE_MESSAGE_SEND, msg.toByteArray())
 
+        @JvmStatic
         fun from(code: Byte, bytes: ByteArray) = Command(code, bytes)
     }
 }

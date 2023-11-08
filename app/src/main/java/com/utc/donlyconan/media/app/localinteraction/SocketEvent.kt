@@ -5,4 +5,6 @@ interface SocketEvent {
 
     fun onReceive(command: Command)
 
+    fun onReceive(bytes: ByteArray) {}
+
 }
