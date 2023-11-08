@@ -8,9 +8,9 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
-import kotlin.math.min
+import kotlin.reflect.KClass
 
-abstract class EgmSystem {
+abstract class EGPSystem {
     companion object {
         const val IP_PORT = 8888
         const val HOSTNAME = "localhost"
@@ -18,18 +18,33 @@ abstract class EgmSystem {
         const val CAPACITY_2M = 2046
         const val CAPACITY_4M = 4096
         const val CAPACITY_8M = 8192
+
+        @JvmStatic
+        fun <T: EGPSystem> create(kClass: KClass<T>, ipAddress: String): EGPSystem {
+            return when(kClass) {
+                EGPMediaServer::class -> EGPMediaServer()
+                EGPMediaClient::class -> EGPMediaClient()
+                else -> {
+                    throw ClassNotFoundException("${kClass.simpleName} is not found")
+                }
+            }?.apply {
+                setup(ipAddress)
+            }
+        }
     }
 
     protected var isAlive:Boolean = false
-    protected lateinit var selector: Selector
-    val mediumBuffer = ByteBuffer.allocate(CAPACITY_4M)
-    val clients: HashMap<SelectionKey, Client> by lazy { hashMapOf() }
-    val events by lazy { mutableListOf<SocketEvent>() }
+        private set
+    protected var _selector: Selector? = null
+    protected val selector: Selector get() = _selector!!
+    protected val byteBuffer: ByteBuffer by lazy { ByteBuffer.allocate(CAPACITY_4M) }
+    protected val clients: HashMap<SelectionKey, Client> by lazy { hashMapOf() }
+    protected val events by lazy { mutableListOf<SocketEvent>() }
 
     /**
      * Set up all attributes for system before running
      */
-    abstract fun setup()
+    abstract fun setup(ipAddress: String)
 
     fun run() {
         Log("Setup is completed and run on port: $IP_PORT")
@@ -63,16 +78,15 @@ abstract class EgmSystem {
                     e.printStackTrace()
                 }
             }
-
         }
+
+        // shutdown when server is not necessary
         shutdown()
     }
 
     open fun doAccept(socket: SocketChannel) {
         socket.configureBlocking(false)
-        val key = socket.register(selector, SelectionKey.OP_READ).apply {
-            interestOps(SelectionKey.OP_READ)
-        }
+        val key = socket.register(selector, SelectionKey.OP_READ)
         val client = Client(key, selector, socket)
         key.attach(client)
         Log("Server# Accepted a client: IP: ${socket.remoteAddress}")
@@ -80,24 +94,24 @@ abstract class EgmSystem {
     }
 
     open fun doWrite(key: SelectionKey) = key.use { socket, client ->
-        mediumBuffer.clear()
+        byteBuffer.clear()
         client?.packages?.iterator()?.consumeAll { data ->
-            mediumBuffer.put(data).flip()
-            socket.write(mediumBuffer)
+            byteBuffer.put(data).flip()
+            socket.write(byteBuffer)
         }
     }
 
     open fun doRead(key: SelectionKey) = key.use { socket, client ->
-        mediumBuffer.clear()
-        var quantity = socket.read(mediumBuffer)
-        if(quantity <= -1) {
+        byteBuffer.clear()
+        var quantity = socket.read(byteBuffer)
+        if(quantity == -1) {
             disconnect(key)
         } else {
-            mediumBuffer.flip()
-            val command = Command.from(mediumBuffer)
+            byteBuffer.flip()
+            val command = Command.from(byteBuffer)
             client?.receive(command)
-            events.send(command)
-            mediumBuffer.compact()
+            events.sendAll(command)
+            byteBuffer.compact()
         }
     }
 
@@ -120,18 +134,22 @@ abstract class EgmSystem {
         isAlive = false
         clients.clear()
         selector.close()
+        _selector = null
     }
 
-    abstract fun isServer(): Boolean
+    abstract fun isGroupOwner(): Boolean
 
     fun sendWith(command: Command) {
-        Log("sendAll: command=$command")
+        Log("sendWith: client.size=${clients.size}, command=$command")
         clients.values.forEach { client ->
             client.send(command, false)
         }
         selector.wakeup()
     }
 
+    /**
+     * Send to all clients with data that is attached
+     */
     fun send(code: Byte, bytes: ByteArray) {
         val buffer = ByteBuffer.allocate(CAPACITY_4M)
         buffer.put(code).put(bytes).flip()
@@ -141,13 +159,20 @@ abstract class EgmSystem {
         }
     }
 
+    /**
+     * Send a file and it's info
+     */
     suspend fun sendFile(destination: Command, inputStream: InputStream) {
         Log("sendAll: inputStream")
         send(destination.code, destination.bytes)
-        delay(50)
+        delay(50 /*delay time for preparing form clients*/ )
+        // spend a slot for hash code
+        var bytes = ByteArray(CAPACITY_4M - 1)
         inputStream.use { inp ->
             while (inp.available() > 0) {
-                var bytes = ByteArray(min(inp.available(), CAPACITY_4M - 1))
+                if(inp.available() < CAPACITY_4M - 1) {
+                    bytes = ByteArray(inp.available())
+                }
                 val code = if (inp.available() > CAPACITY_4M - 1) Command.CODE_FILE_SENDING else Command.CODE_FILE_END
                 inp.read(bytes)
                 send(code, bytes)

@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -13,37 +12,36 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.Scanner
-import kotlin.experimental.or
-import kotlin.math.log
 
-class EgmMediaClient: EgmSystem() {
-    lateinit var socket: SocketChannel
-    var client: Client? = null
+class EGPMediaClient: EGPSystem() {
+    var socket: SocketChannel? = null
 
-    override fun setup() {
-        Log("connect: Client is connecting to the server...")
-        socket = SocketChannel.open(InetSocketAddress(HOSTNAME, IP_PORT))
-        socket.configureBlocking(false)
-        Log("connect: Client was setup and run...")
-        selector = Selector.open()
-        val key = socket.register(selector, SelectionKey.OP_READ)
-        client = Client(key, selector, socket)
-        key.attach(client)
+    override fun setup(ipAddress: String) {
+        Log("Client is setting up...")
+        socket = SocketChannel.open(InetSocketAddress(ipAddress, IP_PORT)).apply {
+            configureBlocking(false)
+            _selector = Selector.open()
+            val key = register(selector, SelectionKey.OP_READ)
+            val client = Client(key, selector, this)
+            key.attach(client)
+            clients[key] = client
+        }
     }
 
     override fun shutdown() {
         super.shutdown()
-        socket.close()
+        socket?.close()
+        socket = null
     }
 
-    override fun isServer(): Boolean {
+    override fun isGroupOwner(): Boolean {
         return false
     }
 }
 
 fun main() {
     runBlocking {
-        val clientService = EgmMediaClient()
+        val clientService = EGPSystem.create(EGPMediaClient::class, EGPSystem.HOSTNAME)
         var file: File? = null
         var outputStream: OutputStream? = null
 
@@ -51,12 +49,9 @@ fun main() {
         clientService.registerSocketEvent(object : SocketEvent {
 
             override fun onReceive(command: Command) {
+                super.onReceive(command)
                 Log("onReceive() called with: command = ${command.code}")
                 when(command.code) {
-                    Command.CODE_FILE_START -> {
-                        file = File("A:\\resources",command.get(String::class))
-                        outputStream = FileOutputStream(file)
-                    }
                     Command.CODE_FILE_START -> {
                         file = File("A:\\resources",command.get(String::class))
                         outputStream = FileOutputStream(file)
@@ -69,6 +64,9 @@ fun main() {
                             outputStream = null
                         }
                     }
+                    else -> {
+                        Log("Code = ${command.code} is not found")
+                    }
                 }
 
             }
@@ -77,7 +75,6 @@ fun main() {
         launch(Dispatchers.IO) {
             Log("setup")
             clientService.apply {
-                setup()
                 run()
             }
         }
@@ -87,7 +84,7 @@ fun main() {
             val scanner = Scanner(System.`in`)
             println("Enter something: ")
             val data = scanner.nextLine()
-            clientService.client?.send(Command.from(data))
+            clientService.sendWith(Command.from(data))
         } while (!data.equals("exit"))
         println("End of system.")
     }

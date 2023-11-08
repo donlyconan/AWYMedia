@@ -28,7 +28,7 @@ fun Log(msg: String) {
 var SelectionKey.client: Client? get() = attachment() as? Client
     set(value) = attach(value) as Unit
 
-fun List<SocketEvent>.send(command: Command) {
+fun List<SocketEvent>.sendAll(command: Command) {
     forEach { e -> e.onReceive(command) }
 }
 

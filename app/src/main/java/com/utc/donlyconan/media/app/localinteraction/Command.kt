@@ -1,7 +1,5 @@
 package com.utc.donlyconan.media.app.localinteraction
 
-import com.utc.donlyconan.media.data.models.Video
-import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 
@@ -20,11 +18,9 @@ class Command private constructor(){
         buffer.get(bytes)
     }
 
-    fun toByteBuffer(): ByteBuffer {
-        val buffer = ByteBuffer.allocate(bytes.size + 1)
+    fun putInto(buffer: ByteBuffer) {
         buffer.put(code)
         buffer.put(bytes)
-        return buffer
     }
 
     fun toByteArray(): ByteArray {
@@ -52,12 +48,16 @@ class Command private constructor(){
     }
 
     companion object {
-        val CODE_MESSAGE_SEND: Byte = 1
-        val CODE_OBJECT_SEND: Byte = 2
-        val CODE_FILE_START: Byte = 11
-        val CODE_FILE_SENDING: Byte = 12
-        val CODE_FILE_END: Byte = 13
-        val CODE_VIDEO_START: Byte = 14
+        const val CODE_MESSAGE_SEND: Byte   = 1
+        const val CODE_OBJECT_SEND: Byte    = 2
+
+        const val CODE_FILE_START: Byte     = 11
+        const val CODE_FILE_SENDING: Byte   = 12
+        const val CODE_FILE_END: Byte       = 13
+        const val CODE_VIDEO_ENCODE: Byte   = 14
+
+        const val CODE_ADJUST_POSITION: Byte= 15
+        const val CODE_CHANGE_SPEED: Byte   = 16
 
         @JvmStatic
         fun from(buffer: ByteBuffer): Command = Command(buffer)
@@ -67,5 +67,16 @@ class Command private constructor(){
 
         @JvmStatic
         fun from(code: Byte, bytes: ByteArray) = Command(code, bytes)
+
+        @JvmStatic
+        fun hasCode(code: Byte): Boolean {
+            return when(code) {
+                CODE_MESSAGE_SEND, CODE_OBJECT_SEND,
+                CODE_FILE_START, CODE_FILE_SENDING, CODE_VIDEO_ENCODE,
+                CODE_ADJUST_POSITION, CODE_CHANGE_SPEED,
+                    -> true
+                else -> false
+            }
+        }
     }
 }
