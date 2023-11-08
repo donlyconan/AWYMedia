@@ -10,6 +10,10 @@ import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import kotlin.reflect.KClass
 
+/**
+ * That class represent for clients or server. It can be used to communicate among anther devices.
+ * EGM System need to implement into two parts that is EGM Server and EGM Client
+ */
 abstract class EGPSystem {
     companion object {
         const val IP_PORT = 8888
@@ -149,6 +153,7 @@ abstract class EGPSystem {
 
     /**
      * Send to all clients with data that is attached
+     * It can be used outside the current thread
      */
     fun send(code: Byte, bytes: ByteArray) {
         val buffer = ByteBuffer.allocate(CAPACITY_4M)
