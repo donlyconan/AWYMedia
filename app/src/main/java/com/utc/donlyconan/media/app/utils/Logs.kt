@@ -9,7 +9,6 @@ object Logs {
 
     const val DEBUG_MODE = true
 
-
     fun d(tag: String, msg: String) = Log.d(tag, msg)
 
     fun d(msg: String) = Timber.d(msg)

@@ -33,3 +33,13 @@ fun ImageView.setVideoImage(uri: String?, circle: Boolean = false, position: Lon
     }
     request.into(this)
 }
+
+fun <T> MutableIterator<out T>.consumeAll(consume: (e: T) -> Unit) {
+    try {
+        while (hasNext()) {
+            val data = next()
+            remove()
+            consume(data)
+        }
+    } finally {}
+}

@@ -1,5 +1,6 @@
 package com.utc.donlyconan.media.data.models
 
+import android.os.Parcelable
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.ColumnInfo
@@ -10,8 +11,9 @@ import androidx.room.PrimaryKey
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.views.adapter.Selectable
+import kotlinx.android.parcel.Parcelize
 import java.io.File
-
+@Parcelize
 @Entity(tableName = "videos", indices = [Index(value = ["video_uri"], unique = true)])
 data class Video(
     @PrimaryKey(autoGenerate = true)
@@ -41,7 +43,7 @@ data class Video(
     var subtitleUri: String? = null,
     @ColumnInfo(name = "external_uri")
     var externalUri: String? = null,
-) : Selectable {
+) : Selectable, Parcelable {
     @Ignore
     var isChecked: Boolean = false
 
