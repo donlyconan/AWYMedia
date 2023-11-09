@@ -3,32 +3,26 @@ package com.utc.donlyconan.media.app.localinteraction
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 
-class Command private constructor(){
+class Packet private constructor(){
     var code: Byte = 0
+        private set
     lateinit var bytes: ByteArray
+        private set
 
     private constructor(code: Byte, bytes: ByteArray) : this() {
         this.code = code
         this.bytes = bytes
     }
 
-    private constructor(buffer: ByteBuffer) : this() {
-        code = buffer.get()
-        bytes = ByteArray(buffer.remaining())
-        buffer.get(bytes)
-    }
-
-    fun putInto(buffer: ByteBuffer) {
-        buffer.put(code)
-        buffer.put(bytes)
+    private constructor(bytes: ByteArray) : this() {
+        this.code = bytes[0]
+        this.bytes = bytes.copyOfRange(1, bytes.size)
     }
 
     fun toByteArray(): ByteArray {
         return ByteArray(bytes.size + 1).apply {
-            set(0, code)
-            for (i in 0 until bytes.size) {
-                set(i + 1, bytes[i])
-            }
+            this[0] = code
+            fill(bytes, 1)
         }
     }
 
@@ -60,13 +54,12 @@ class Command private constructor(){
         const val CODE_CHANGE_SPEED: Byte   = 16
 
         @JvmStatic
-        fun from(buffer: ByteBuffer): Command = Command(buffer)
+        fun from(msg: String): Packet = Packet(CODE_MESSAGE_SEND, msg.toByteArray())
+
+        fun from(bytes: ByteArray): Packet = Packet(bytes)
 
         @JvmStatic
-        fun from(msg: String): Command = Command(CODE_MESSAGE_SEND, msg.toByteArray())
-
-        @JvmStatic
-        fun from(code: Byte, bytes: ByteArray) = Command(code, bytes)
+        fun from(code: Byte, bytes: ByteArray) = Packet(code, bytes)
 
         @JvmStatic
         fun hasCode(code: Byte): Boolean {

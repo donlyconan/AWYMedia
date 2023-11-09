@@ -2,8 +2,8 @@ package com.utc.donlyconan.media.app.localinteraction
 
 
 interface SocketEvent {
-    fun onReceive(command: Command) {
-        onReceive(command.code, command.bytes)
+    fun onReceive(packet: Packet) {
+        onReceive(packet.code, packet.bytes)
     }
 
     fun onReceive(code: Byte, bytes: ByteArray) { }

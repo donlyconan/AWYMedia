@@ -1,92 +1,111 @@
 package com.utc.donlyconan.media.app.localinteraction
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.net.Inet4Address
+import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.Socket
+import java.net.SocketAddress
+import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.Scanner
 
 class EGPMediaClient: EGPSystem() {
-    var socket: SocketChannel? = null
+    private var _socket: Socket? = null
+    val socket: Socket get() = _socket!!
+    var client: Client? = null
+        private set
 
-    override fun setup(ipAddress: String) {
-        Log("Client is setting up...")
-        socket = SocketChannel.open(InetSocketAddress(ipAddress, IP_PORT)).apply {
-            configureBlocking(false)
-            _selector = Selector.open()
-            val key = register(selector, SelectionKey.OP_READ)
-            val client = Client(key, selector, this)
-            key.attach(client)
-            clients[key] = client
-        }
+    override fun setup(inetAddress: InetAddress?) {
+        _socket = Socket(inetAddress, IP_PORT)
+        accept(socket)
+    }
+
+    override suspend fun start() {
+        println("Client is started.")
+        isAlive = true
+        clients.values.firstOrNull()?.start()
+        println("Client is shutdown.")
+        shutdown()
     }
 
     override fun shutdown() {
         super.shutdown()
-        socket?.close()
-        socket = null
+        _socket?.close()
+        _socket = null
     }
 
-    override fun isGroupOwner(): Boolean {
-        return false
-    }
+    override fun isGroupOwner() = false
 }
 
 fun main() {
     runBlocking {
-        val clientService = EGPSystem.create(EGPMediaClient::class, EGPSystem.HOSTNAME)
-        var file: File? = null
-        var outputStream: OutputStream? = null
+        val service = (EGPSystem.create(EGPMediaClient::class, InetAddress.getLocalHost()) as EGPMediaClient)
 
+        service.registerClientServiceListener(object : Client.ClientServiceListener {
 
-        clientService.registerSocketEvent(object : SocketEvent {
+            var file: File? = null
+            var outputStream: OutputStream? = null
 
-            override fun onReceive(command: Command) {
-                super.onReceive(command)
-                Log("onReceive() called with: command = ${command.code}")
-                when(command.code) {
-                    Command.CODE_FILE_START -> {
-                        file = File("A:\\resources",command.get(String::class))
+            override fun onReceive(clientId: Long, bytes: ByteArray) {
+                val code = bytes[0]
+                when(code) {
+                    Packet.CODE_FILE_START -> {
+                        val packet = Packet.from(bytes)
+                        file = File("A:\\resources", packet.get(String::class))
                         outputStream = FileOutputStream(file)
+                        println("Filename=${file?.name}")
                     }
-                    Command.CODE_FILE_SENDING,  Command.CODE_FILE_END -> {
-                        outputStream?.write(command.bytes, )
-                        if (command.code == Command.CODE_FILE_END) {
+                    Packet.CODE_FILE_SENDING,  Packet.CODE_FILE_END -> {
+                        outputStream?.write(bytes, 1, bytes.size - 1)
+                        if (code == Packet.CODE_FILE_END) {
                             outputStream?.flush()
                             outputStream?.close()
                             outputStream = null
+                            println("Size=${file?.length()}")
                         }
                     }
+                    Packet.CODE_MESSAGE_SEND -> {
+                        println("Message: ${Packet.from(bytes).get(String::class)}")
+                    }
                     else -> {
-                        Log("Code = ${command.code} is not found")
+                        Log("Code = ${code} is not found")
                     }
                 }
-
             }
+
         })
-        delay(1000)
+
         launch(Dispatchers.IO) {
-            Log("setup")
-            clientService.apply {
-                run()
+            val scanner = Scanner(System.`in`)
+            while (true) {
+                println("Input something ${service.threadInfo()}: ")
+                val text = scanner.nextLine()
+                service.send(Packet.from(text))
             }
         }
-           Log("socketEvent")
 
-        do {
-            val scanner = Scanner(System.`in`)
-            println("Enter something: ")
-            val data = scanner.nextLine()
-            clientService.sendWith(Command.from(data))
-        } while (!data.equals("exit"))
-        println("End of system.")
+
+        GlobalScope.launch {
+            delay(2000)
+            val file = File("B:\\Downloads\\English Conversation Practice - Improve Speaking Skills.mp4")
+            val packet = Packet.from(Packet.CODE_FILE_START, file.name.toByteArray())
+            service.sendFile(packet, file.inputStream())
+        }
+
+        launch {
+            service.start()
+        }.join()
     }
 
 }

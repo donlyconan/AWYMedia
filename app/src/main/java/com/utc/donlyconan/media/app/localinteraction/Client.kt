@@ -1,38 +1,65 @@
 package com.utc.donlyconan.media.app.localinteraction
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
-import java.nio.channels.SocketChannel
-import java.util.Stack
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.net.ConnectException
+import java.net.Socket
+import java.nio.ByteBuffer
+import kotlin.concurrent.thread
+import kotlin.math.log
 
-class Client(val key: SelectionKey, val selector: Selector, val socket: SocketChannel) {
-    companion object {
-        @get:Synchronized
-        private var sClientId = 0L
+open class Client(val clientId: Long, val socket: Socket) {
+    protected val inputStream = DataInputStream(socket.getInputStream())
+    protected val outputStream = DataOutputStream(socket.getOutputStream())
+    @Volatile
+    var clientServiceListener: ClientServiceListener? = null
+
+    /**
+     * Start a service
+     * Thread will be block to run the service.
+     */
+    suspend fun start() {
+        println("Client#$clientId is started. ThreadInfo={${Thread.currentThread().name}}")
+        var count = 0
+        val bytes = ByteArray(EGPSystem.DEFAULT_BUFFER_SIZE)
+        clientServiceListener?.onStart(clientId, socket)
+        while (count != -1){
+            count = inputStream.read(bytes)
+            if(count < bytes.size) {
+                clientServiceListener?.onReceive(clientId, bytes.copyOfRange(0, count))
+            } else {
+                clientServiceListener?.onReceive(clientId, bytes)
+            }
+        }
+        close()
+        throw ConnectException("Client#$clientId is disconnected")
     }
-    var clientId: Long = sClientId++
-        private set
-    val packages: Stack<ByteArray> by lazy { Stack<ByteArray>() }
-    var socketEvent: SocketEvent? = null
 
-    fun send(bytes: ByteArray, sendImmediately: Boolean = true) {
-        packages.push(bytes)
-        key.interestOps(SelectionKey.OP_WRITE)
-        if(sendImmediately) {
-            selector.wakeup()
+    fun send(bytes: ByteArray) {
+        outputStream.write(bytes)
+    }
+
+    fun send(buffer: ByteBuffer) {
+        socket.channel.write(buffer)
+    }
+
+    fun send(packet: Packet) {
+        outputStream.write(packet.toByteArray())
+    }
+
+    fun close() {
+        try {
+            inputStream.close()
+            outputStream.close()
+            socket.close()
+        } finally {
+            println("client#$clientId is closed.")
+            clientServiceListener?.onClose(clientId, socket)
         }
     }
 
-    fun send(command: Command, sendImmediately: Boolean = true) {
-        val bytes = command.toByteArray()
-        send(bytes, sendImmediately)
+    interface ClientServiceListener {
+        fun onStart(clientId: Long, socket: Socket) {}
+        fun onClose(clientId: Long, socket: Socket) {}
+        fun onReceive(clientId: Long, bytes: ByteArray) {}
     }
-
-    fun receive(command: Command) {
-        socketEvent?.onReceive(command)
-    }
-
-    override fun toString(): String {
-        return "clientId = ${clientId}, packages = ${packages.size}"
-    }
-
 }

@@ -1,35 +1,39 @@
 package com.utc.donlyconan.media.app.localinteraction
 
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.net.InetSocketAddress
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
-import java.nio.channels.ServerSocketChannel
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.net.InetAddress
+import java.net.ServerSocket
 
 
 @WorkerThread
 class EGPMediaServer: EGPSystem() {
-    private var serverSocket: ServerSocketChannel? = null
-
-    override fun setup(ipAddress: String) {
-        Log("Server is setting up...")
-        // Connect and setup the server
-        serverSocket = ServerSocketChannel.open().apply {
-            socket().bind(InetSocketAddress(ipAddress, IP_PORT))
-            configureBlocking(false)
-            // Open selector and register
-            _selector = Selector.open()
-            register(selector, SelectionKey.OP_ACCEPT)
-        }
+    private var _serverSocket: ServerSocket? = null
+    private val serverSocket: ServerSocket get() = _serverSocket!!
+    override fun setup(inetAddress: InetAddress?) {
+        _serverSocket = ServerSocket(IP_PORT)
     }
 
+    override suspend fun start() {
+        println("Server is started.")
+        isAlive = true
+        while (isAlive) {
+            val socket = serverSocket.accept()
+            accept(socket)
+        }
+        println("Server is shutdown.")
+        shutdown()
+    }
 
     override fun shutdown() {
         super.shutdown()
-        Log("Server is terminated.")
-        serverSocket?.close()
-        serverSocket = null
+        _serverSocket?.close()
+        _serverSocket = null
     }
 
     override fun isGroupOwner(): Boolean {
@@ -40,15 +44,45 @@ class EGPMediaServer: EGPSystem() {
 
 fun main() {
     runBlocking {
-        EGPSystem.create(EGPMediaServer::class, EGPSystem.HOSTNAME)?.apply {
-            registerSocketEvent(object : SocketEvent {
-                override fun onReceive(command: Command) {
-                    super.onReceive(command)
-                    Log("Message received: ${command.get(String::class)}")
+        val service = EGPSystem.create(EGPMediaServer::class, null)
+
+        service.registerClientServiceListener(object : Client.ClientServiceListener {
+
+                var file: File? = null
+                var outputStream: OutputStream? = null
+
+                override fun onReceive(clientId: Long, bytes: ByteArray) {
+                    val code = bytes[0]
+                    when(code) {
+                        Packet.CODE_FILE_START -> {
+                            val packet = Packet.from(bytes)
+                            file = File("A:\\resources", "${System.currentTimeMillis()}_" +packet.get(String::class))
+                            outputStream = FileOutputStream(file)
+                            println("Filename=${file?.name}")
+                        }
+                        Packet.CODE_FILE_SENDING,  Packet.CODE_FILE_END -> {
+                            outputStream?.write(bytes, 1, bytes.size - 1)
+                            if (code == Packet.CODE_FILE_END) {
+                                outputStream?.flush()
+                                outputStream?.close()
+                                outputStream = null
+                                println("Size=${file?.length()}")
+                            }
+                        }
+                        Packet.CODE_MESSAGE_SEND -> {
+                            println("Message: ${Packet.from(bytes).get(String::class)}")
+                        }
+                        else -> {
+                            Log("Code = ${code} is not found")
+                        }
+                    }
                 }
-            })
-            run()
-        }
+
+            }
+        )
+        launch(Dispatchers.IO) {
+            service.start()
+        }.join()
 
     }
 }

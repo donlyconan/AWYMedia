@@ -1,13 +1,15 @@
 package com.utc.donlyconan.media.app.localinteraction
 
-import com.utc.donlyconan.media.app.utils.consumeAll
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import java.io.InputStream
+import java.lang.IllegalArgumentException
+import java.net.InetAddress
+import java.net.Socket
 import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
-import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
 import kotlin.reflect.KClass
 
 /**
@@ -19,177 +21,124 @@ abstract class EGPSystem {
         const val IP_PORT = 8888
         const val HOSTNAME = "localhost"
 
-        const val CAPACITY_2M = 2046
-        const val CAPACITY_4M = 4096
+        const val DEFAULT_BUFFER_SIZE = 4097
+        const val DEFAULT_DATA_SIZE = DEFAULT_BUFFER_SIZE - 1
         const val CAPACITY_8M = 8192
 
         @JvmStatic
-        fun <T: EGPSystem> create(kClass: KClass<T>, ipAddress: String): EGPSystem {
+        fun <T: EGPSystem> create(kClass: KClass<T>, inetAddress: InetAddress?): EGPSystem {
             return when(kClass) {
                 EGPMediaServer::class -> EGPMediaServer()
                 EGPMediaClient::class -> EGPMediaClient()
                 else -> {
-                    throw ClassNotFoundException("${kClass.simpleName} is not found")
+                    throw IllegalArgumentException("${kClass.simpleName} is not accepted.")
                 }
-            }?.apply {
-                setup(ipAddress)
+            }.apply {
+                setup(inetAddress)
             }
         }
+
+        @get:Synchronized
+        private var sClientId: Long = 0L
     }
 
     protected var isAlive:Boolean = false
-        private set
-    protected var _selector: Selector? = null
-    protected val selector: Selector get() = _selector!!
-    protected val byteBuffer: ByteBuffer by lazy { ByteBuffer.allocate(CAPACITY_4M) }
-    protected val clients: HashMap<SelectionKey, Client> by lazy { hashMapOf() }
-    protected val events by lazy { mutableListOf<SocketEvent>() }
+    protected val clients: HashMap<InetAddress, Client> by lazy { hashMapOf() }
+    protected val supervisorJob = SupervisorJob()
+    protected val coroutineScope = CoroutineScope(supervisorJob + Dispatchers.IO)
+    val events: MutableList<Client.ClientServiceListener> by lazy { mutableListOf() }
+
 
     /**
      * Set up all attributes for system before running
      */
-    abstract fun setup(ipAddress: String)
+    abstract fun setup(inetAddress: InetAddress?)
 
-    fun run() {
-        Log("Setup is completed and run on port: $IP_PORT")
-        // Mark the server is working
-        isAlive = true
+    /**
+     * Perform to start a server or client
+     * Require: call accept(...)
+     */
+    abstract suspend fun start()
 
-        while (isAlive) {
-            selector.select()
-            selector.selectedKeys().iterator().consumeAll { key ->
-                try {
-                    if(!key.isValid) {
-                        return@consumeAll
-                    }
-                    if (key.isAcceptable) {
-                        val server = key.channel() as ServerSocketChannel
-                        val socket = server.accept()
-                        doAccept(socket)
-                    }
-                    if (key.isConnectable) {
-                        doConnect(key)
-                    }
-                    if (key.isReadable) {
-                        doRead(key)
-                    }
-                    if (key.isWritable) {
-                        doWrite(key)
-                        key.interestOps(SelectionKey.OP_READ)
-                    }
-                } catch (e: Exception) {
-                    disconnect(key)
-                    e.printStackTrace()
-                }
-            }
+    open fun accept(socket: Socket) {
+        println("${socket.inetAddress.hostAddress} is accepted. ${threadInfo()}")
+        sClientId++
+        val client = Client(sClientId, socket)
+        clients[socket.inetAddress] = client
+        client.clientServiceListener = clientServiceListener
+        coroutineScope.launch(newSingleThreadContext("Client#${client.clientId}")) {
+            client.start()
         }
-
-        // shutdown when server is not necessary
-        shutdown()
-    }
-
-    open fun doAccept(socket: SocketChannel) {
-        socket.configureBlocking(false)
-        val key = socket.register(selector, SelectionKey.OP_READ)
-        val client = Client(key, selector, socket)
-        key.attach(client)
-        Log("Server# Accepted a client: IP: ${socket.remoteAddress}")
-        clients[key] = client
-    }
-
-    open fun doWrite(key: SelectionKey) = key.use { socket, client ->
-        byteBuffer.clear()
-        client?.packages?.iterator()?.consumeAll { data ->
-            byteBuffer.put(data).flip()
-            socket.write(byteBuffer)
-        }
-    }
-
-    open fun doRead(key: SelectionKey) = key.use { socket, client ->
-        byteBuffer.clear()
-        var quantity = socket.read(byteBuffer)
-        if(quantity == -1) {
-            disconnect(key)
-        } else {
-            byteBuffer.flip()
-            val command = Command.from(byteBuffer)
-            client?.receive(command)
-            events.sendAll(command)
-            byteBuffer.compact()
-        }
-    }
-
-    open fun doConnect(key: SelectionKey) {
-        Log("doConnect() called with: key = $key")
-    }
-
-    open fun disconnect(key: SelectionKey) {
-        Log("disconnect() called with: address = ${key.client?.socket?.remoteAddress}")
-        try {
-            key.close()
-            key.channel().close()
-        } finally {
-            clients.remove(key)
-        }
-    }
-
-    open fun shutdown() {
-        Log("shutdown() called")
-        isAlive = false
-        clients.clear()
-        selector.close()
-        _selector = null
+        send(Packet.from("client#$sClientId have took part in the waiting room."))
     }
 
     abstract fun isGroupOwner(): Boolean
 
-    fun sendWith(command: Command) {
-        Log("sendWith: client.size=${clients.size}, command=$command")
-        clients.values.forEach { client ->
-            client.send(command, false)
+    open fun send(bytes: ByteArray) {
+        clients.forEach { id, client ->
+            client.send(bytes)
         }
-        selector.wakeup()
     }
 
-    /**
-     * Send to all clients with data that is attached
-     * It can be used outside the current thread
-     */
-    fun send(code: Byte, bytes: ByteArray) {
-        val buffer = ByteBuffer.allocate(CAPACITY_4M)
-        buffer.put(code).put(bytes).flip()
-        clients.forEach { _, client ->
-            client.socket.write(buffer)
-            buffer.rewind()
+    open fun send(packet: Packet) {
+        val bytes = packet.toByteArray()
+        send(bytes)
+    }
+
+    open fun sendWith(buffer: ByteBuffer) {
+        clients.forEach { inet, client ->
+            client.send(buffer)
         }
     }
 
     /**
      * Send a file and it's info
      */
-    suspend fun sendFile(destination: Command, inputStream: InputStream) {
-        Log("sendAll: inputStream")
-        send(destination.code, destination.bytes)
-        delay(50 /*delay time for preparing form clients*/ )
-        // spend a slot for hash code
-        var bytes = ByteArray(CAPACITY_4M - 1)
+    fun sendFile(packet: Packet, inputStream: InputStream) {
+        send(packet)
+        // spend a slot for code in the head
+        var bytes = ByteArray(DEFAULT_BUFFER_SIZE)
         inputStream.use { inp ->
             while (inp.available() > 0) {
-                if(inp.available() < CAPACITY_4M - 1) {
-                    bytes = ByteArray(inp.available())
+                if (inp.available() > DEFAULT_BUFFER_SIZE - 1) {
+                    bytes[0] = Packet.CODE_FILE_SENDING
+                } else {
+                    bytes = ByteArray(inp.available() + 1)
+                    bytes[0] = Packet.CODE_FILE_END
+                    println("Last package: " + inp.available())
                 }
-                val code = if (inp.available() > CAPACITY_4M - 1) Command.CODE_FILE_SENDING else Command.CODE_FILE_END
-                inp.read(bytes)
-                send(code, bytes)
+                inp.read(bytes, 1, bytes.size - 1)
+                send(bytes)
             }
         }
     }
 
-    fun registerSocketEvent(event: SocketEvent) {
+    fun threadInfo() = "threadId: ${Thread.currentThread().id}; threadName: ${Thread.currentThread().name}"
+
+    open fun shutdown() {
+        isAlive = false
+        clients.values.forEach { client -> client.close() }
+    }
+
+    private val clientServiceListener = object : Client.ClientServiceListener {
+        override fun onStart(clientId: Long, socket: Socket) {
+            events.forEach { e -> e.onStart(clientId, socket) }
+        }
+
+        override fun onClose(clientId: Long, socket: Socket) {
+            events.forEach { e -> e.onStart(clientId, socket) }
+        }
+
+        override fun onReceive(clientId: Long, bytes: ByteArray) {
+            events.forEach { e -> e.onReceive(clientId, bytes) }
+        }
+    }
+
+    fun registerClientServiceListener(event: Client.ClientServiceListener) {
         events.add(event)
     }
 
-    fun unregisterSocketEvent(event: SocketEvent) {
+    fun unregisterClientServiceListener(event: Client.ClientServiceListener) {
         events.remove(event)
     }
 }
