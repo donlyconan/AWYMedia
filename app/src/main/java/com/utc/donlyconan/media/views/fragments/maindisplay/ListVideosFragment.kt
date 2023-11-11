@@ -60,6 +60,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
                     }
 
                     R.id.btn_share -> share(video)
+                    R.id.btn_quick_share -> handleQuickShare(video)
                     R.id.btn_lock -> lockVideo(video, videoRepo, appComponent.getPlaylistWithVideoDao())
                     R.id.btn_unlock -> unlockVideo(video, videoRepo)
                     else -> {

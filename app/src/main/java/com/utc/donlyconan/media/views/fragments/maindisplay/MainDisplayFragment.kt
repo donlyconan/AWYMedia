@@ -16,6 +16,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.navigation.NavigationBarView
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.localinteraction.EGPMediaClient
+import com.utc.donlyconan.media.app.localinteraction.EGPMediaServer
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.data.repo.ListVideoRepository
 import com.utc.donlyconan.media.data.repo.TrashRepository
@@ -27,6 +29,7 @@ import com.utc.donlyconan.media.views.OnClickTimesListener
 import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
+import java.net.InetAddress
 import javax.inject.Inject
 
 
@@ -176,38 +179,29 @@ class MainDisplayFragment : BaseFragment() {
                 startActivity(intent)
             }
             R.id.it_search -> {
-                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToSearchBarFragment(
-                        binding.viewPager2.currentItem
-                    )
-                findNavController().navigate(action)
+                    application.getFileService()?.apply {
+                        openEgmService(EGPMediaServer::class, InetAddress.getByName("192.168.1.156")) { res ->
+                            Log.d(PersonalVideoFragment.TAG, "openEgmService() called result=$res")
+                        }
+                    }
             }
             R.id.it_sync_data -> {
-                application.getFileService()?.syncAllVideos()
+                runOnWorkerThread {
+                    application.getFileService()?.apply {
+                        val video = videoRepository.getAllOnThread().first()
+                        send(video) {
+                            Log.d(TAG, "onViewCreated: send video=$video")
+                        }
+                    }
+                }
             }
             R.id.it_sort_by -> {
-                val fragment = mainDisplayAdapter.getFragment(binding.viewPager2.currentItem)
-               if(fragment is PersonalVideoFragment) {
-                   fragment.let { frag ->
-                        val checkId = if(settings.sortBy == Settings.SORT_VIDEO_BY_CREATION_UP) {
-                            R.id.btn_sort_by_creation_up
-                        } else {
-                            R.id.btn_sort_by_creation_down
-                        }
-                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_video_option, listener = frag)
-                           .setCheckedId(checkId)
-                           .show(supportFragmentManager, TAG)
-                   }
-               } else if(fragment is PlaylistFragment) {
-                   fragment.let { frag ->
-                       val checkId = when(settings.playlistSortBy) {
-                           Settings.SORT_BY_NAME_UP -> R.id.btn_sort_by_name_up
-                           else -> R.id.btn_sort_by_name_down
-                       }
-                       MenuMoreOptionFragment.newInstance(R.layout.fragment_sort_music_option, listener = frag)
-                           .setCheckedId(checkId)
-                           .show(supportFragmentManager, TAG)
-                   }
-               }
+                application.getFileService()?.apply {
+                    openEgmService(EGPMediaClient::class, InetAddress.getByName("192.168.1.156")) { res ->
+                        Log.d(TAG, "openEgmService() called result=$res")
+
+                    }
+                }
             }
             R.id.it_trash -> {
                 val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToTrashFragment()

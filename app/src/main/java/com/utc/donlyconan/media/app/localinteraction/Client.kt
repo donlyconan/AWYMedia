@@ -20,16 +20,22 @@ open class Client(val clientId: Long, val socket: Socket) {
         val bytes = ByteArray(EGPSystem.DEFAULT_BUFFER_SIZE)
         clientServiceListener?.onStart(clientId, socket)
         isAlive = true
+        var curIndex = 0
+        val packet = Packet.from("")
+
         while (isAlive) {
-            var readIndex = inputStream.read(bytes)
+            var readIndex = inputStream.read(bytes, curIndex, bytes.size - curIndex)
+            curIndex += readIndex
             if (readIndex == -1) {
+                println("Can not read anything.")
                 isAlive = false
-            } else {
-                val packet = Packet.from(bytes, readIndex)
+            } else if(curIndex >= EGPSystem.DEFAULT_BUFFER_SIZE) {
+                packet.replace(bytes)
                 if (packet.code() == Packet.CODE_DEVICE_NAME) {
                     name = String(packet.data())
                 }
                 clientServiceListener?.onReceive(clientId, packet)
+                curIndex = 0
             }
         }
         close()
@@ -61,5 +67,6 @@ open class Client(val clientId: Long, val socket: Socket) {
         fun onClose(clientId: Long, socket: Socket) {}
         fun onReceive(clientId: Long, bytes: ByteArray) {}
         fun onReceive(clientId: Long, packet: Packet) {}
+        fun onReceive(bytes: ByteArray, part: Int) {}
     }
 }

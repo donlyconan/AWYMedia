@@ -1,45 +1,71 @@
 package com.utc.donlyconan.media.app.localinteraction
-
-import android.provider.MediaStore.Video
-import kotlin.reflect.KClass
+import com.utc.donlyconan.media.data.models.Video
+import java.nio.ByteBuffer
 
 class Packet private constructor(){
-    private lateinit var bytes: ByteArray
-    private var length = 0
+    private val buffer: ByteBuffer by lazy { ByteBuffer.allocate(EGPSystem.DEFAULT_BUFFER_SIZE) }
 
     private constructor(code: Byte, bytes: ByteArray) : this() {
-        this.bytes = ByteArray(bytes.size + 1)
-        this.bytes[0] = code
-        this.bytes.fill(bytes, 1)
-        length = bytes.size
+        buffer.put(code)
+        buffer.putInt(bytes.size)
+        buffer.put(bytes)
     }
 
-    private constructor(bytes: ByteArray, length: Int) : this() {
-        this.bytes = bytes
-        this.length = length
+    private constructor(bytes: ByteArray) : this() {
+        buffer.put(bytes)
     }
 
-    fun code(code: Byte) {
-        bytes[0] = code
+    /**
+     * Replace all data in the packet
+     */
+    fun replace(bytes: ByteArray): Packet {
+        buffer.clear()
+        buffer.put(bytes)
+        return this
+    }
+
+    fun code(code: Byte): Packet {
+        buffer.put(INDEX_CODE, code)
+        return this
     }
 
     fun code(): Byte {
-        return bytes[0]
+        return buffer.get(INDEX_CODE)
     }
 
-    fun bytes(): ByteArray {
-        return bytes
+    fun length(length: Int): Packet {
+        buffer.putInt(INDEX_LENGTH, length)
+        return this
+    }
+
+    fun length(): Int {
+        return buffer.getInt(INDEX_LENGTH)
+    }
+
+    fun data(data: ByteArray): Packet {
+        buffer.position(INDEX_LENGTH)
+        buffer.put(data)
+        return this
     }
 
     fun data(): ByteArray {
-        return bytes.copyOfRange(1, length)
+        return buffer.array().copyOfRange(INDEX_DATA, length() + INDEX_DATA)
+    }
+
+    fun bytes(): ByteArray {
+        return buffer.array()
+    }
+
+
+    fun capacity(): Int {
+        return buffer.capacity()
     }
 
     inline fun <reified T: Any> get(): T? {
         return when(T::class) {
             String::class -> String(data(), Charsets.UTF_8).trim() as? T
             ByteArray::class -> data() as? T
-            Video::class -> data().serialize() as? T
+            Video::class -> data().deserialize() as? T
             else -> {
                 Log("kClass: ${T::class.simpleName} is not found.")
                 null
@@ -48,8 +74,9 @@ class Packet private constructor(){
     }
 
     override fun toString(): String {
-        return "code=${code()}, data.size=${bytes.size - 1}"
+        return "Packet {code=${code()}, length=${length()}}"
     }
+
 
     companion object {
         const val CODE_MESSAGE_SEND: Byte   = 1
@@ -65,10 +92,15 @@ class Packet private constructor(){
         const val CODE_CHANGE_SPEED: Byte   = 31
         const val CODE_DEVICE_NAME: Byte = 32
 
+        ///
+        private const val INDEX_CODE = 0
+        private const val INDEX_LENGTH = 1
+        const val INDEX_DATA = 5
+
         @JvmStatic
         fun from(msg: String): Packet = Packet(CODE_MESSAGE_SEND, msg.toByteArray())
 
-        fun from(bytes: ByteArray, length: Int = bytes.size): Packet = Packet(bytes, length)
+        fun from(bytes: ByteArray): Packet = Packet(bytes)
 
         @JvmStatic
         fun from(code: Byte, bytes: ByteArray) = Packet(code, bytes)
@@ -83,6 +115,13 @@ class Packet private constructor(){
                     -> true
                 else -> false
             }
+        }
+
+        fun code(bytes: ByteArray): Byte = bytes[0]
+        fun length(bytes: ByteArray) = ByteBuffer.wrap(bytes, INDEX_LENGTH, 4).int
+        fun data(bytes: ByteArray): ByteArray {
+            val length = length(bytes)
+            return bytes.copyOfRange(INDEX_DATA, length + INDEX_DATA)
         }
     }
 }

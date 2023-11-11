@@ -22,6 +22,8 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.localinteraction.EGPMediaClient
+import com.utc.donlyconan.media.app.localinteraction.EGPMediaServer
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
@@ -34,6 +36,7 @@ import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import java.net.InetAddress
 
 
 /**

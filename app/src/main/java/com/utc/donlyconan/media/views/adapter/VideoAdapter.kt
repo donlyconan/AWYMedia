@@ -53,7 +53,6 @@ class VideoAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocalHolder {
-        Log.d(TAG, "onCreateViewHolder: ")
         return when(viewType) {
             TYPE_GROUP -> {
                 val binding: ItemGroupNameBinding = ItemGroupNameBinding.inflate(inflater, parent, false)

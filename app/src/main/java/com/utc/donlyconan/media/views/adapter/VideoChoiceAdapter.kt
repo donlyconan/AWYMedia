@@ -24,7 +24,6 @@ class VideoChoiceAdapter(var context: Context, var videos: ArrayList<Video>) :
         private set
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
-        Log.d(TAG, "onCreateViewHolder: ")
         val binding: ItemVideoChoiceBinding = ItemVideoChoiceBinding.inflate(inflater)
         return VideoHolder(binding)
     }

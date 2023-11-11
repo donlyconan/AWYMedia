@@ -2,11 +2,11 @@ package com.utc.donlyconan.media.app.localinteraction
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.InetAddress
 import java.net.Socket
+import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.SocketChannel
 
@@ -72,3 +72,5 @@ fun ByteArray.deserialize(): Any {
     objectInput.close()
     return data
 }
+
+fun Int.toBytes() = ByteBuffer.allocate(4).array()

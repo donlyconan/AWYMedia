@@ -234,6 +234,11 @@ abstract class BaseFragment : Fragment() {
      */
     protected open fun onErrorOccurred(context: CoroutineContext, e: Throwable) {}
 
+    fun handleQuickShare(video: Video) {
+        Logs.d( "handleQuickShare() called with: video = $video")
+        application.getFileService()?.send(video)
+    }
+
 
     fun showSnackBar(msgId: Int) = showSnackBar(getString(msgId))
     fun showSnackBar(msg: String) = runOnUIThread {

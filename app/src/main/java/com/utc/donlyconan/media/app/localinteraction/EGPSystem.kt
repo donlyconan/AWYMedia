@@ -1,6 +1,5 @@
 package com.utc.donlyconan.media.app.localinteraction
 
-import com.utc.donlyconan.media.app.utils.Logs
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +35,7 @@ abstract class EGPSystem {
         }
 
         @get:Synchronized
-        private var sClientId: Long = 0L
+        protected var sClientId: Long = 0L
     }
 
     var isAlive:Boolean = false
@@ -60,6 +59,7 @@ abstract class EGPSystem {
     abstract suspend fun start()
 
     open fun accept(socket: Socket) {
+        println( "accept() called with: socket = $socket")
         sClientId++
         val client = Client(sClientId, socket)
         clients[client.clientId] = client
@@ -82,6 +82,11 @@ abstract class EGPSystem {
         send(bytes)
     }
 
+    open suspend fun send(clientId: Long, packet: Packet) {
+        val bytes = packet.bytes()
+        clients[clientId]?.send(packet)
+    }
+
     open suspend fun send(code: Byte, obj: Any) {
         obj.serialize()?.let {
             val packet = Packet.from(code, it)
@@ -99,21 +104,22 @@ abstract class EGPSystem {
     /**
      * Send a file and it's info
      */
-    open suspend fun sendFile(purpose: Packet, inputStream: InputStream) {
-        send(purpose)
+    open suspend fun sendFile(packet: Packet, inp: InputStream) {
+        println("sendFile() called with: purpose = $packet, inputStream=$inp")
+        send(packet)
         // spend a slot for code in the head
-        var bytes = ByteArray(DEFAULT_BUFFER_SIZE)
-        inputStream.use { inp ->
-            while (inp.available() > 0) {
-                if (inp.available() > DEFAULT_BUFFER_SIZE - 1) {
-                    bytes[0] = Packet.CODE_FILE_SENDING
+        var quantity = 0
+        while (quantity != -1) {
+            quantity = inp.read(packet.bytes(), Packet.INDEX_DATA, packet.capacity() - Packet.INDEX_DATA)
+            if(quantity != -1) {
+                if (quantity >= DEFAULT_BUFFER_SIZE - Packet.INDEX_DATA) {
+                    packet.code(Packet.CODE_FILE_SENDING)
                 } else {
-                    bytes = ByteArray(inp.available() + 1)
-                    bytes[0] = Packet.CODE_FILE_END
-                    println("Last package: " + inp.available())
+                    packet.code(Packet.CODE_FILE_END)
+                    println("Last package: " + quantity)
                 }
-                inp.read(bytes, 1, bytes.size - 1)
-                send(bytes)
+                packet.length(quantity)
+                send(packet)
             }
         }
     }
@@ -125,7 +131,7 @@ abstract class EGPSystem {
         clients.values.forEach { client -> client.close() }
     }
 
-    private val clientServiceListener = object : Client.ClientServiceListener {
+    protected val clientServiceListener = object : Client.ClientServiceListener {
         override fun onStart(clientId: Long, socket: Socket) {
             events.forEach { e -> e.onStart(clientId, socket) }
         }

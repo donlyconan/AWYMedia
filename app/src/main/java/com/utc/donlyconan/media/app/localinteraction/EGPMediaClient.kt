@@ -1,12 +1,14 @@
 package com.utc.donlyconan.media.app.localinteraction
 
 import android.util.Log
+import com.utc.donlyconan.media.app.utils.Logs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.net.Inet4Address
@@ -21,14 +23,26 @@ import java.nio.channels.SocketChannel
 import java.util.Scanner
 
 class EGPMediaClient: EGPSystem() {
+    companion object {
+        const val CLIENT_ID = 0L
+    }
+
     private var _socket: Socket? = null
     val socket: Socket get() = _socket!!
     var client: Client? = null
         private set
 
     override fun setup(inetAddress: InetAddress?) {
+        println("setup() called with: inetAddress = $inetAddress")
         _socket = Socket(inetAddress, IP_PORT)
         accept(socket)
+    }
+
+    override fun accept(socket: Socket) {
+        println( "accept() called with: socket = $socket")
+        val client = Client(CLIENT_ID, socket)
+        clients[client.clientId] = client
+        client.clientServiceListener = clientServiceListener
     }
 
     override suspend fun start() {
@@ -110,3 +124,28 @@ class EGPMediaClient: EGPSystem() {
 //
 //}
 //
+
+//fun main() {
+////        send(packet)
+//    // spend a slot for code in the head
+//    val file = FileInputStream("B:\\Downloads\\Merriam_Websters_Vocabulary_Builder.pdf")
+//    val packet = Packet.from("")
+//    file.use { inp ->
+//        var quantity = 0
+//        while (quantity != -1) {
+//            quantity = inp.read(packet.bytes(), Packet.INDEX_DATA, packet.capacity() - Packet.INDEX_DATA)
+//            if(quantity != -1) {
+//                if (quantity >= EGPSystem.DEFAULT_BUFFER_SIZE - Packet.INDEX_DATA) {
+//                    packet.code(Packet.CODE_FILE_SENDING)
+//                    println("Quantity=$quantity")
+//                } else {
+//                    packet.code(Packet.CODE_FILE_END)
+//                    println("Last package: " + quantity)
+//                }
+//                packet.length(quantity)
+////                send(packet)
+//            }
+//        }
+//    }
+//
+//}

@@ -34,7 +34,6 @@ class RecycleBinAdapter(var context: Context, trashes: ArrayList<Any>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocalHolder {
-        Log.d(TAG, "onCreateViewHolder: ")
         return if(viewType == TYPE_GROUP_NAME) {
             GroupHolder(ItemGroupNameBinding.inflate(inflater, parent, false))
         } else {

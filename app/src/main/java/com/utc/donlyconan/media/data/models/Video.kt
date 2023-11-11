@@ -13,6 +13,8 @@ import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.views.adapter.Selectable
 import kotlinx.android.parcel.Parcelize
 import java.io.File
+import java.io.Serializable
+
 @Parcelize
 @Entity(tableName = "videos", indices = [Index(value = ["video_uri"], unique = true)])
 data class Video(
@@ -43,7 +45,7 @@ data class Video(
     var subtitleUri: String? = null,
     @ColumnInfo(name = "external_uri")
     var externalUri: String? = null,
-) : Selectable, Parcelable {
+) : Selectable, Parcelable, Serializable {
     @Ignore
     var isChecked: Boolean = false
 

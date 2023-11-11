@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.app.localinteraction
 
 import androidx.annotation.WorkerThread
+import com.utc.donlyconan.media.app.utils.Logs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -16,6 +17,7 @@ class EGPMediaServer: EGPSystem() {
     private var _serverSocket: ServerSocket? = null
     private val serverSocket: ServerSocket get() = _serverSocket!!
     override fun setup(inetAddress: InetAddress?) {
+        println( "setup() called with: inetAddress = $inetAddress")
         _serverSocket = ServerSocket(IP_PORT)
     }
 

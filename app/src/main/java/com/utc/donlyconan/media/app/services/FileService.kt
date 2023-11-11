@@ -141,6 +141,7 @@ class FileService : Service() {
     }
     
     private fun generateExceptionHandler() = CoroutineExceptionHandler { v, e ->
+        e.printStackTrace()
         listeners.forEach { listener -> listener.onError(e) }
         Log.d(TAG, "generateExceptionHandler() called with: v = $v, e = $e")
         coroutineScope.launch(Dispatchers.Main) {
@@ -283,21 +284,20 @@ class FileService : Service() {
     }
 
     fun <T: EGPSystem>openEgmService(kClass: KClass<T>, inetAddress: InetAddress?, onFinish: (connected: Boolean) -> Unit) {
-        Log.d(TAG, "openEgmService() called")
+        Log.d(TAG, "openEgmService() called with: kClass = $kClass, inetAddress = $inetAddress")
         socketJob = runIO {
-            if(egmSystem != null) {
+            if(isReadyService()) {
                 Log.d(TAG, "openEgmService: System is running.")
                 onFinish(false)
             } else {
-                withTimeout(10000 /*limit time for connecting about 10s*/) {
-                    egmSystem = EGPSystem.create(kClass, inetAddress).apply {
-                        registerClientServiceListener(clientServiceListener)
-                        start()
-                    }
-                    val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
-                    egmSystem?.send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray()))
-                    onFinish(egmSystem != null)
+                egmSystem?.shutdown()
+                egmSystem = EGPSystem.create(kClass, inetAddress).apply {
+                    registerClientServiceListener(clientServiceListener)
+                    runIO { start() }
                 }
+                val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
+                egmSystem?.send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray()))
+                onFinish(egmSystem != null)
             }
         }
     }
@@ -323,6 +323,10 @@ class FileService : Service() {
             Log.d(TAG, "onStart() called with: clientId = $clientId, socket = $socket")
             clientHandlers[clientId] = ClientHandler(clientId)
             listeners.forEach { e -> e.onClientConnectionChanged(egmSystem?.listClients ?: listOf()) }
+            runIO {
+                val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
+                egmSystem?.send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray()))
+            }
         }
 
         override fun onClose(clientId: Long, socket: Socket) {
@@ -332,12 +336,17 @@ class FileService : Service() {
         }
 
         override fun onReceive(clientId: Long, packet: Packet) {
-            clientHandlers[clientId]?.handle(packet)
+            try {
+                clientHandlers[clientId]?.handle(packet)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e(TAG, "onReceive: ",e)
+            }
         }
     }
 
     private fun createVideoFile(filename: String): File {
-        Log.d(TAG, "openStreamWithVideo() called with: filename = $filename")
+        Log.d(TAG, "createVideoFile() called with: filename = $filename")
         val rootFolder = androidFile(Environment.DIRECTORY_DOWNLOADS)
         val file = File(rootFolder, filename)
         val newFilename = handleFilename(file)
@@ -354,13 +363,15 @@ class FileService : Service() {
             video.copy(createdAt = now(), updatedAt = now(), isSecured = false, isFavorite = false).apply {
                 serialize()?.let { bytes ->
                     val purpose = Packet.from(Packet.CODE_VIDEO_ENCODE, bytes)
-                    contentResolver.openInputStream(video.videoUri.toUri())?.let { inp ->
+                    contentResolver.openInputStream(videoUri.toUri())?.use { inp ->
                         egmSystem?.sendFile(purpose, inp)
+                        Log.d(TAG, "Video is sent.")
                     }
-                    val subtitlePacket = Packet.from(Packet.CODE_SUBTITLE_ENCODE, "$title.srt".toByteArray())
                     if(subtitleUri != null){
-                        contentResolver.openInputStream(subtitleUri?.toUri()!!)?.let { inp ->
+                        val subtitlePacket = Packet.from(Packet.CODE_SUBTITLE_ENCODE, "$title.srt".toByteArray())
+                        contentResolver.openInputStream(subtitleUri?.toUri()!!)?.use { inp ->
                             egmSystem?.sendFile(subtitlePacket, inp)
+                            Log.d(TAG, "Subtitle is sent.")
                         }
                     }
                 }
@@ -381,12 +392,13 @@ class FileService : Service() {
         @Synchronized
         fun handle(packet: Packet) {
             when(packet.code()) {
+                Packet.CODE_DEVICE_NAME -> Log.d(TAG, "handle() deviceName = ${packet.get<String>()}")
                 Packet.CODE_VIDEO_ENCODE -> createVideoFile(packet)
                 Packet.CODE_SUBTITLE_ENCODE -> createSubtitleFile(packet)
                 Packet.CODE_FILE_SENDING, Packet.CODE_FILE_END -> writeFile(packet)
                 else -> {
                     video = null
-                    Log.d(TAG, "handle: code = ${packet.code()} is not processed.")
+                    Log.d(TAG, "handle: packet=$packet is not processed.")
                 }
             }
         }
@@ -401,14 +413,15 @@ class FileService : Service() {
         }
 
         private fun createVideoFile(packet: Packet) {
-            Log.d(TAG, "createVideoFile() called with: packet = $packet")
             video = packet.get()
+            Log.d(TAG, "createVideoFile() called with: packet = $packet, video=$video")
             video?.let { video ->
+                video.videoId = 0
                 file = createVideoFile(video.title!!)
+                Log.d(TAG, "createVideoFile file = $file")
                 outputStream = file?.outputStream()
             }
             flag = packet.code()
-            Log.d(TAG, "handle: start to send file")
         }
 
         private fun writeFile(packet: Packet) {
@@ -416,9 +429,10 @@ class FileService : Service() {
             if (packet.code() == Packet.CODE_FILE_END) {
                 outputStream?.flush()
                 outputStream?.close()
-
+                Log.d(TAG, "writeFile: flag=$flag, file=$file, video=$video")
                 if (file != null && video != null) {
                     file!!.getMediaUri(this@FileService) { uri ->
+                        Log.d(TAG, "writeFile: uri = $uri")
                         video!!.videoUri = uri.toString()
                         if (flag == Packet.CODE_VIDEO_ENCODE) {
                             videoRepository.insert(video!!)
