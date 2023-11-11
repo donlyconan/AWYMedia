@@ -59,10 +59,11 @@ class Packet private constructor(){
         const val CODE_FILE_SENDING: Byte   = 12
         const val CODE_FILE_END: Byte       = 13
         const val CODE_VIDEO_ENCODE: Byte   = 14
+        const val CODE_SUBTITLE_ENCODE: Byte   = 15
 
-        const val CODE_ADJUST_POSITION: Byte= 15
-        const val CODE_CHANGE_SPEED: Byte   = 16
-        const val CODE_DEVICE_NAME: Byte = 17
+        const val CODE_ADJUST_POSITION: Byte= 30
+        const val CODE_CHANGE_SPEED: Byte   = 31
+        const val CODE_DEVICE_NAME: Byte = 32
 
         @JvmStatic
         fun from(msg: String): Packet = Packet(CODE_MESSAGE_SEND, msg.toByteArray())
