@@ -15,14 +15,19 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.MediaStore.Video.Media
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.core.net.toUri
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
+import com.utc.donlyconan.media.app.localinteraction.Client
+import com.utc.donlyconan.media.app.localinteraction.EGPSystem
+import com.utc.donlyconan.media.app.localinteraction.Packet
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.androidFile
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.components.getMediaUri
@@ -34,10 +39,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
 import java.io.File
 import java.io.IOException
+import java.io.OutputStream
+import java.net.InetAddress
+import java.net.Socket
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 
 /**
@@ -62,6 +72,11 @@ class FileService : Service() {
     private val listeners by lazy { mutableSetOf<OnFileServiceListener>() }
     private var deletingJob: Job? = null
     private var updateRecycleBinJob: Job? = null
+    private var socketJob: Job? = null
+
+    var egmSystem: EGPSystem? = null
+        private set
+    private val clientHandlers by lazy { HashMap<Long, ClientHandler>() }
 
     override fun onCreate() {
         super.onCreate()
@@ -263,9 +278,116 @@ class FileService : Service() {
         }
     }
 
+    fun <T: EGPSystem>openEgmService(kClass: KClass<T>, inetAddress: InetAddress?, onFinish: (connected: Boolean) -> Unit) {
+        Log.d(TAG, "openEgmService() called")
+        socketJob = runIO {
+            if(egmSystem != null) {
+                Log.d(TAG, "openEgmService: System is running.")
+                onFinish(false)
+            } else {
+                withTimeout(10000 /*limit time for connecting about 10s*/) {
+                    egmSystem = EGPSystem.create(kClass, inetAddress).apply {
+                        registerClientServiceListener(clientServiceListenr)
+                        start()
+                    }
+                    val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
+                    egmSystem?.send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray()))
+                    onFinish(egmSystem != null)
+                }
+            }
+        }
+    }
+
+    /**
+     * Return true if service is working
+     */
+    fun isReadyService(): Boolean {
+        return egmSystem?.isAlive == true
+    }
+
+    fun close() {
+        Log.d(TAG, "close() called")
+        egmSystem?.shutdown()
+        socketJob?.cancel()
+    }
+
+    private val clientServiceListenr = object : Client.ClientServiceListener {
+        override fun onStart(clientId: Long, socket: Socket) {
+            Log.d(TAG, "onStart() called with: clientId = $clientId, socket = $socket")
+            clientHandlers[clientId] = ClientHandler(clientId)
+            listeners.forEach { e -> e.onClientConnectionChanged(egmSystem?.listClients ?: listOf()) }
+        }
+
+        override fun onClose(clientId: Long, socket: Socket) {
+            Log.d(TAG, "onClose() called with: clientId = $clientId, socket = $socket")
+            clientHandlers.remove(clientId)
+            listeners.forEach { e -> e.onClientConnectionChanged(egmSystem?.listClients ?: listOf()) }
+        }
+
+        override fun onReceive(clientId: Long, packet: Packet) {
+            clientHandlers[clientId]?.handle(packet)
+        }
+    }
+
+    private fun createFile(filename: String): File {
+        Log.d(TAG, "openStreamWithVideo() called with: filename = $filename")
+        val rootFolder = androidFile(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(rootFolder, filename)
+        val newFilename = handleFilename(file)
+        val newFile = File(rootFolder, newFilename)
+        if (!newFile.exists()) {
+            newFile.createNewFile()
+        }
+        return newFile
+    }
+
+    inner class ClientHandler(val clientId: Long) {
+        private var outputStream: OutputStream? = null
+        private var video: Video? = null
+        private var file: File? = null
+
+        /**
+         * Handle message which is sent by clients or server
+         */
+        fun handle(packet: Packet) {
+            when(packet.code()) {
+                Packet.CODE_FILE_START -> createFile(packet)
+                Packet.CODE_FILE_SENDING, Packet.CODE_FILE_END -> writeFile(packet)
+                else -> {
+                    Log.d(TAG, "handle: code = ${packet.code()} is not processed.")
+                }
+            }
+        }
+
+        private fun createFile(packet: Packet) {
+            video = packet.get()
+            video?.let { video ->
+                file = createFile(video.title!!)
+                outputStream = file?.outputStream()
+            }
+            Log.d(TAG, "handle: start to send file")
+        }
+
+        private fun writeFile(packet: Packet) {
+            outputStream?.write(packet.data())
+            if(packet.code() == Packet.CODE_FILE_END) {
+                outputStream?.flush()
+                outputStream?.close()
+                if(video != null && file != null) {
+                    file!!.getMediaUri(this@FileService) {uri ->
+                        video!!.videoUri = uri.toString()
+                        videoRepository.insert(video!!)
+                    }
+                }
+                outputStream = null
+                file = null
+                Log.d(TAG, "handle: sending file is finished.")
+            }
+        }
+    }
 
     interface OnFileServiceListener {
-
+        fun onClientConnectionChanged(clients: List<Client>) {}
         fun onDiskSizeNotEnough() {}
         fun onDeletedFileError(uris: List<Uri>,e: Exception) {}
         fun onError(e: Throwable?) {}

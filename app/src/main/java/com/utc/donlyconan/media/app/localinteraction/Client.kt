@@ -1,17 +1,15 @@
 package com.utc.donlyconan.media.app.localinteraction
-import java.io.DataInputStream
-import java.io.DataOutputStream
 import java.net.ConnectException
 import java.net.Socket
-import java.nio.ByteBuffer
-import kotlin.concurrent.thread
-import kotlin.math.log
 
 open class Client(val clientId: Long, val socket: Socket) {
-    protected val inputStream = DataInputStream(socket.getInputStream())
-    protected val outputStream = DataOutputStream(socket.getOutputStream())
+    private val inputStream = socket.getInputStream()
+    private val outputStream = socket.getOutputStream()
     @Volatile
     var clientServiceListener: ClientServiceListener? = null
+    var name: String? = null
+    var isAlive: Boolean = false
+        private set
 
     /**
      * Start a service
@@ -19,35 +17,36 @@ open class Client(val clientId: Long, val socket: Socket) {
      */
     suspend fun start() {
         println("Client#$clientId is started. ThreadInfo={${Thread.currentThread().name}}")
-        var count = 0
         val bytes = ByteArray(EGPSystem.DEFAULT_BUFFER_SIZE)
         clientServiceListener?.onStart(clientId, socket)
-        while (count != -1){
-            count = inputStream.read(bytes)
-            if(count < bytes.size) {
-                clientServiceListener?.onReceive(clientId, bytes.copyOfRange(0, count))
+        isAlive = true
+        while (isAlive) {
+            var readIndex = inputStream.read(bytes)
+            if (readIndex == -1) {
+                isAlive = false
             } else {
-                clientServiceListener?.onReceive(clientId, bytes)
+                val packet = Packet.from(bytes, readIndex)
+                if (packet.code() == Packet.CODE_DEVICE_NAME) {
+                    name = String(packet.data())
+                }
+                clientServiceListener?.onReceive(clientId, packet)
             }
         }
         close()
-        throw ConnectException("Client#$clientId is disconnected")
+        throw ConnectException("Client#$clientId is disconnected.")
     }
 
     fun send(bytes: ByteArray) {
         outputStream.write(bytes)
     }
 
-    fun send(buffer: ByteBuffer) {
-        socket.channel.write(buffer)
-    }
-
     fun send(packet: Packet) {
-        outputStream.write(packet.toByteArray())
+        outputStream.write(packet.bytes())
     }
 
     fun close() {
         try {
+            isAlive = false
             inputStream.close()
             outputStream.close()
             socket.close()
@@ -61,5 +60,6 @@ open class Client(val clientId: Long, val socket: Socket) {
         fun onStart(clientId: Long, socket: Socket) {}
         fun onClose(clientId: Long, socket: Socket) {}
         fun onReceive(clientId: Long, bytes: ByteArray) {}
+        fun onReceive(clientId: Long, packet: Packet) {}
     }
 }

@@ -1,15 +1,15 @@
 package com.utc.donlyconan.media.app.localinteraction
 
+import com.utc.donlyconan.media.app.utils.Logs
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
 import java.io.InputStream
 import java.lang.IllegalArgumentException
 import java.net.InetAddress
 import java.net.Socket
-import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 
 /**
@@ -20,10 +20,7 @@ abstract class EGPSystem {
     companion object {
         const val IP_PORT = 8888
         const val HOSTNAME = "localhost"
-
         const val DEFAULT_BUFFER_SIZE = 4097
-        const val DEFAULT_DATA_SIZE = DEFAULT_BUFFER_SIZE - 1
-        const val CAPACITY_8M = 8192
 
         @JvmStatic
         fun <T: EGPSystem> create(kClass: KClass<T>, inetAddress: InetAddress?): EGPSystem {
@@ -42,14 +39,16 @@ abstract class EGPSystem {
         private var sClientId: Long = 0L
     }
 
-    protected var isAlive:Boolean = false
-    protected val clients: HashMap<InetAddress, Client> by lazy { hashMapOf() }
+    var isAlive:Boolean = false
+        protected set
+    protected val clients: HashMap<Long, Client> by lazy { hashMapOf() }
     protected val supervisorJob = SupervisorJob()
-    protected val coroutineScope = CoroutineScope(supervisorJob + Dispatchers.IO)
+    protected val coroutineScope = CoroutineScope(supervisorJob + Dispatchers.IO + CoroutineExceptionHandler {_,e -> e.printStackTrace() })
     val events: MutableList<Client.ClientServiceListener> by lazy { mutableListOf() }
+    val listClients: List<Client> get() = clients.values.toList()
 
 
-    /**
+        /**
      * Set up all attributes for system before running
      */
     abstract fun setup(inetAddress: InetAddress?)
@@ -61,41 +60,47 @@ abstract class EGPSystem {
     abstract suspend fun start()
 
     open fun accept(socket: Socket) {
-        println("${socket.inetAddress.hostAddress} is accepted. ${threadInfo()}")
         sClientId++
         val client = Client(sClientId, socket)
-        clients[socket.inetAddress] = client
+        clients[client.clientId] = client
         client.clientServiceListener = clientServiceListener
-        coroutineScope.launch(newSingleThreadContext("Client#${client.clientId}")) {
+        coroutineScope.launch {
             client.start()
         }
-        send(Packet.from("client#$sClientId have took part in the waiting room."))
     }
 
     abstract fun isGroupOwner(): Boolean
 
-    open fun send(bytes: ByteArray) {
+    open suspend fun send(bytes: ByteArray) {
         clients.forEach { id, client ->
             client.send(bytes)
         }
     }
 
-    open fun send(packet: Packet) {
-        val bytes = packet.toByteArray()
+    open suspend fun send(packet: Packet) {
+        val bytes = packet.bytes()
         send(bytes)
     }
 
-    open fun sendWith(buffer: ByteBuffer) {
-        clients.forEach { inet, client ->
-            client.send(buffer)
+    open suspend fun send(code: Byte, obj: Any) {
+        obj.serialize()?.let {
+            val packet = Packet.from(code, it)
+            send(packet)
         }
+    }
+
+    /**
+     * Disconnect a specific client from system
+     */
+    fun disconnect(clientId: Long){
+        clients[clientId]?.close()
     }
 
     /**
      * Send a file and it's info
      */
-    fun sendFile(packet: Packet, inputStream: InputStream) {
-        send(packet)
+    open suspend fun sendFile(purpose: Packet, inputStream: InputStream) {
+        send(purpose)
         // spend a slot for code in the head
         var bytes = ByteArray(DEFAULT_BUFFER_SIZE)
         inputStream.use { inp ->
@@ -126,11 +131,16 @@ abstract class EGPSystem {
         }
 
         override fun onClose(clientId: Long, socket: Socket) {
-            events.forEach { e -> e.onStart(clientId, socket) }
+            events.forEach { e -> e.onClose(clientId, socket) }
+            clients.remove(clientId)
         }
 
         override fun onReceive(clientId: Long, bytes: ByteArray) {
             events.forEach { e -> e.onReceive(clientId, bytes) }
+        }
+
+        override fun onReceive(clientId: Long, packet: Packet) {
+            events.forEach { e -> e.onReceive(clientId, packet) }
         }
     }
 

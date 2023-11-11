@@ -9,8 +9,10 @@ object Logs {
 
     const val DEBUG_MODE = true
 
-    fun d(tag: String, msg: String) = Log.d(tag, msg)
+    @JvmStatic
+    fun d(tag: String, msg: String) = Timber.d(msg)
 
+    @JvmStatic
     fun d(msg: String) = Timber.d(msg)
 
 }

@@ -42,47 +42,47 @@ class EGPMediaServer: EGPSystem() {
 
 }
 
-fun main() {
-    runBlocking {
-        val service = EGPSystem.create(EGPMediaServer::class, null)
-
-        service.registerClientServiceListener(object : Client.ClientServiceListener {
-
-                var file: File? = null
-                var outputStream: OutputStream? = null
-
-                override fun onReceive(clientId: Long, bytes: ByteArray) {
-                    val code = bytes[0]
-                    when(code) {
-                        Packet.CODE_FILE_START -> {
-                            val packet = Packet.from(bytes)
-                            file = File("A:\\resources", "${System.currentTimeMillis()}_" +packet.get(String::class))
-                            outputStream = FileOutputStream(file)
-                            println("Filename=${file?.name}")
-                        }
-                        Packet.CODE_FILE_SENDING,  Packet.CODE_FILE_END -> {
-                            outputStream?.write(bytes, 1, bytes.size - 1)
-                            if (code == Packet.CODE_FILE_END) {
-                                outputStream?.flush()
-                                outputStream?.close()
-                                outputStream = null
-                                println("Size=${file?.length()}")
-                            }
-                        }
-                        Packet.CODE_MESSAGE_SEND -> {
-                            println("Message: ${Packet.from(bytes).get(String::class)}")
-                        }
-                        else -> {
-                            Log("Code = ${code} is not found")
-                        }
-                    }
-                }
-
-            }
-        )
-        launch(Dispatchers.IO) {
-            service.start()
-        }.join()
-
-    }
-}
+//fun main() {
+//    runBlocking {
+//        val service = EGPSystem.create(EGPMediaServer::class, null)
+//
+//        service.registerClientServiceListener(object : Client.ClientServiceListener {
+//
+//                var file: File? = null
+//                var outputStream: OutputStream? = null
+//
+//                override fun onReceive(clientId: Long, bytes: ByteArray) {
+//                    val code = bytes[0]
+//                    when(code) {
+//                        Packet.CODE_FILE_START -> {
+//                            val packet = Packet.from(bytes)
+//                            file = File("A:\\resources", "${System.currentTimeMillis()}_" +packet.get(String::class))
+//                            outputStream = FileOutputStream(file)
+//                            println("Filename=${file?.name}")
+//                        }
+//                        Packet.CODE_FILE_SENDING,  Packet.CODE_FILE_END -> {
+//                            outputStream?.write(bytes, 1, bytes.size - 1)
+//                            if (code == Packet.CODE_FILE_END) {
+//                                outputStream?.flush()
+//                                outputStream?.close()
+//                                outputStream = null
+//                                println("Size=${file?.length()}")
+//                            }
+//                        }
+//                        Packet.CODE_MESSAGE_SEND -> {
+//                            println("Message: ${Packet.from(bytes).get(String::class)}")
+//                        }
+//                        else -> {
+//                            Log("Code = ${code} is not found")
+//                        }
+//                    }
+//                }
+//
+//            }
+//        )
+//        launch(Dispatchers.IO) {
+//            service.start()
+//        }.join()
+//
+//    }
+//}

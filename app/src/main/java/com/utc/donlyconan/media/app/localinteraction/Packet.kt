@@ -1,44 +1,54 @@
 package com.utc.donlyconan.media.app.localinteraction
 
-import java.nio.ByteBuffer
+import android.provider.MediaStore.Video
 import kotlin.reflect.KClass
 
 class Packet private constructor(){
-    var code: Byte = 0
-        private set
-    lateinit var bytes: ByteArray
-        private set
+    private lateinit var bytes: ByteArray
+    private var length = 0
 
     private constructor(code: Byte, bytes: ByteArray) : this() {
-        this.code = code
+        this.bytes = ByteArray(bytes.size + 1)
+        this.bytes[0] = code
+        this.bytes.fill(bytes, 1)
+        length = bytes.size
+    }
+
+    private constructor(bytes: ByteArray, length: Int) : this() {
         this.bytes = bytes
+        this.length = length
     }
 
-    private constructor(bytes: ByteArray) : this() {
-        this.code = bytes[0]
-        this.bytes = bytes.copyOfRange(1, bytes.size)
+    fun code(code: Byte) {
+        bytes[0] = code
     }
 
-    fun toByteArray(): ByteArray {
-        return ByteArray(bytes.size + 1).apply {
-            this[0] = code
-            fill(bytes, 1)
-        }
+    fun code(): Byte {
+        return bytes[0]
     }
 
-    inline fun <reified T: Any> get(kClass: KClass<T>): T? {
-        return when(kClass) {
-            String::class -> String(bytes, Charsets.UTF_8).trim() as T
-            ByteArray::class -> bytes as? T
+    fun bytes(): ByteArray {
+        return bytes
+    }
+
+    fun data(): ByteArray {
+        return bytes.copyOfRange(1, length)
+    }
+
+    inline fun <reified T: Any> get(): T? {
+        return when(T::class) {
+            String::class -> String(data(), Charsets.UTF_8).trim() as? T
+            ByteArray::class -> data() as? T
+            Video::class -> data().serialize() as? T
             else -> {
-                Log("kClass: $kClass is not found.")
+                Log("kClass: ${T::class.simpleName} is not found.")
                 null
             }
         }
     }
 
     override fun toString(): String {
-        return "code=$code, bytes.size=${bytes.size}"
+        return "code=${code()}, data.size=${bytes.size - 1}"
     }
 
     companion object {
@@ -52,11 +62,12 @@ class Packet private constructor(){
 
         const val CODE_ADJUST_POSITION: Byte= 15
         const val CODE_CHANGE_SPEED: Byte   = 16
+        const val CODE_DEVICE_NAME: Byte = 17
 
         @JvmStatic
         fun from(msg: String): Packet = Packet(CODE_MESSAGE_SEND, msg.toByteArray())
 
-        fun from(bytes: ByteArray): Packet = Packet(bytes)
+        fun from(bytes: ByteArray, length: Int = bytes.size): Packet = Packet(bytes, length)
 
         @JvmStatic
         fun from(code: Byte, bytes: ByteArray) = Packet(code, bytes)
@@ -67,6 +78,7 @@ class Packet private constructor(){
                 CODE_MESSAGE_SEND, CODE_OBJECT_SEND,
                 CODE_FILE_START, CODE_FILE_SENDING, CODE_VIDEO_ENCODE,
                 CODE_ADJUST_POSITION, CODE_CHANGE_SPEED,
+                CODE_DEVICE_NAME,
                     -> true
                 else -> false
             }

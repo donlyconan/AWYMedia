@@ -1,9 +1,12 @@
 package com.utc.donlyconan.media.app.localinteraction
 
-import android.os.Parcel
-import android.os.Parcelable
-import java.io.InputStream
-import java.nio.ByteBuffer
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.net.InetAddress
+import java.net.Socket
 import java.nio.channels.SelectionKey
 import java.nio.channels.SocketChannel
 
@@ -27,35 +30,6 @@ fun Log(msg: String) {
     println(msg)
 }
 
-var SelectionKey.client: Client? get() = attachment() as? Client
-    set(value) = attach(value) as Unit
-
-inline fun List<SocketEvent>.send(block: SocketEvent.() -> Unit) {
-    forEach { e -> block.invoke(e)}
-}
-
-fun Parcelable.marshall(): ByteArray {
-    val parcel = Parcel.obtain()
-    writeToParcel(parcel, 0)
-    val bytes = parcel.marshall()
-    parcel.recycle()
-    return bytes
-}
-
-fun unmarshall(bytes: ByteArray): Parcel {
-    val parcel = Parcel.obtain()
-    parcel.unmarshall(bytes, 0, bytes.size)
-    parcel.setDataPosition(0)
-    return parcel
-}
-
-fun <T> unmarshall(bytes: ByteArray, creator: Parcelable.Creator<T>): T {
-    val parcel = unmarshall(bytes)
-    val result = creator.createFromParcel(parcel)
-    parcel.recycle()
-    return result
-}
-
 fun ByteArray.fill(bytes: ByteArray, offset: Int = 0) {
     var index = offset
     var length = Math.min(bytes.size + offset, size)
@@ -63,4 +37,38 @@ fun ByteArray.fill(bytes: ByteArray, offset: Int = 0) {
         this[index] = bytes[index - offset]
         index++
     }
+}
+
+fun Socket.send(packet: Packet) {
+    getOutputStream().write(packet.bytes())
+}
+
+fun Map<InetAddress, Client>.all(block: Client.() -> Unit): Int {
+    var count = 0
+    forEach { _, client ->
+        try {
+            block.invoke(client)
+            count++
+        } finally { }
+    }
+    return count
+}
+
+fun Any.serialize(): ByteArray? {
+    val out = ByteArrayOutputStream()
+    val os = ObjectOutputStream(out)
+    os.writeObject(this)
+    val data = out.toByteArray()
+    out.close()
+    os.close()
+    return data
+}
+
+fun ByteArray.deserialize(): Any {
+    val byteInput = ByteArrayInputStream(this)
+    val objectInput = ObjectInputStream(byteInput)
+    val data = objectInput.readObject()
+    byteInput.close()
+    objectInput.close()
+    return data
 }

@@ -47,66 +47,66 @@ class EGPMediaClient: EGPSystem() {
 
     override fun isGroupOwner() = false
 }
-
-fun main() {
-    runBlocking {
-        val service = (EGPSystem.create(EGPMediaClient::class, InetAddress.getLocalHost()) as EGPMediaClient)
-
-        service.registerClientServiceListener(object : Client.ClientServiceListener {
-
-            var file: File? = null
-            var outputStream: OutputStream? = null
-
-            override fun onReceive(clientId: Long, bytes: ByteArray) {
-                val code = bytes[0]
-                when(code) {
-                    Packet.CODE_FILE_START -> {
-                        val packet = Packet.from(bytes)
-                        file = File("A:\\resources", packet.get(String::class))
-                        outputStream = FileOutputStream(file)
-                        println("Filename=${file?.name}")
-                    }
-                    Packet.CODE_FILE_SENDING,  Packet.CODE_FILE_END -> {
-                        outputStream?.write(bytes, 1, bytes.size - 1)
-                        if (code == Packet.CODE_FILE_END) {
-                            outputStream?.flush()
-                            outputStream?.close()
-                            outputStream = null
-                            println("Size=${file?.length()}")
-                        }
-                    }
-                    Packet.CODE_MESSAGE_SEND -> {
-                        println("Message: ${Packet.from(bytes).get(String::class)}")
-                    }
-                    else -> {
-                        Log("Code = ${code} is not found")
-                    }
-                }
-            }
-
-        })
-
-        launch(Dispatchers.IO) {
-            val scanner = Scanner(System.`in`)
-            while (true) {
-                println("Input something ${service.threadInfo()}: ")
-                val text = scanner.nextLine()
-                service.send(Packet.from(text))
-            }
-        }
-
-
-        GlobalScope.launch {
-            delay(2000)
-            val file = File("B:\\Downloads\\English Conversation Practice - Improve Speaking Skills.mp4")
-            val packet = Packet.from(Packet.CODE_FILE_START, file.name.toByteArray())
-            service.sendFile(packet, file.inputStream())
-        }
-
-        launch {
-            service.start()
-        }.join()
-    }
-
-}
-
+//
+//fun main() {
+//    runBlocking {
+//        val service = (EGPSystem.create(EGPMediaClient::class, InetAddress.getLocalHost()) as EGPMediaClient)
+//
+//        service.registerClientServiceListener(object : Client.ClientServiceListener {
+//
+//            var file: File? = null
+//            var outputStream: OutputStream? = null
+//
+//            override fun onReceive(clientId: Long, bytes: ByteArray) {
+//                val code = bytes[0]
+//                when(code) {
+//                    Packet.CODE_FILE_START -> {
+//                        val packet = Packet.from(bytes)
+//                        file = File("A:\\resources", packet.get(String::class))
+//                        outputStream = FileOutputStream(file)
+//                        println("Filename=${file?.name}")
+//                    }
+//                    Packet.CODE_FILE_SENDING,  Packet.CODE_FILE_END -> {
+//                        outputStream?.write(bytes, 1, bytes.size - 1)
+//                        if (code == Packet.CODE_FILE_END) {
+//                            outputStream?.flush()
+//                            outputStream?.close()
+//                            outputStream = null
+//                            println("Size=${file?.length()}")
+//                        }
+//                    }
+//                    Packet.CODE_MESSAGE_SEND -> {
+//                        println("Message: ${Packet.from(bytes).get(String::class)}")
+//                    }
+//                    else -> {
+//                        Log("Code = ${code} is not found")
+//                    }
+//                }
+//            }
+//
+//        })
+//
+//        launch(Dispatchers.IO) {
+//            val scanner = Scanner(System.`in`)
+//            while (true) {
+//                println("Input something ${service.threadInfo()}: ")
+//                val text = scanner.nextLine()
+//                service.send(Packet.from(text))
+//            }
+//        }
+//
+//
+//        GlobalScope.launch {
+//            delay(2000)
+//            val file = File("B:\\Downloads\\English Conversation Practice - Improve Speaking Skills.mp4")
+//            val packet = Packet.from(Packet.CODE_FILE_START, file.name.toByteArray())
+//            service.sendFile(packet, file.inputStream())
+//        }
+//
+//        launch {
+//            service.start()
+//        }.join()
+//    }
+//
+//}
+//
