@@ -137,6 +137,11 @@
     <string name="quick_share">Quick share</string>
     <string name="disconnect">Disconnect</string>
     <string name="local_interaction">Local Interaction</string>
+    <string name="connect">Connect</string>
+    <string name="create_group">Create group</string>
+    <string name="group_is_working">Group is working.</string>
+    <string name="scan_qr_code">Scan QR code</string>
+    <string name="remove_group">Remove group</string>
 
     <string-array name="language_entries">
         <item>English</item>

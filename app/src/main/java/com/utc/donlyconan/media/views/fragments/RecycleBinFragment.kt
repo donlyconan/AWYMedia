@@ -77,8 +77,9 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
 
     private val onFileServiceListener = object : FileService.OnFileServiceListener {
 
-        override fun onError(e: Throwable?) {
+        override fun onError(e: Throwable?): Boolean {
             Log.d(TAG, "onError() called with: e = $e")
+            return false
         }
     }
 

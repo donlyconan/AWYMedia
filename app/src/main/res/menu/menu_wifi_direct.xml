@@ -7,18 +7,12 @@
         android:title="Refresh"
         app:showAsAction="always"/>
 
-
-    <item android:id="@+id/it_remove"
-        android:icon="@drawable/baseline_leak_remove_24"
-        android:title="Disconnect"
-        app:showAsAction="always"/>
-
     <item android:id="@+id/it_create_group"
-        android:icon="@drawable/baseline_leak_remove_24"
-        android:title="Create group"/>
+        android:icon="@drawable/baseline_groups_2_24"
+        android:title="@string/create_group"/>
 
 
     <item android:id="@+id/it_connect"
-        android:icon="@drawable/baseline_leak_remove_24"
-        android:title="Connect"/>
+        android:icon="@drawable/outline_playlist_add_20"
+        android:title="@string/connect"/>
 </menu>

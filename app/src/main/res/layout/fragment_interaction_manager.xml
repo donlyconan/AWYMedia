@@ -22,17 +22,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/menu_wifi_direct"
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-        app:title="Wi-Fi Direct"
+        app:title="Wi-Fi Pair"
         app:titleTextColor="@android:color/white">
 
-        <TextView
-            android:id="@+id/tv_device_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
-            android:textColor="@color/white"
-            tools:text="Group Owner" />
 
     </androidx.appcompat.widget.Toolbar>
 

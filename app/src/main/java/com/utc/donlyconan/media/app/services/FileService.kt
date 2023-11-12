@@ -29,13 +29,13 @@ import com.utc.donlyconan.media.app.localinteraction.Packet
 import com.utc.donlyconan.media.app.localinteraction.serialize
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.androidFile
+import com.utc.donlyconan.media.app.utils.browse
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.components.getMediaUri
 import com.utc.donlyconan.media.extension.widgets.showMessage
-import com.utc.donlyconan.media.views.fragments.InteractionManagerFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +49,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.net.InetAddress
 import java.net.Socket
+import java.net.SocketException
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
@@ -143,11 +144,13 @@ class FileService : Service() {
     
     private fun generateExceptionHandler() = CoroutineExceptionHandler { v, e ->
         e.printStackTrace()
-        listeners.forEach { listener -> listener.onError(e) }
+        val count = listeners.count { listener -> listener.onError(e) }
         Log.d(TAG, "generateExceptionHandler() called with: v = $v, e = $e")
-        coroutineScope.launch(Dispatchers.Main) {
-            context.showMessage(R.string.toast_when_failed_user_action, duration = Toast.LENGTH_SHORT)
-        }
+       if(count != 0) {
+           coroutineScope.launch(Dispatchers.Main) {
+               context.showMessage(R.string.toast_when_failed_user_action, duration = Toast.LENGTH_SHORT)
+           }
+       }
     }
 
     @Throws(IOException::class)
@@ -284,9 +287,13 @@ class FileService : Service() {
         }
     }
 
-    fun <T: EGPSystem>openEgmService(kClass: KClass<T>, inetAddress: InetAddress?, onFinish: (connected: Boolean) -> Unit) {
+
+    private val egmHandler = CoroutineExceptionHandler { _, e ->
+        listeners.browse { onError(e) }
+    }
+    fun <T: EGPSystem>openEgmService(kClass: KClass<T>, inetAddress: InetAddress?, onFinish: (connected: Boolean) -> Unit = {}): Job? {
         Log.d(TAG, "openEgmService() called with: kClass = $kClass, inetAddress = $inetAddress")
-        socketJob = runIO {
+        socketJob = coroutineScope.launch(Dispatchers.IO + egmHandler) {
             if(isReadyService()) {
                 Log.d(TAG, "openEgmService: System is running.")
                 onFinish(false)
@@ -298,9 +305,13 @@ class FileService : Service() {
                     registerClientServiceListener(clientServiceListener)
                     runIO { start() }
                 }
+                listeners.browse {
+                    onEgpConnectionChanged(true, egmSystem?.isGroupOwner() == true)
+                }
                 onFinish(egmSystem != null)
             }
         }
+        return socketJob
     }
 
     /**
@@ -310,8 +321,11 @@ class FileService : Service() {
         return egmSystem?.isAlive == true
     }
 
-    fun close() {
+    fun closeEgpSystem() {
         Log.d(TAG, "close() called")
+        listeners.browse {
+            onEgpConnectionChanged(false, egmSystem?.isGroupOwner() == true)
+        }
         egmSystem?.shutdown()
         socketJob?.cancel()
         clientHandlers.clear()
@@ -459,6 +473,7 @@ class FileService : Service() {
         fun onClientConnectionChanged(clients: List<Client>) {}
         fun onDiskSizeNotEnough() {}
         fun onDeletedFileError(uris: List<Uri>,e: Exception) {}
-        fun onError(e: Throwable?) {}
+        fun onError(e: Throwable?): Boolean { return false }
+        fun onEgpConnectionChanged(isConnected: Boolean, isGroupOwner: Boolean) {}
     }
 }

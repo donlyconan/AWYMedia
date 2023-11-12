@@ -43,3 +43,7 @@ fun <T> MutableIterator<out T>.consumeAll(consume: (e: T) -> Unit) {
         }
     } finally {}
 }
+
+fun <T> Collection<T>.browse(block: T.() -> Unit) {
+    forEach { item -> block.invoke(item) }
+}

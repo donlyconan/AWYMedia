@@ -2,12 +2,8 @@ package com.utc.donlyconan.media.views.fragments
 
 import ClientAdapter
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,15 +11,12 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
+import android.view.animation.ScaleAnimation
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.common.BitMatrix
 import com.google.zxing.integration.android.IntentIntegrator
-import com.google.zxing.qrcode.QRCodeWriter
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.localinteraction.Client
 import com.utc.donlyconan.media.app.localinteraction.EGPMediaClient
@@ -38,6 +31,7 @@ import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import kotlinx.coroutines.Dispatchers
 import java.net.InetAddress
 import java.net.NetworkInterface
+import java.net.SocketException
 
 
 class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
@@ -53,6 +47,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
     private val fileService by lazy { application.getFileService() }
     private val args by navArgs<InteractionManagerFragmentArgs>()
     private lateinit var intentIntegrator: IntentIntegrator
+    private lateinit var optionMenu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +75,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         Log.d(RecycleBinFragment.TAG, "onViewCreated: ")
         deviceAdapter.setOnItemClickListener(this)
         binding.recyclerView.adapter = deviceAdapter
-        binding.tvDeviceName.text = Settings.Global.getString(context!!.contentResolver, Settings.Global.DEVICE_NAME)
+        showLoadingScreen()
         viewModel.devicesMdl.observe(this) { data ->
             if(data == null || data.isEmpty()) {
                 showNoDataScreen()
@@ -89,15 +84,17 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
             }
             deviceAdapter.submit(data)
         }
-        runOnWorkerThread {
-            val ipAddress = "egm.media/local-interaction/${getDeviceIPAddress()}"
-            val bitmap = generateQRCode(ipAddress)
-            with(Dispatchers.Main) {
-                binding.imQrCode.setImageBitmap(bitmap)
-                hideLoading()
+        viewModel.ipAddress.observe(this) { ip ->
+            if(fileService?.isReadyService() == true) {
+                showToast("Disconnect before pair with another devices")
+            } else {
+                fileService?.openEgmService(EGPMediaClient::class, InetAddress.getByName(ip))
             }
         }
-
+        viewModel.qrCodeMdl.observe(this) { bitmap->
+            binding.imQrCode.setImageBitmap(bitmap)
+        }
+        viewModel.devicesMdl.value = fileService?.egmSystem?.listClients ?: listOf()
         Log.d(TAG, "onViewCreated: args=${args.ipAddress}")
     }
 
@@ -118,13 +115,13 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         activity.listener = null
     }
 
-    fun scan() {
+    private fun scanQRCode() {
         Log.d(TAG, "scan() called")
         intentIntegrator = IntentIntegrator(requireActivity()).apply {
             setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
             setBarcodeImageEnabled(true)
             setOrientationLocked(false)
-            setPrompt("Scan QR code")
+            setPrompt(getString(R.string.scan_qr_code))
             setBeepEnabled(false)
             initiateScan()
         }
@@ -145,29 +142,58 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
             menu.setOptionalIconsVisible(true)
         }
         inflater.inflate(R.menu.menu_wifi_direct, menu)
+        optionMenu = menu
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun adjustMenuName(isConnected: Boolean, isGroupOwner: Boolean) {
+        Log.d(TAG, "adjustMenuName() called with: isConnected = $isConnected, isGroupOwner = $isGroupOwner")
+        if(optionMenu == null) {
+            Log.d(TAG, "adjustMenuName: Option menu is null")
+            return
+        }
+        val menuItem = optionMenu.findItem(R.id.it_connect)
+        if (isConnected && !isGroupOwner) {
+            menuItem.setTitle(R.string.disconnect)
+        } else {
+            menuItem.setTitle(R.string.connect)
+        }
+        val groupItem = optionMenu.findItem(R.id.it_create_group)
+        if (isConnected && isGroupOwner) {
+            groupItem.setTitle(R.string.remove_group)
+        } else {
+            groupItem.setTitle(R.string.create_group)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(RecycleBinFragment.TAG, "onOptionsItemSelected() called with: item = $item")
-        runOnUIThread {
-            when (item.itemId) {
-                R.id.it_refresh -> {}
-                R.id.it_create_group -> {
-                    application.getFileService()?.openEgmService(EGPMediaServer::class, null ){ res ->
-                        if(res) {
-                            showToast("Group is created")
-                            runOnUIThread {
-                                binding.qrGroup.visibility = View.VISIBLE
-                            }
-                        }
+        when (item.itemId) {
+            R.id.it_refresh ->{
+                viewModel.devicesMdl.value = fileService?.egmSystem?.listClients ?: listOf()
+            }
+            R.id.it_create_group -> {
+                fileService?.let { service ->
+                    if (service.isReadyService()) {
+                        service.closeEgpSystem()
+                    } else {
+                        openServer()
                     }
                 }
-                R.id.it_connect -> {
-                    scan()
+            }
+            R.id.it_connect -> {
+                fileService?.let { service ->
+                    if (service.isReadyService()) {
+                        if (service.egmSystem?.isGroupOwner() == true) {
+                            showToast(R.string.group_is_working)
+                        } else {
+                            service.closeEgpSystem()
+                        }
+                    } else {
+                        scanQRCode()
+                    }
                 }
             }
-
         }
         return true
     }
@@ -178,19 +204,6 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         viewModel.submit(clients)
     }
 
-    private fun generateQRCode(content: String): Bitmap? {
-        val qrCodeWriter = QRCodeWriter()
-        val bitMatrix: BitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, 256, 256)
-        val width: Int = bitMatrix.width
-        val height: Int = bitMatrix.height
-        val qrCodeBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                qrCodeBitmap.setPixel(x, y, if (bitMatrix.get(x, y)) Color.BLACK else Color.WHITE)
-            }
-        }
-        return qrCodeBitmap
-    }
 
     private fun getDeviceIPAddress(): String? {
         Log.d(TAG, "getDeviceIPAddress() called")
@@ -201,9 +214,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
             while (addresses.hasMoreElements()) {
                 val address = addresses.nextElement()
                 if (!address.isLoopbackAddress && address.hostAddress.indexOf(':') == -1) {
-                    return address.hostAddress.let { ip ->
-                        if(ip.startsWith("10.")) "127.0.0.1" else ip
-                    }
+                    return address.hostAddress
                 }
 
             }
@@ -214,13 +225,56 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d(TAG, "onActivityResult() called with: requestCode = $requestCode, resultCode = $resultCode, data = $data")
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if(result != null) {
-            runOnWorkerThread { 
-                val ipAddress = result.contents.substringAfterLast('/')
-                Log.d(TAG, "onActivityResult: IPAddress=$ipAddress")
-                application.getFileService()?.openEgmService(EGPMediaClient::class, InetAddress.getByName(ipAddress)) {
-                    Log.d(TAG, "onActivityResult: $it")
+        val ipAddress = result?.contents?.substringAfterLast('/')
+        if(ipAddress != null) {
+            Log.d(TAG, "onActivityResult: IPAddress=$ipAddress")
+            viewModel.ipAddress.value = ipAddress
+        }
+    }
+
+
+    private fun openServer() {
+        Log.d(TAG, "openServer() called")
+        application.getFileService()?.openEgmService(EGPMediaServer::class, null )
+    }
+
+
+    private fun showQRCode() {
+        Log.d(TAG, "showQRCode() called")
+        runOnWorkerThread {
+            val ipAddress = "egm.media/local-interaction/${getDeviceIPAddress()}"
+            viewModel.generateQRCode(ipAddress)
+            with(Dispatchers.Main) {
+                runOnUIThread {
+                    binding.qrGroup.visibility = View.VISIBLE
+                    binding.imQrCode.startAnimation(
+                        ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.5f).apply {
+                            duration = 1500
+                        }
+                    )
                 }
+            }
+        }
+    }
+
+    override fun onError(e: Throwable?): Boolean {
+        Log.d(TAG, "onError() called with: e = $e")
+        if(e is SocketException) {
+            if(fileService?.egmSystem?.isGroupOwner() == false) {
+                showToast("Pair is interrupted.")
+            }
+        }
+        return super.onError(e)
+    }
+
+    override fun onEgpConnectionChanged(isConnected: Boolean, isGroupOwner: Boolean) {
+        Log.d(TAG, "onEgpConnectionChanged() called with: isConnected = $isConnected, isGroupOwner = $isGroupOwner")
+        runOnUIThread {
+            adjustMenuName(isConnected, isGroupOwner)
+            if (isConnected && isGroupOwner) {
+                showQRCode()
+            } else {
+                binding.qrGroup.visibility = View.INVISIBLE
             }
         }
     }
