@@ -150,4 +150,7 @@ dependencies {
 
     implementation "androidx.work:work-runtime-ktx:2.7.1"
     implementation "androidx.biometric:biometric-ktx:1.2.0-alpha05"
+
+    // implement lib of QR code
+    implementation "com.journeyapps:zxing-android-embedded:4.1.0"
 }

@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.views
 import android.app.Activity
 import android.app.RecoverableSecurityException
 import android.app.Service
+import android.content.Intent
 import android.content.IntentSender
 import android.net.Uri
 import android.os.Build
@@ -11,13 +12,17 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.navigation.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.FileService
+import com.utc.donlyconan.media.databinding.ActivityMainBinding
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 
 
 class MainActivity : BaseActivity() {
+
+    var listener: OnActivityResponse? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +69,16 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        findNavController(R.id.nav_host_fragment_container).handleDeepLink(intent)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        listener?.onActivityResult(requestCode, resultCode, data)
+    }
+
     private val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         Log.d(TAG, "onDeletedResult() called with: result = ${result.resultCode == Activity.RESULT_OK}")
         application.getFileService()?.notifyDeletedResult(result)
@@ -71,6 +86,10 @@ class MainActivity : BaseActivity() {
 
     companion object {
         val TAG: String = MainActivity.javaClass.simpleName
+    }
+
+    interface OnActivityResponse {
+        fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     }
 
 }

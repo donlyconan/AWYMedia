@@ -35,10 +35,12 @@ class EGPMediaClient: EGPSystem() {
     override fun setup(inetAddress: InetAddress?) {
         println("setup() called with: inetAddress = $inetAddress")
         _socket = Socket(inetAddress, IP_PORT)
-        accept(socket)
+        coroutineScope.launch {
+            accept(socket)
+        }
     }
 
-    override fun accept(socket: Socket) {
+    override suspend fun accept(socket: Socket) {
         println( "accept() called with: socket = $socket")
         val client = Client(CLIENT_ID, socket)
         clients[client.clientId] = client

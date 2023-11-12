@@ -1,8 +1,26 @@
 package com.utc.donlyconan.media.app.localinteraction
+import androidx.recyclerview.widget.DiffUtil
+import com.utc.donlyconan.media.data.models.Playlist
+import com.utc.donlyconan.media.data.models.Video
 import java.net.ConnectException
 import java.net.Socket
 
 open class Client(val clientId: Long, val socket: Socket) {
+
+    companion object {
+        val diffUtil = object : DiffUtil.ItemCallback<Any>() {
+            override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+                if(oldItem is Client && newItem is Client) {
+                    return oldItem.clientId == newItem.clientId
+                }
+                return false
+            }
+            override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
+
     private val inputStream = socket.getInputStream()
     private val outputStream = socket.getOutputStream()
     @Volatile

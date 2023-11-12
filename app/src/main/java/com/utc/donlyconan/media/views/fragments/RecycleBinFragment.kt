@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.net.toUri

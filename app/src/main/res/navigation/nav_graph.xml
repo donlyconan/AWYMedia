@@ -53,6 +53,9 @@
         <action
             android:id="@+id/action_mainDisplayFragment_to_privateFolder"
             app:destination="@id/nav_private_folder" />
+        <action
+            android:id="@+id/action_mainDisplayFragment_to_interactionManagerFragment"
+            app:destination="@id/interactionManagerFragment" />
 
     </fragment>
 
@@ -106,6 +109,22 @@
 
     <include app:graph="@navigation/nav_private_folder"
         android:layout="@layout/fragment_private_folder"/>
+
+    <fragment
+        android:id="@+id/interactionManagerFragment"
+        android:name="com.utc.donlyconan.media.views.fragments.InteractionManagerFragment"
+        android:label="InteractionManagerFragment"
+        tools:layout="@layout/fragment_interaction_manager">
+        <deepLink
+            android:id="@+id/deepLink"
+            android:autoVerify="true"
+            app:uri="egm.media/local-interaction/{ipAddress}" />
+        <argument
+            android:name="ipAddress"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 
 
 </navigation>

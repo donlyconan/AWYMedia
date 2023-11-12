@@ -221,6 +221,10 @@ class MainDisplayFragment : BaseFragment() {
                 val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToPrivateFolder()
                 findNavController().navigate(action)
             }
+            R.id.it_local_interaction -> {
+                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToInteractionManagerFragment()
+                findNavController().navigate(action)
+            }
             else -> {
                 Log.d(TAG, "onOptionsItemSelected: item not found!")
             }

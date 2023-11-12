@@ -23,6 +23,7 @@ import androidx.core.net.toUri
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.localinteraction.Client
+import com.utc.donlyconan.media.app.localinteraction.EGPMediaClient
 import com.utc.donlyconan.media.app.localinteraction.EGPSystem
 import com.utc.donlyconan.media.app.localinteraction.Packet
 import com.utc.donlyconan.media.app.localinteraction.serialize
@@ -34,6 +35,7 @@ import com.utc.donlyconan.media.data.repo.TrashRepository
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.extension.components.getMediaUri
 import com.utc.donlyconan.media.extension.widgets.showMessage
+import com.utc.donlyconan.media.views.fragments.InteractionManagerFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +43,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
 import java.io.File
 import java.io.IOException
@@ -292,11 +293,11 @@ class FileService : Service() {
             } else {
                 egmSystem?.shutdown()
                 egmSystem = EGPSystem.create(kClass, inetAddress).apply {
+                    val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
+                    setName(name)
                     registerClientServiceListener(clientServiceListener)
                     runIO { start() }
                 }
-                val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
-                egmSystem?.send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray()))
                 onFinish(egmSystem != null)
             }
         }
@@ -322,10 +323,8 @@ class FileService : Service() {
         override fun onStart(clientId: Long, socket: Socket) {
             Log.d(TAG, "onStart() called with: clientId = $clientId, socket = $socket")
             clientHandlers[clientId] = ClientHandler(clientId)
-            listeners.forEach { e -> e.onClientConnectionChanged(egmSystem?.listClients ?: listOf()) }
             runIO {
-                val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
-                egmSystem?.send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray()))
+                listeners.forEach { e -> e.onClientConnectionChanged(egmSystem?.listClients ?: listOf()) }
             }
         }
 
@@ -333,6 +332,9 @@ class FileService : Service() {
             Log.d(TAG, "onClose() called with: clientId = $clientId, socket = $socket")
             clientHandlers.remove(clientId)
             listeners.forEach { e -> e.onClientConnectionChanged(egmSystem?.listClients ?: listOf()) }
+            if(clientId == EGPMediaClient.CLIENT_ID) {
+                egmSystem = null
+            }
         }
 
         override fun onReceive(clientId: Long, packet: Packet) {

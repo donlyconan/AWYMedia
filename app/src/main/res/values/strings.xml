@@ -135,6 +135,8 @@
     <string name="des_of_hidden_entrance">The private folder entrance will be hidden, You can access it by clicking three times on the app\'s title</string>
     <string name="hide_the_entrance">Hide the Entrance</string>
     <string name="quick_share">Quick share</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="local_interaction">Local Interaction</string>
 
     <string-array name="language_entries">
         <item>English</item>

@@ -36,6 +36,11 @@
         android:title="@string/data_synchronization" />
 
     <item
+        android:id="@+id/it_local_interaction"
+        android:icon="@drawable/ic_baseline_sync_24"
+        android:title="@string/local_interaction" />
+
+    <item
         android:id="@+id/it_help"
         android:icon="@drawable/ic_help_white_24dp"
         android:title="@string/help_amp_feedback" />

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/it_refresh"
+        android:icon="@drawable/baseline_refresh_24"
+        android:title="Refresh"
+        app:showAsAction="always"/>
+
+
+    <item android:id="@+id/it_remove"
+        android:icon="@drawable/baseline_leak_remove_24"
+        android:title="Disconnect"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/it_create_group"
+        android:icon="@drawable/baseline_leak_remove_24"
+        android:title="Create group"/>
+
+
+    <item android:id="@+id/it_connect"
+        android:icon="@drawable/baseline_leak_remove_24"
+        android:title="Connect"/>
+</menu>

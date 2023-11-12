@@ -19,7 +19,7 @@ abstract class EGPSystem {
     companion object {
         const val IP_PORT = 8888
         const val HOSTNAME = "localhost"
-        const val DEFAULT_BUFFER_SIZE = 4097
+        const val DEFAULT_BUFFER_SIZE = 2048
 
         @JvmStatic
         fun <T: EGPSystem> create(kClass: KClass<T>, inetAddress: InetAddress?): EGPSystem {
@@ -45,6 +45,7 @@ abstract class EGPSystem {
     protected val coroutineScope = CoroutineScope(supervisorJob + Dispatchers.IO + CoroutineExceptionHandler {_,e -> e.printStackTrace() })
     val events: MutableList<Client.ClientServiceListener> by lazy { mutableListOf() }
     val listClients: List<Client> get() = clients.values.toList()
+    private var systemName: String? = null
 
 
         /**
@@ -58,12 +59,13 @@ abstract class EGPSystem {
      */
     abstract suspend fun start()
 
-    open fun accept(socket: Socket) {
+    open suspend fun accept(socket: Socket) {
         println( "accept() called with: socket = $socket")
         sClientId++
         val client = Client(sClientId, socket)
         clients[client.clientId] = client
         client.clientServiceListener = clientServiceListener
+        systemName?.let { name -> send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray())) }
         coroutineScope.launch {
             client.start()
         }
@@ -131,14 +133,18 @@ abstract class EGPSystem {
         clients.values.forEach { client -> client.close() }
     }
 
+    fun setName(name: String) {
+        systemName = name
+    }
+
     protected val clientServiceListener = object : Client.ClientServiceListener {
         override fun onStart(clientId: Long, socket: Socket) {
             events.forEach { e -> e.onStart(clientId, socket) }
         }
 
         override fun onClose(clientId: Long, socket: Socket) {
-            events.forEach { e -> e.onClose(clientId, socket) }
             clients.remove(clientId)
+            events.forEach { e -> e.onClose(clientId, socket) }
         }
 
         override fun onReceive(clientId: Long, bytes: ByteArray) {
