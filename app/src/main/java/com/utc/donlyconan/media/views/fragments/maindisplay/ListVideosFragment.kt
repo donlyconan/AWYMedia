@@ -36,43 +36,48 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         val video = videoAdapter.getVideo(position)
 
         if (v.id == R.id.img_menu_more) {
-            MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
-                when (view.id) {
-                    R.id.btn_play -> startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId(), isContinue())
-                    R.id.btn_play_music -> {
-                        if(getPlaylistId() == -1) {
-                            playMusic(video)
-                        } else {
-                            val videos = videoAdapter.getData().filterIsInstance<Video>()
-                            val index = videos.indexOfFirst { vd -> vd.videoId == video.videoId }
-                            val items = videos.map { MediaItem.fromUri(it.videoUri) }
-                            startPlayMusic(items, index)
-                        }
-                    }
-                    R.id.btn_favorite -> {
-                        video.isFavorite = !video.isFavorite
-                        videoRepo.update(video)
-                        videoAdapter.notifyItemChanged(position)
-                    }
-
-                    R.id.btn_delete -> lifecycleScope.launch(Dispatchers.IO) {
-                        deleteVideo(video, videoRepo)
-                    }
-
-                    R.id.btn_share -> share(video)
-                    R.id.btn_quick_share -> handleQuickShare(video)
-                    R.id.btn_lock -> lockVideo(video, videoRepo, appComponent.getPlaylistWithVideoDao())
-                    R.id.btn_unlock -> unlockVideo(video, videoRepo)
-                    else -> {
-                        Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
-                    }
-                }
-            }.setGoneViews(hideViews)
-                .setViewState(R.id.btn_favorite, video.isFavorite)
-                .show(parentFragmentManager, PersonalVideoFragment.TAG)
+            openMenuMore(video, position)
         } else {
             startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId(), isContinue())
         }
+    }
+
+    protected fun openMenuMore(video: Video, position: Int) {
+        Log.d(TAG, "openMenuMore() called with: video = $video, position = $position")
+        MenuMoreOptionFragment.newInstance(R.layout.fragment_personal_option) { view ->
+            when (view.id) {
+                R.id.btn_play -> startVideoDisplayActivity(video.videoId, video.videoUri, getPlaylistId(), isContinue())
+                R.id.btn_play_music -> {
+                    if(getPlaylistId() == -1) {
+                        playMusic(video)
+                    } else {
+                        val videos = videoAdapter.getData().filterIsInstance<Video>()
+                        val index = videos.indexOfFirst { vd -> vd.videoId == video.videoId }
+                        val items = videos.map { MediaItem.fromUri(it.videoUri) }
+                        startPlayMusic(items, index)
+                    }
+                }
+                R.id.btn_favorite -> {
+                    video.isFavorite = !video.isFavorite
+                    videoRepo.update(video)
+                    videoAdapter.notifyItemChanged(position)
+                }
+
+                R.id.btn_delete -> lifecycleScope.launch(Dispatchers.IO) {
+                    deleteVideo(video, videoRepo)
+                }
+
+                R.id.btn_share -> share(video)
+                R.id.btn_quick_share -> handleQuickShare(video)
+                R.id.btn_lock -> lockVideo(video, videoRepo, appComponent.getPlaylistWithVideoDao())
+                R.id.btn_unlock -> unlockVideo(video, videoRepo)
+                else -> {
+                    Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
+                }
+            }
+        }.setGoneViews(hideViews)
+            .setViewState(R.id.btn_favorite, video.isFavorite)
+            .show(parentFragmentManager, PersonalVideoFragment.TAG)
     }
 
     open fun getPlaylistId(): Int {

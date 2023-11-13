@@ -41,10 +41,11 @@ class EGPMediaClient: EGPSystem() {
     }
 
     override suspend fun accept(socket: Socket) {
-        println( "accept() called with: socket = $socket")
+        println( "accept() called with: socket = $socket, systemName=$systemName")
         val client = Client(CLIENT_ID, socket)
         clients[client.clientId] = client
         client.clientServiceListener = clientServiceListener
+        systemName?.let { name -> send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray())) }
     }
 
     override suspend fun start() {

@@ -45,7 +45,8 @@ abstract class EGPSystem {
     protected val coroutineScope = CoroutineScope(supervisorJob + Dispatchers.IO + CoroutineExceptionHandler {_,e -> e.printStackTrace() })
     val events: MutableList<Client.ClientServiceListener> by lazy { mutableListOf() }
     val listClients: List<Client> get() = clients.values.toList()
-    private var systemName: String? = null
+    protected var systemName: String? = null
+        private set
 
 
         /**
@@ -60,14 +61,20 @@ abstract class EGPSystem {
     abstract suspend fun start()
 
     open suspend fun accept(socket: Socket) {
-        println( "accept() called with: socket = $socket")
+        println( "accept() called with: socket = $socket, SystemName=$systemName")
         sClientId++
         val client = Client(sClientId, socket)
         clients[client.clientId] = client
         client.clientServiceListener = clientServiceListener
         systemName?.let { name -> send(Packet.from(Packet.CODE_DEVICE_NAME, name.toByteArray())) }
         coroutineScope.launch {
-            client.start()
+            try {
+                client.start()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                client.close()
+            }
         }
     }
 

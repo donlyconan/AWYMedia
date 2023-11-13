@@ -29,17 +29,20 @@ import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.app.utils.toBannerNumber
+import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
+import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 
 
 /**
  * Represent for Main Screen of app where app will shows all video list has on it
  */
-class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItemClickListener {
+class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItemClickListener,
+    OnItemLongClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>{
@@ -70,6 +73,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         super.onViewCreated(view, savedInstanceState)
         videoAdapter = VideoAdapter(requireContext(), arrayListOf())
         videoAdapter.setOnItemClickListener(this)
+        videoAdapter.setOnLongClickListener(this)
         binding.recyclerView.adapter = videoAdapter
         binding.fab.setOnClickListener(this)
         showLoadingScreen()
@@ -250,6 +254,13 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     companion object {
         val TAG = PersonalVideoFragment::class.simpleName
         fun newInstance() = PersonalVideoFragment()
+    }
+
+    override fun onItemLongClick(v: View, position: Int) {
+        Log.d(TAG, "onItemLongClick() called with: v = $v, position = $position")
+        (videoAdapter.getItem(position) as? Video)?.let { video ->
+            openMenuMore(video, position)
+        }
     }
 
 }

@@ -1,8 +1,11 @@
 package com.utc.donlyconan.media.views.fragments
 
 import ClientAdapter
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -96,6 +99,10 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         }
         viewModel.devicesMdl.value = fileService?.egmSystem?.listClients ?: listOf()
         Log.d(TAG, "onViewCreated: args=${args.ipAddress}")
+        requestPermissionIfNeed(android.Manifest.permission.CAMERA)
+        if(!haveNetworkConnection()) {
+            showToast("Network is not available.")
+        }
     }
 
     override fun onStart() {
@@ -182,6 +189,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
                 }
             }
             R.id.it_connect -> {
+                requestPermissionIfNeed(Manifest.permission.CAMERA)
                 fileService?.let { service ->
                     if (service.isReadyService()) {
                         if (service.egmSystem?.isGroupOwner() == true) {
@@ -202,6 +210,11 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
     override fun onClientConnectionChanged(clients: List<Client>) {
         Log.d(TAG, "onClientConnectionChanged() called with: clients = $clients")
         viewModel.submit(clients)
+    }
+
+    override fun onDeviceNameUpdated(deviceName: String?) {
+        Log.d(TAG, "onDeviceNameUpdated() called with: deviceName = $deviceName")
+        viewModel.submit(fileService?.egmSystem?.listClients ?: listOf())
     }
 
 
@@ -273,10 +286,25 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
             adjustMenuName(isConnected, isGroupOwner)
             if (isConnected && isGroupOwner) {
                 showQRCode()
-            } else {
-                binding.qrGroup.visibility = View.INVISIBLE
+            }
+            if(!isGroupOwner) {
+                binding.qrGroup.visibility = View.GONE
             }
         }
+    }
+
+    private fun haveNetworkConnection(): Boolean {
+        var haveConnectedWifi = false
+        var haveConnectedMobile = false
+        val cm = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val netInfo = cm.allNetworkInfo
+        for (ni in netInfo) {
+            if (ni.typeName.equals("WIFI", ignoreCase = true))
+                if (ni.isConnected) haveConnectedWifi = true
+            if (ni.typeName.equals("MOBILE", ignoreCase = true))
+                if (ni.isConnected) haveConnectedMobile = true
+        }
+        return haveConnectedWifi || haveConnectedMobile
     }
 
 }

@@ -66,6 +66,7 @@ class Packet private constructor(){
             String::class -> String(data(), Charsets.UTF_8).trim() as? T
             ByteArray::class -> data() as? T
             Video::class -> data().deserialize() as? T
+            List::class -> data().deserialize() as? T
             else -> {
                 Log("kClass: ${T::class.simpleName} is not found.")
                 null
