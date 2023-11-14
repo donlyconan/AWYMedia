@@ -23,9 +23,11 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.material.snackbar.Snackbar
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.AudioService
+import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
+import com.utc.donlyconan.media.app.utils.compareUri
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.app.utils.toBannerNumber
@@ -42,7 +44,7 @@ import com.utc.donlyconan.media.views.adapter.VideoAdapter
  * Represent for Main Screen of app where app will shows all video list has on it
  */
 class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItemClickListener,
-    OnItemLongClickListener {
+    OnItemLongClickListener, FileService.OnFileServiceListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>{
@@ -239,6 +241,18 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart() called")
+        application.getFileService()?.registerOnFileServiceListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop() called")
+        application.getFileService()?.unregisterOnFileServiceListener(this)
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -260,6 +274,24 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         Log.d(TAG, "onItemLongClick() called with: v = $v, position = $position")
         (videoAdapter.getItem(position) as? Video)?.let { video ->
             openMenuMore(video, position)
+        }
+    }
+
+    override fun onDownloadingProgress(uri: String, progress: Long, total: Long) {
+        val index = videoAdapter.getData().indexOfFirst { item ->  item is Video && item.videoUri.compareUri(uri) }
+        runOnUIThread {
+            val holder = binding.recyclerView.findViewHolderForAdapterPosition(index) as? VideoAdapter.VideoHolder
+            holder?.setProgress(progress, total)
+            holder?.setBlockMode(progress != total)
+        }
+    }
+
+    override fun onEgpConnectionChanged(isConnected: Boolean, isGroupOwner: Boolean) {
+        Log.d(TAG, "onEgpConnectionChanged() called with: isConnected = $isConnected, isGroupOwner = $isGroupOwner")
+        if(isConnected) {
+            hideViews.remove(R.id.btn_quick_share)
+        } else {
+            hideViews.add(R.id.btn_quick_share)
         }
     }
 

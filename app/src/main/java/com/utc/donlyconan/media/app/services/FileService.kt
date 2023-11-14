@@ -52,6 +52,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.net.InetAddress
 import java.net.Socket
+import java.net.SocketException
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
@@ -297,6 +298,10 @@ class FileService : Service() {
     private val egmHandler = CoroutineExceptionHandler { _, e ->
         listeners.browse { onError(e) }
         e.printStackTrace()
+        showMessage("An error has occurred. ${e.message}")
+        if(e is SocketException) {
+            closeEgpSystem()
+        }
     }
     fun <T: EGPSystem>openEgmService(kClass: KClass<T>, inetAddress: InetAddress?, onFinish: (connected: Boolean) -> Unit = {}): Job? {
         Log.d(TAG, "openEgmService() called with: kClass = $kClass, inetAddress = $inetAddress")
@@ -384,23 +389,15 @@ class FileService : Service() {
         return newFile
     }
 
-    private val senderChannel by lazy {
-        BroadcastChannel<Video>(Channel.BUFFERED).apply {
-            runIO {
-                openSubscription().consumeEach { video ->
-                    handleSendRequest(video)
-                }
-            }
-        }
-    }
 
     fun send(video: Video) {
         Log.d(TAG, "send() called with: videos = $video")
-        runIO {
-            senderChannel.send(video)
+        coroutineScope.launch(Dispatchers.IO + egmHandler) {
+            handleSendRequest(video)
         }
     }
 
+    @Synchronized
     private suspend fun handleSendRequest(video: Video) {
         Log.d(TAG, "handleSendRequest() called")
         video.copy(createdAt = now(), updatedAt = now(), isSecured = false, isFavorite = false)
@@ -428,6 +425,8 @@ class FileService : Service() {
         private var video: Video? = null
         private var file: File? = null
         private var flag: Byte = -1
+        private var expiredTime: Long = 0
+        private var downloadingProgress: Long = 0
 
         /**
          * Handle message which is sent by clients or server
@@ -459,6 +458,7 @@ class FileService : Service() {
                 outputStream = file?.outputStream()
                 flag = packet.code()
             }
+            downloadingProgress = 0
         }
 
         private fun createVideoFile(packet: Packet) {
@@ -469,20 +469,41 @@ class FileService : Service() {
                 file = createNewFile(video.title!!)
                 Log.d(TAG, "createVideoFile file = $file")
                 outputStream = file?.outputStream()
+                file?.getMediaUri(this@FileService) { uri ->
+                    video.videoUri = uri.toString()
+                    videoRepository.insertOrUpdate(video)
+                }
             }
+            downloadingProgress = 0
             flag = packet.code()
         }
 
         private fun writeFile(packet: Packet) {
             outputStream?.write(packet.data())
+            downloadingProgress += packet.length()
+            if(expiredTime < now() - 1000 && packet.code() == Packet.CODE_FILE_SENDING) {
+                listeners.browse {
+                    video?.videoUri?.let { uri ->
+                        onDownloadingProgress(uri, downloadingProgress, video?.size ?: 0)
+                    }
+                }
+                expiredTime = now()
+            }
             if (packet.code() == Packet.CODE_FILE_END) {
                 outputStream?.flush()
                 outputStream?.close()
+                listeners.browse {
+                    val size = video?.size ?: 0
+                    video?.videoUri?.let { uri ->
+                        onDownloadingProgress(uri, size, size)
+                    }
+                }
                 if(flag == Packet.CODE_VIDEO_ENCODE) {
                     handleWhenFinish()
                 }
                 outputStream = null
                 file = null
+                downloadingProgress = 0
                 flag = -1
                 Log.d(TAG, "handle: sending file is finished.")
             }
@@ -514,5 +535,6 @@ class FileService : Service() {
         fun onDeletedFileError(uris: List<Uri>,e: Exception) {}
         fun onError(e: Throwable?): Boolean { return false }
         fun onEgpConnectionChanged(isConnected: Boolean, isGroupOwner: Boolean) {}
+        fun onDownloadingProgress(uri: String, progress: Long, total: Long) {}
     }
 }

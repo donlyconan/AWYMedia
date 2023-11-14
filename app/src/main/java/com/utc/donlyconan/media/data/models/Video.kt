@@ -48,6 +48,8 @@ data class Video(
 ) : Selectable, Parcelable, Serializable {
     @Ignore
     var isChecked: Boolean = false
+    @Ignore
+    var progress: Int = 0
 
     fun compareTo(v: Video, sortBy: Int) = when (sortBy) {
         Settings.SORT_BY_CREATION -> {
@@ -120,6 +122,7 @@ data class Video(
                 return oldItem == newItem
             }
         }
+        private const val serialVersionUID = 2394384857837457L
     }
 
     override fun isSelected(): Boolean {

@@ -47,3 +47,7 @@ fun <T> MutableIterator<out T>.consumeAll(consume: (e: T) -> Unit) {
 fun <T> Collection<T>.browse(block: T.() -> Unit) {
     forEach { item -> block.invoke(item) }
 }
+
+fun String.compareUri(target: String): Boolean {
+    return substringAfterLast('/') == target.substringAfterLast('/')
+}

@@ -1,25 +1,20 @@
 package com.utc.donlyconan.media.views.adapter
 
-import android.content.ClipData
-import android.content.ClipDescription
 import android.content.Context
-import android.util.Log
-import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
+import androidx.core.content.ContextCompat
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
-import com.utc.donlyconan.media.app.utils.formatToTime
 import com.utc.donlyconan.media.app.utils.formatShortTime
+import com.utc.donlyconan.media.app.utils.formatToTime
 import com.utc.donlyconan.media.app.utils.setVideoImage
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
 import com.utc.donlyconan.media.databinding.ItemPlaylistBinding
 import com.utc.donlyconan.media.databinding.ItemVideoSingleModeBinding
-import kotlin.math.log
 
 
 class VideoAdapter(
@@ -117,14 +112,9 @@ class VideoAdapter(
                     max = video.duration
                     progress = video.playedTime.toInt()
                 }
+            } else {
+                binding.progress.visibility = View.GONE
             }
-            binding.rootLayout.setOnLongClickListener { v ->
-                val shadow = View.DragShadowBuilder(binding.imgThumbnail)
-                val data = ClipData(video.videoUri, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), ClipData.Item(video.videoUri.toUri()))
-                v.startDragAndDrop(data, shadow, binding.imgThumbnail, 0)
-                true
-            }
-            binding.rootLayout.setOnDragListener(this)
         }
 
         fun setLastItem(isLastItem: Boolean) {
@@ -137,6 +127,19 @@ class VideoAdapter(
             } else if (binding.container.paddingBottom != 0) {
                 binding.container.apply {
                     setPadding(paddingLeft, paddingTop, paddingRight, 0)
+                }
+            }
+        }
+
+        fun setProgress(progress: Long, total: Long) {
+            with(binding.progress) {
+                if(visibility != View.VISIBLE) {
+                    visibility = View.VISIBLE
+                }
+                max = total.toInt()
+                setProgress(progress.toInt(), true)
+                if(progress == total) {
+                    visibility = View.GONE
                 }
             }
         }

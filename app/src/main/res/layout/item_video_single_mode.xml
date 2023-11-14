@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    android:id="@+id/container"
+<FrameLayout android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:id="@+id/rootLayout"
@@ -41,7 +41,7 @@
                 android:alpha="0.8"
                 android:background="@drawable/bg_video_time"
                 android:padding="3dp"
-                android:text="02:04:12"
+                tools:text="02:04:12"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
 
@@ -53,7 +53,7 @@
                 android:layout_gravity="bottom"
                 android:progress="20"
                 android:progressDrawable="@drawable/video_play_progress"
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
         </androidx.cardview.widget.CardView>
 

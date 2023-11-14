@@ -71,4 +71,13 @@ class VideoRepository @Inject constructor(
         videoDao.delete(video.videoId)
     }
 
+    fun insertOrUpdate(video: Video) {
+        val existedVideo = get(video.videoUri)
+        if(existedVideo == null) {
+            insert(video)
+        } else {
+            update(video)
+        }
+    }
+
 }
