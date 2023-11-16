@@ -26,6 +26,7 @@ import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.OnClickTimesListener
 import com.utc.donlyconan.media.views.SettingsActivity
 import com.utc.donlyconan.media.views.adapter.MainDisplayAdapter
+import com.utc.donlyconan.media.views.fragments.SearchBarFragment
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import javax.inject.Inject
 
@@ -176,9 +177,8 @@ class MainDisplayFragment : BaseFragment() {
                 startActivity(intent)
             }
             R.id.it_search -> {
-                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToSearchBarFragment(
-                        binding.viewPager2.currentItem
-                    )
+                val type = if(binding.viewPager2.currentItem == PLAYLIST_FRAGMENT) SearchBarFragment.SEARCH_FOR_PLAYLIST else SearchBarFragment.SEARCH_FOR_VIDEO
+                val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToSearchBarFragment(type)
                 findNavController().navigate(action)
             }
             R.id.it_sync_data -> {

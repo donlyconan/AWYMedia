@@ -22,7 +22,7 @@ import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 
 class MainActivity : BaseActivity() {
 
-    private val listeners: MutableList<OnActivityResponse> by lazy { mutableListOf() }
+    private val listeners: MutableSet<OnActivityResponse> by lazy { mutableSetOf() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

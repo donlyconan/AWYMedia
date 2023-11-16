@@ -153,6 +153,7 @@ class AudioService : Service() {
         }
         notificationManager.hideNotification()
         mediaStateListener.onAudioServiceAvailable(false)
+        player = null
     }
 
     private val broadcastReceiver = object  : BroadcastReceiver() {

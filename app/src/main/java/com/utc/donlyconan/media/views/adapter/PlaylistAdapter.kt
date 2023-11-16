@@ -51,6 +51,10 @@ class PlaylistAdapter(var context: Context,
         notifyDataSetChanged()
     }
 
+    override fun getItem(position: Int): Playlist {
+        return playlists[position]
+    }
+
 
     class PlaylistHolder(val binding: ItemPlaylistBinding) : BaseAdapter.LocalHolder(binding) {
 

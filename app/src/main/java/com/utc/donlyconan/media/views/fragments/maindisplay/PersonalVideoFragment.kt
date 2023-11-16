@@ -104,10 +104,6 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         }
 
         requestPermissions()
-        application.getAudioService()?.let { audioService ->
-            audioService.registerPlayerListener(listener)
-            binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
-        }
         binding.fab.setOnTouchListener(onTouchEvent)
         viewModel.numberOfTrash.observe(this) { quantity ->
             binding.fabTrash.isSelected = quantity > 0
@@ -257,25 +253,19 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         super.onStart()
         Log.d(TAG, "onStart() called")
         application.getFileService()?.registerOnFileServiceListener(this)
+        application.getAudioService()?.let { audioService ->
+            audioService.registerPlayerListener(listener)
+            binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
+        }
     }
 
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop() called")
         application.getFileService()?.unregisterOnFileServiceListener(this)
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
         application.getAudioService()?.removePlayerListener(listener)
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        Log.d(TAG, "onDetach() called")
-        application.getAudioService()?.removePlayerListener(listener)
-    }
 
     companion object {
         val TAG = PersonalVideoFragment::class.simpleName

@@ -29,6 +29,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         appComponent.inject(this)
         audioService = application.getAudioService()
         hideViews.add(R.id.btn_unlock)
+        hideViews.add(R.id.btn_quick_share)
     }
 
     override fun onItemClick(v: View, position: Int) {

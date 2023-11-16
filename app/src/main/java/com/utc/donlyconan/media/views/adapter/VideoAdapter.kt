@@ -95,6 +95,7 @@ class VideoAdapter(
         }
 
         fun bind(video: Video, showProgress: Boolean, showOptionMenu: Boolean, dragMode: Boolean = false) {
+            setBlockMode(!video.available)
             binding.tvTitle.text = video.title
             binding.tvDate.text = video.createdAt.formatToTime()
             binding.tvSize.text = video.size.convertToStorageData()
@@ -116,7 +117,6 @@ class VideoAdapter(
             } else {
                 binding.progress.visibility = View.GONE
             }
-            setBlockMode(!video.available)
         }
 
         fun setLastItem(isLastItem: Boolean) {
@@ -148,10 +148,9 @@ class VideoAdapter(
         }
 
         override fun setBlockMode(isBlocked: Boolean) {
-            Log.d(TAG, "setBlockMode() called with: isBlocked = $isBlocked")
             super.setBlockMode(isBlocked)
-            binding.root.isEnabled = isBlocked
-            binding.rootLayout.isEnabled = isBlocked
+            binding.root.isEnabled = !isBlocked
+            binding.rootLayout.isEnabled = !isBlocked
         }
     }
 
