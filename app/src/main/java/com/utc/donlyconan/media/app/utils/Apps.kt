@@ -1,6 +1,7 @@
 package com.utc.donlyconan.media.app.utils
 
 import android.os.Environment
+import android.view.View
 import android.widget.ImageView
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
@@ -50,4 +51,12 @@ fun <T> Collection<T>.browse(block: T.() -> Unit) {
 
 fun String.compareUri(target: String): Boolean {
     return substringAfterLast('/') == target.substringAfterLast('/')
+}
+
+fun View.gone() {
+    visibility = View.GONE
+}
+
+fun View.show() {
+    visibility = View.VISIBLE
 }

@@ -42,6 +42,7 @@ class PrivateFolderFragment : ListVideosFragment() {
         setHasOptionsMenu(true)
         hideViews.clear()
         hideViews.add(R.id.btn_lock)
+        hideViews.add(R.id.btn_share)
     }
 
     override fun onCreateView(

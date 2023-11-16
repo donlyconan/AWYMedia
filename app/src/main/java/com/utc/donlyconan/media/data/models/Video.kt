@@ -50,6 +50,8 @@ data class Video(
     var isChecked: Boolean = false
     @Ignore
     var progress: Int = 0
+    @Ignore
+    var available: Boolean = true
 
     fun compareTo(v: Video, sortBy: Int) = when (sortBy) {
         Settings.SORT_BY_CREATION -> {

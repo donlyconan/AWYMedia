@@ -28,7 +28,7 @@ class ClientAdapter(var context: Context, data: List<Client>) : BaseAdapter<Any>
         }
 
         fun bind(client: Client) {
-            binding.tvDeviceName.text = client.name ?: binding.root.context.getText(R.string.unknow)
+            binding.tvDeviceName.text = client.name ?: binding.root.context.getText(R.string.unknown)
             binding.tvAddress.text = client.socket.inetAddress.hostAddress
             binding.btDisconnect.setOnClickListener {
                 onItemClickListener?.onItemClick(it, absoluteAdapterPosition)

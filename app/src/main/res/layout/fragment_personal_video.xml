@@ -87,4 +87,29 @@
         android:visibility="gone"
         android:layout_gravity="center" />
 
+    <LinearLayout
+        android:id="@+id/ll_pair_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@drawable/bg_device_online"
+        android:paddingEnd="10dp"
+        android:visibility="gone"
+        android:layout_gravity="start|bottom">
+        <TextView
+            android:id="@+id/tv_device_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unknown"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:padding="8dp"/>
+
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:src="@drawable/bg_round_online"/>
+
+    </LinearLayout>
+
 </FrameLayout>

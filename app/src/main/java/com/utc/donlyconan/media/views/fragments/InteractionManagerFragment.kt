@@ -3,9 +3,7 @@ package com.utc.donlyconan.media.views.fragments
 import ClientAdapter
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -49,7 +47,6 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
     private val deviceAdapter by lazy { ClientAdapter(requireContext(), fileService?.egmSystem?.listClients ?: listOf()) }
     private val fileService by lazy { application.getFileService() }
     private val args by navArgs<InteractionManagerFragmentArgs>()
-    private lateinit var intentIntegrator: IntentIntegrator
     private lateinit var optionMenu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +57,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
             supportActionBar?.setDisplayShowTitleEnabled(false)
             supportActionBar?.setDisplayShowTitleEnabled(true)
             setHasOptionsMenu(true)
-        }.listener = this
+        }
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -99,9 +96,13 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         }
         viewModel.devicesMdl.value = fileService?.egmSystem?.listClients ?: listOf()
         Log.d(TAG, "onViewCreated: args=${args.ipAddress}")
-        requestPermissionIfNeed(android.Manifest.permission.CAMERA)
+        requestPermissionIfNeed(Manifest.permission.CAMERA)
         if(!haveNetworkConnection()) {
-            showToast("Network is not available.")
+            showToast(R.string.network_is_not_available)
+        } else {
+            if(args.ipAddress?.trim()?.isNotEmpty() == true) {
+                viewModel.ipAddress.postValue(args.ipAddress)
+            }
         }
     }
 
@@ -117,22 +118,6 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         fileService?.unregisterOnFileServiceListener(this)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        activity.listener = null
-    }
-
-    private fun scanQRCode() {
-        Log.d(TAG, "scan() called")
-        intentIntegrator = IntentIntegrator(requireActivity()).apply {
-            setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-            setBarcodeImageEnabled(true)
-            setOrientationLocked(false)
-            setPrompt(getString(R.string.scan_qr_code))
-            setBeepEnabled(false)
-            initiateScan()
-        }
-    }
 
     override fun onItemClick(v: View, position: Int) {
         Log.d(TAG, "onItemClick() called with: position = $position")
@@ -189,7 +174,6 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
                 }
             }
             R.id.it_connect -> {
-                requestPermissionIfNeed(Manifest.permission.CAMERA)
                 fileService?.let { service ->
                     if (service.isReadyService()) {
                         if (service.egmSystem?.isGroupOwner() == true) {
@@ -262,7 +246,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
                     binding.qrGroup.visibility = View.VISIBLE
                     binding.imQrCode.startAnimation(
                         ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.5f).apply {
-                            duration = 1500
+                            duration = 1000
                         }
                     )
                 }
@@ -291,20 +275,6 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
                 binding.qrGroup.visibility = View.GONE
             }
         }
-    }
-
-    private fun haveNetworkConnection(): Boolean {
-        var haveConnectedWifi = false
-        var haveConnectedMobile = false
-        val cm = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val netInfo = cm.allNetworkInfo
-        for (ni in netInfo) {
-            if (ni.typeName.equals("WIFI", ignoreCase = true))
-                if (ni.isConnected) haveConnectedWifi = true
-            if (ni.typeName.equals("MOBILE", ignoreCase = true))
-                if (ni.isConnected) haveConnectedMobile = true
-        }
-        return haveConnectedWifi || haveConnectedMobile
     }
 
 }

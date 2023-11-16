@@ -231,6 +231,9 @@ class MainDisplayFragment : BaseFragment() {
                 val action = MainDisplayFragmentDirections.actionMainDisplayFragmentToInteractionManagerFragment()
                 findNavController().navigate(action)
             }
+            R.id.it_connect -> {
+                scanQRCode()
+            }
             else -> {
                 Log.d(TAG, "onOptionsItemSelected: item not found!")
             }

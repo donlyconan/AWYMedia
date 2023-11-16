@@ -21,7 +21,10 @@ import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.material.snackbar.Snackbar
+import com.google.zxing.integration.android.IntentIntegrator
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.localinteraction.Client
+import com.utc.donlyconan.media.app.localinteraction.EGPMediaClient
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
@@ -38,6 +41,8 @@ import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
+import com.utc.donlyconan.media.views.fragments.InteractionManagerFragment
+import java.net.InetAddress
 
 
 /**
@@ -87,6 +92,13 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             } else {
                 hideLoading()
                 val data = videos.sortedByCreatedDate(settings.sortBy == Settings.SORT_VIDEO_BY_CREATION_DOWN)
+                    .apply {
+                        application.getFileService()?.getDownloadingItems()?.let { videos ->
+                            filterIsInstance<Video>().forEach { video ->
+                                video.available = !videos.any { it.videoUri == video.videoUri }
+                            }
+                        }
+                    }
                 videoAdapter.submit(data)
             }
         }
@@ -292,6 +304,41 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             hideViews.remove(R.id.btn_quick_share)
         } else {
             hideViews.add(R.id.btn_quick_share)
+        }
+        runOnUIThread {
+            binding.llPairGroup.visibility = if(isConnected) View.VISIBLE else View.GONE
+        }
+    }
+
+    override fun onDeviceNameUpdated(deviceName: String?) {
+        updateDeviceName(deviceName)
+    }
+
+    private fun updateDeviceName(deviceName: String?) {
+        Log.d(TAG, "updateDeviceName() called with: deviceName = $deviceName")
+        runOnUIThread {
+            binding.tvDeviceName.text = deviceName ?: getString(R.string.unknown)
+        }
+    }
+
+    override fun onClientConnectionChanged(clients: List<Client>) {
+        Log.d(TAG, "onClientConnectionChanged() called with: clients = $clients")
+        super.onClientConnectionChanged(clients)
+        application.getFileService()?.egmSystem?.listClients?.lastOrNull()?.name.let { name ->
+            updateDeviceName(name)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d(InteractionManagerFragment.TAG, "onActivityResult() called with: requestCode = $requestCode, resultCode = $resultCode, data = $data")
+        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        val ipAddress = result?.contents?.substringAfterLast('/')
+        if(ipAddress != null) {
+            Log.d(InteractionManagerFragment.TAG, "onActivityResult: IPAddress=$ipAddress")
+            application.getFileService()?.let { service ->
+                service.closeEgpSystem()
+                service.openEgmService(EGPMediaClient::class, InetAddress.getByName(ipAddress))
+            }
         }
     }
 

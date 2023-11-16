@@ -41,6 +41,11 @@
         android:title="@string/local_interaction" />
 
     <item
+        android:id="@+id/it_connect"
+        android:icon="@drawable/outline_playlist_add_20"
+        android:title="@string/scan_qr_code" />
+
+    <item
         android:id="@+id/it_help"
         android:icon="@drawable/ic_help_white_24dp"
         android:title="@string/help_amp_feedback" />

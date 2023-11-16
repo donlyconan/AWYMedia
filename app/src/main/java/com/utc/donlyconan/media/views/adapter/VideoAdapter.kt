@@ -1,10 +1,11 @@
 package com.utc.donlyconan.media.views.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.formatShortTime
@@ -115,6 +116,7 @@ class VideoAdapter(
             } else {
                 binding.progress.visibility = View.GONE
             }
+            setBlockMode(!video.available)
         }
 
         fun setLastItem(isLastItem: Boolean) {
@@ -135,6 +137,7 @@ class VideoAdapter(
             with(binding.progress) {
                 if(visibility != View.VISIBLE) {
                     visibility = View.VISIBLE
+                    progressTintList = ColorStateList.valueOf(resources.getColor(R.color.blue_700))
                 }
                 max = total.toInt()
                 setProgress(progress.toInt(), true)
@@ -142,6 +145,13 @@ class VideoAdapter(
                     visibility = View.GONE
                 }
             }
+        }
+
+        override fun setBlockMode(isBlocked: Boolean) {
+            Log.d(TAG, "setBlockMode() called with: isBlocked = $isBlocked")
+            super.setBlockMode(isBlocked)
+            binding.root.isEnabled = isBlocked
+            binding.rootLayout.isEnabled = isBlocked
         }
     }
 

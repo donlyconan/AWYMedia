@@ -141,6 +141,7 @@ abstract class EGPSystem {
     }
 
     fun setName(name: String) {
+        println("setName: systemName=$name")
         systemName = name
     }
 

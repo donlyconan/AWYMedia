@@ -16,13 +16,13 @@ import androidx.navigation.findNavController
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.FileService
-import com.utc.donlyconan.media.databinding.ActivityMainBinding
+import com.utc.donlyconan.media.app.utils.browse
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 
 
 class MainActivity : BaseActivity() {
 
-    var listener: OnActivityResponse? = null
+    private val listeners: MutableList<OnActivityResponse> by lazy { mutableListOf() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,12 +76,22 @@ class MainActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        listener?.onActivityResult(requestCode, resultCode, data)
+        listeners.browse {
+            onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     private val intentSenderForResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         Log.d(TAG, "onDeletedResult() called with: result = ${result.resultCode == Activity.RESULT_OK}")
         application.getFileService()?.notifyDeletedResult(result)
+    }
+
+    fun registerListener(listener: OnActivityResponse) {
+        listeners.add(listener)
+    }
+
+    fun unregisterListener(listener: OnActivityResponse) {
+        listeners.remove(listener)
     }
 
     companion object {

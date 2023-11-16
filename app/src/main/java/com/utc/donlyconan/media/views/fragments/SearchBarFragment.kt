@@ -169,7 +169,7 @@ class SearchBarFragment : BaseFragment(), View.OnClickListener, OnItemClickListe
                                 Log.d(PersonalVideoFragment.TAG, "onClick: actionId hasn't found!")
                             }
                         }
-                    }.setGoneViews(listOf(R.id.btn_unlock))
+                    }.setGoneViews(setOf(R.id.btn_unlock))
                         .setViewState(R.id.btn_favorite, item.isFavorite)
                         .show(parentFragmentManager, PersonalVideoFragment.TAG)
                 }

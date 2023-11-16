@@ -24,7 +24,7 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
     private val layoutId by lazy { arguments!!.getInt(EXTRA_LAYOUT_ID) }
     private val map by lazy { HashMap<Int, Boolean>() }
     private var onInitialView: OnInitialView? = null
-    private var viewGones = ArrayList<Int>()
+    private var viewGones = HashSet<Int>()
     private var checkedViewId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +82,7 @@ class MenuMoreOptionFragment: BottomSheetDialogFragment(), View.OnClickListener 
         return this
     }
 
-    fun setGoneViews(viewIds: List<Int>): MenuMoreOptionFragment {
+    fun setGoneViews(viewIds: Set<Int>): MenuMoreOptionFragment {
         Log.d(TAG, "setGoneViews() called with: viewIds = $viewIds")
         viewGones.addAll(viewIds)
         return this

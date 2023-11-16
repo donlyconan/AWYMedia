@@ -1,7 +1,10 @@
 package com.utc.donlyconan.media.views
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.material.snackbar.Snackbar
+import com.google.zxing.integration.android.IntentIntegrator
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.FileService
@@ -22,6 +26,7 @@ import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
+import com.utc.donlyconan.media.views.fragments.InteractionManagerFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.MainDisplayFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -34,7 +39,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * This is basic class that will provide some properties for children class
  */
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment(), MainActivity.OnActivityResponse {
 
     protected val activity by lazy { requireActivity() as MainActivity }
     protected val application by lazy { requireContext().applicationContext as EGMApplication }
@@ -148,7 +153,7 @@ abstract class BaseFragment : Fragment() {
             intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.shared_file))
             startActivity(Intent.createChooser(intent,  getString(R.string.share_file)))
         } else {
-            showToast("The video is being protected, You cannot share it!")
+            showToast(R.string.the_video_is_being_protected_you_cannot_share_it)
         }
     }
 
@@ -246,4 +251,53 @@ abstract class BaseFragment : Fragment() {
             Snackbar.make(this, msg, Snackbar.LENGTH_SHORT).show()
         }
     }
+
+    protected fun scanQRCode() {
+        Log.d(InteractionManagerFragment.TAG, "scan() called")
+        if(!haveNetworkConnection()) {
+            showToast(R.string.network_is_not_available)
+            return
+        }
+        if(checkPermission(Manifest.permission.CAMERA)) {
+            val intentIntegrator = IntentIntegrator(requireActivity()).apply {
+                setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+                setBarcodeImageEnabled(true)
+                setOrientationLocked(false)
+                setPrompt(getString(R.string.scan_qr_code))
+                setBeepEnabled(false)
+                setCameraId(0)
+            }
+            intentIntegrator.initiateScan()
+        } else {
+            Logs.d("scanQRCode: request camera permission.")
+            requestPermissionIfNeed(Manifest.permission.CAMERA)
+        }
+    }
+
+    protected fun haveNetworkConnection(): Boolean {
+        var haveConnectedWifi = false
+        var haveConnectedMobile = false
+        val cm = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val netInfo = cm.allNetworkInfo
+        for (ni in netInfo) {
+            if (ni.typeName.equals("WIFI", ignoreCase = true))
+                if (ni.isConnected) haveConnectedWifi = true
+            if (ni.typeName.equals("MOBILE", ignoreCase = true))
+                if (ni.isConnected) haveConnectedMobile = true
+        }
+        return haveConnectedWifi || haveConnectedMobile
+    }
+
+    override fun onStart() {
+        super.onStart()
+        activity.registerListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        activity.unregisterListener(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {}
+
 }

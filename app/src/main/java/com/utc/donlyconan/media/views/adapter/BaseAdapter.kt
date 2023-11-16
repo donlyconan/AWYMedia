@@ -141,7 +141,7 @@ abstract class BaseAdapter<T>(differ: ItemCallback<T>, private var data: List<T>
 
         open fun bind(value: Any) {}
 
-        fun setBlockMode(isBlocked: Boolean) {
+        open fun setBlockMode(isBlocked: Boolean) {
             itemView.alpha = if(isBlocked) 0.6f else 1.0f
             this.isBlocked = isBlocked
         }

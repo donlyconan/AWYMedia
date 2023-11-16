@@ -22,7 +22,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
     protected lateinit var videoAdapter: VideoAdapter
     protected var audioService: AudioService? = null
     @Inject lateinit var videoRepo: VideoRepository
-    protected val hideViews by lazy { ArrayList<Int>() }
+    protected val hideViews by lazy { mutableSetOf<Int>() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

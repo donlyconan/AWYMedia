@@ -46,6 +46,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import java.io.File
 import java.io.IOException
@@ -269,6 +270,9 @@ class FileService : Service() {
         listeners.browse {
             onEgpConnectionChanged(isReadyService(), egmSystem?.isGroupOwner() == true)
             onClientConnectionChanged(egmSystem?.listClients ?: listOf())
+            egmSystem?.listClients?.lastOrNull()?.let {  client ->
+                onDeviceNameUpdated(client.name)
+            }
         }
     }
 
@@ -298,7 +302,9 @@ class FileService : Service() {
     private val egmHandler = CoroutineExceptionHandler { _, e ->
         listeners.browse { onError(e) }
         e.printStackTrace()
-        showMessage("An error has occurred. ${e.message}")
+        coroutineScope.launch(Dispatchers.Main) {
+            showMessage("An error has occurred. ${e.message}")
+        }
         if(e is SocketException) {
             closeEgpSystem()
         }
@@ -420,9 +426,14 @@ class FileService : Service() {
             }
     }
 
+    fun getDownloadingItems(): List<Video> {
+        return clientHandlers.filter { it.value.isAvailable() }.map { it.value.video!! }
+    }
+
     inner class ClientHandler(val clientId: Long) {
         private var outputStream: OutputStream? = null
-        private var video: Video? = null
+        var video: Video? = null
+            private set
         private var file: File? = null
         private var flag: Byte = -1
         private var expiredTime: Long = 0
@@ -525,6 +536,10 @@ class FileService : Service() {
                     }
                 }
             }
+        }
+
+        fun isAvailable(): Boolean {
+            return video != null && downloadingProgress < video!!.size && downloadingProgress > 0L
         }
     }
 

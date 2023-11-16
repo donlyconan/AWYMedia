@@ -142,7 +142,9 @@
     <string name="group_is_working">Group is working.</string>
     <string name="scan_qr_code">Scan QR code</string>
     <string name="remove_group">Remove group</string>
-    <string name="unknow">Unknow</string>
+    <string name="unknown">Unknown</string>
+    <string name="network_is_not_available">Network is not available.</string>
+    <string name="the_video_is_being_protected_you_cannot_share_it">The video is being protected, You cannot share it!</string>
 
     <string-array name="language_entries">
         <item>English</item>
