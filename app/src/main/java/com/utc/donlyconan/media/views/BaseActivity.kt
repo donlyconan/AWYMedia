@@ -5,8 +5,10 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.settings.Settings
-import com.utc.donlyconan.media.dagger.components.ApplicationComponent
+import com.utc.donlyconan.media.app.utils.setDetailedFormatDate
+import com.utc.donlyconan.media.app.utils.setFormatDate
 import com.utc.donlyconan.media.extension.widgets.setLocale
+import java.util.Locale
 import javax.inject.Inject
 
 open class BaseActivity: AppCompatActivity() {
@@ -27,6 +29,8 @@ open class BaseActivity: AppCompatActivity() {
         Log.d(TAG, "onCreate: language=${langCode}")
         setLocale(langCode)
         Log.d(TAG, "onCreate: current language=${resources.configuration.locales[0]}")
+        setFormatDate(Locale.forLanguageTag(langCode))
+        setDetailedFormatDate(Locale.forLanguageTag(langCode))
         super.onCreate(savedInstanceState)
     }
 
