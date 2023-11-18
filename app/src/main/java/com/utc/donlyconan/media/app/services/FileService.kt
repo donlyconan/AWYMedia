@@ -406,8 +406,7 @@ class FileService : Service() {
     @Synchronized
     private suspend fun handleSendRequest(video: Video) {
         Log.d(TAG, "handleSendRequest() called")
-        video.copy(createdAt = now(), updatedAt = now(), isSecured = false, isFavorite = false)
-            .apply {
+        video.apply {
                 serialize()?.let { bytes ->
                     val purpose = Packet.from(Packet.CODE_VIDEO_ENCODE, bytes)
                     contentResolver.openInputStream(videoUri.toUri())?.use { inp ->
@@ -475,8 +474,8 @@ class FileService : Service() {
         private fun createVideoFile(packet: Packet) {
             video = packet.get()
             Log.d(TAG, "createVideoFile() called with: packet = $packet, video=$video")
-            video?.let { video ->
-                video.videoId = 0
+            video?.copy(videoId = 0, createdAt = now(), updatedAt = now(), isFavorite = false, isSecured = false)
+                ?.let { video ->
                 file = createNewFile(video.title!!)
                 Log.d(TAG, "createVideoFile file = $file")
                 outputStream = file?.outputStream()
