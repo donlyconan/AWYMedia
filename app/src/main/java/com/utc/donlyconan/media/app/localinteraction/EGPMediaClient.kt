@@ -1,26 +1,8 @@
 package com.utc.donlyconan.media.app.localinteraction
 
-import android.util.Log
-import com.utc.donlyconan.media.app.utils.Logs
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.OutputStream
-import java.net.Inet4Address
 import java.net.InetAddress
-import java.net.InetSocketAddress
 import java.net.Socket
-import java.net.SocketAddress
-import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
-import java.nio.channels.SocketChannel
-import java.util.Scanner
 
 class EGPMediaClient: EGPSystem() {
     companion object {
@@ -131,23 +113,18 @@ class EGPMediaClient: EGPSystem() {
 //fun main() {
 ////        send(packet)
 //    // spend a slot for code in the head
-//    val file = FileInputStream("B:\\Downloads\\Merriam_Websters_Vocabulary_Builder.pdf")
-//    val packet = Packet.from("")
-//    file.use { inp ->
-//        var quantity = 0
-//        while (quantity != -1) {
-//            quantity = inp.read(packet.bytes(), Packet.INDEX_DATA, packet.capacity() - Packet.INDEX_DATA)
-//            if(quantity != -1) {
-//                if (quantity >= EGPSystem.DEFAULT_BUFFER_SIZE - Packet.INDEX_DATA) {
-//                    packet.code(Packet.CODE_FILE_SENDING)
-//                    println("Quantity=$quantity")
-//                } else {
-//                    packet.code(Packet.CODE_FILE_END)
-//                    println("Last package: " + quantity)
+//    val file = FileInputStream("C:\\Users\\Admin\\AWYMedia\\app\\src\\main\\res\\values-vi\\strings.xml")
+//    val fileEn = FileInputStream("C:\\Program Files (x86)\\Notepad++\\es.txt")
+//    runBlocking {
+//        file.bufferedReader().use { reader ->
+//            reader.readLines().asFlow()
+//                .filter { it.contains("</string>") }
+//                .zip(fileEn.bufferedReader().readLines().asFlow()) { f1, f2 ->
+//                    val content = f1.substringAfter("\">").substringBeforeLast("</string")
+//                    f1.replace(content, f2)
+//                }.collectLatest {
+//                    println(it)
 //                }
-//                packet.length(quantity)
-////                send(packet)
-//            }
 //        }
 //    }
 //

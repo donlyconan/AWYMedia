@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="toolbar_title_explore">Khám phá</string>
-    <string name="toolbar_title_about">Phiên bản</string>
-    <string name="toolbar_title_account">Tài khoản</string>
-    <string name="toolbar_title_help_and_feedback">Giúp đỡ &amp; Phản hồi</string>
     <string name="remove_all">Xoá tất cả</string>
     <string name="playlist">Danh sách phát</string>
     <string name="no_data">Không có dữ liệu</string>
@@ -15,19 +11,19 @@
     <string name="sort_by">Sắp xếp theo</string>
     <string name="add_video">Thêm video</string>
     <string name="remove">Xóa</string>
-    <string name="feedback_hint">Nhập câu hỏi hoặc cảm nhận của bạn...</string>
+    <string name="feedback_hint">Nhập câu hỏi hoặc cảm nhận của bạn…</string>
     <string name="trash">Thùng rác</string>
     <string name="rating">Đánh giá</string>
     <string name="view">Xem</string>
     <string name="play_sound">Phát âm thanh</string>
     <string name="remove_from_play_list">Xóa khỏi danh sách phát</string>
-    <string name="enter_the_content_what_you_find">Nhập nội dung tìm kiếm...</string>
+    <string name="enter_the_content_what_you_find">Nhập nội dung tìm kiếm…</string>
     <string name="yes">Có</string>
     <string name="no">Không</string>
     <string name="do_you_want_to_continue_playing_this_video">Bạn có muôn tiếp tục phát video này không?</string>
     <string name="cancel">Hủy bỏ</string>
     <string name="ok">Đồng ý</string>
-    <string name="enter_playlist_name">Nhập tên danh sách phát...</string>
+    <string name="enter_playlist_name">Nhập tên danh sách phát…</string>
     <string name="add_playlist">Thêm danh sách phát</string>
     <string name="app_version">Phiên bản: 1.0.0</string>
     <string name="author_donly_conan">Tác giả: Donly Conan</string>
@@ -49,11 +45,8 @@
     <string name="erasure_cycle_des">Thiết lập thời gian xóa</string>
     <string name="erasure_cycle">Chu kỳ xóa</string>
     <string name="remove_video_from_devices_des">Cho phép ứng dụng xóa video trên thiết bị khi thực hiện thao tác xóa trên ứng dụng.</string>
-    <string name="remove_video_from_devices">Xóa video từ thiết bị</string>
     <string name="language_des">Cài đặt ngôn ngữ sẽ hiển thị trên ứng dụng.</string>
     <string name="language">Ngôn ngữ</string>
-    <string name="toolbar_title_home">Trang chủ</string>
-    <string name="personal">Cá nhân</string>
     <string name="recent">Gần đây</string>
     <string name="shared">Được chia sẻ</string>
     <string name="favorite">Yêu thích</string>
@@ -84,20 +77,52 @@
     <string name="rename">Đổi tên</string>
     <string name="save">Lưu</string>
     <string name="data_synchronization">Đồng bộ hóa dữ liệu</string>
-
-    <string-array name="remove_entries">
-        <item>Hàng ngày</item>
-        <item>Hàng tuần</item>
-        <item>Hàng tháng</item>
-        <item>Hàng năm</item>
-        <item>Vô hiệu hóa</item>
-    </string-array>
     <string name="understood">Đã hiểu</string>
     <string name="trash_clean_des">Thùng rác sẽ được làm sạch sau %s %s</string>
     <string name="days">ngày</string>
     <string name="hours">giờ</string>
     <string name="general_settings">Cài đặt chung</string>
     <string name="select_language">Chọn ngôn ngữ</string>
-    <string name="author">Donly Conan</string>
+    <string name="des_of_hidden_entrance">Ẩn lối vào của thư mục riêng tư. Hãy chạm 3 lần vào tiêu đề trên trang Video để truy cập vào nó.</string>
+    <string name="hide_the_entrance">Ẩn thư mục riêng tư</string>
+    <string name="quick_share">Chia sẻ nhanh</string>
+    <string name="disconnect">Ngắt kết nối</string>
+    <string name="local_interaction">Tương tác nội bộ</string>
+    <string name="connect">Kết nối</string>
+    <string name="create_group">Tạo nhóm</string>
+    <string name="group_is_working">Nhóm đang hoạt động</string>
+    <string name="scan_qr_code">Quét QR Code</string>
+    <string name="remove_group">Xóa nhóm</string>
+    <string name="unknown">Không xác định</string>
+    <string name="network_is_not_available">Network không khả dụng</string>
+    <string name="the_video_is_being_protected_you_cannot_share_it">Video đang được bảo vệ, Bạn không thể chia sẻ nó</string>
+    <string name="disconnect_before_pair_with_another_devices">Hãy ngắt kết nối trước khi ghép đôi với thiết bị khác</string>
+    <string name="pair_is_interrupted">Kết nối bị gián đoạn</string>
+    <string name="no_item_selected">Bạn cần chọn ít nhất một danh mục</string>
+    <string name="subtitles">Phụ đề</string>
+    <string name="private_folder">Thư mục riêng tư</string>
+    <string name="unlock">Mở khóa</string>
+    <string name="require_password_content">Vui lòng sử dụng mật khẩu hoặc vân tay của bạn để xác thực</string>
+    <string name="password">Mật khẩu</string>
+    <string name="authentication_failed">Quá trình xác thực đã xảy ra vấn đề</string>
+    <string name="toast_when_failed_user_action">Đã có lỗi xảy ra, vui lòng thử lại</string>
+    <string name="add">Thêm</string>
+    <string name="shared_file">Tệp tin được chia sẻ</string>
+    <string name="share_file">Chia sẻ tệp tin</string>
+    <string name="request_action_again">"Hành động thất "</string>
+    <string name="untitled">Không tên</string>
+    <string name="file_service_is_not_available">File service không khả dụng</string>
+    <string name="can_t_delete_the_file">Không thể xóa tệp tin</string>
+    <string name="have_had_some_problems_when_moving_files">Đã có lỗi xảy ra khi di chuyển tệp tin</string>
+    <string name="have_had_some_problems_when_restoring_files">Đã có lỗi xảy ra khi khôi phục tệp tin</string>
+    <string name="the_files_is_restored">Tệp tin đã được khôi phục</string>
+    <string name="OK">Đồng ý</string>
+    <string name="the_files_have_not_been_deleted">Tệp tin vẫn chưa được xóa ở bộ nhớ trong</string>
+    <string name="the_files_have_been_moved_to_recycle_bin">Tệp tin đã được di chuyển vào Recycle Bin</string>
+    <string name="move_to_trash">Di chuyển vào thùng rác</string>
+    <string name="playlist_name_is_invalid">Tên Danh sách phát không hợp lệ</string>
+    <string name="the_music_is_playing_by_easy_guard_player">Âm  nhạc đang được phát bở Easy Guard Player</string>
+    <string name="show_info_file_move_into_bin">Tệp tin đã được di chuyển vào Recycle Bin</string>
+    <string name="wi_fi_pair">Wi-Fi Ghép đôi</string>
 
 </resources>

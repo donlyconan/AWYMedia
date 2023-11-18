@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/menu_wifi_direct"
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-        app:title="Wi-Fi Pair"
+        app:title="@string/wi_fi_pair"
         app:titleTextColor="@android:color/white">
 
 

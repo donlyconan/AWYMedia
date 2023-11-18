@@ -65,12 +65,11 @@
 
     <TextView
         android:id="@+id/btn_quick_share"
+        style="@style/BottomMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/outline_share_24"
-        android:text="@string/quick_share"
-        style="@style/BottomMenuItem"
-        />
+        android:drawableStart="@drawable/ic_collaboration"
+        android:text="@string/quick_share" />
 
     <TextView
         android:id="@+id/btn_delete"

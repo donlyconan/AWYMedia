@@ -86,7 +86,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         }
         viewModel.ipAddress.observe(this) { ip ->
             if(fileService?.isReadyService() == true) {
-                showToast("Disconnect before pair with another devices")
+                showToast(R.string.disconnect_before_pair_with_another_devices)
             } else {
                 fileService?.openEgmService(EGPMediaClient::class, InetAddress.getByName(ip))
             }
@@ -258,7 +258,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         Log.d(TAG, "onError() called with: e = $e")
         if(e is SocketException) {
             if(fileService?.egmSystem?.isGroupOwner() == false) {
-                showToast("Pair is interrupted.")
+                showToast(R.string.pair_is_interrupted)
             }
         }
         return super.onError(e)

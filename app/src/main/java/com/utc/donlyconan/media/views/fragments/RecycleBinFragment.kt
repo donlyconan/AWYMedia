@@ -150,7 +150,7 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
         val items = adapter.getSelectedItems()
         if(items.isEmpty()) {
             Log.d(TAG, "onOptionsItemSelected: video list is empty!")
-            showToast("You need to choose at least one item.")
+            showToast(R.string.no_item_selected)
             return true
         }
         if(item.itemId == R.id.it_trash) {

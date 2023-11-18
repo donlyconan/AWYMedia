@@ -37,12 +37,12 @@
 
     <item
         android:id="@+id/it_local_interaction"
-        android:icon="@drawable/ic_baseline_sync_24"
+        android:icon="@drawable/ic_network"
         android:title="@string/local_interaction" />
 
     <item
         android:id="@+id/it_connect"
-        android:icon="@drawable/outline_playlist_add_20"
+        android:icon="@drawable/baseline_qr_code_scanner_24"
         android:title="@string/scan_qr_code" />
 
     <item

@@ -1,174 +1,153 @@
 <resources>
     <string name="app_name" translatable="false">Easy Guard Player</string>
-
-    <string name="toolbar_title_home">Home</string>
-    <string name="toolbar_title_explore">Explore</string>
-    <string name="toolbar_title_about">About</string>
-    <string name="toolbar_title_account">Account</string>
-    <string name="toolbar_title_help_and_feedback">Help&amp;Feedback</string>
+    <string name="author" translatable="false">Donly Conan</string>
+    <string name="_0_mb" translatable="false">0 MB</string>
+    <string name="personal" translatable="false">Videos</string>
 
     <!-- Navigation Drawer -->
-    <string name="nav_drawer_item_home" translatable="false">Home</string>
-    <string name="nav_drawer_item_explore" translatable="false">Explore</string>
-    <string name="nav_drawer_help_and_feedback" translatable="false"><![CDATA[Help & feedback]]></string>
-    <string name="nav_drawer_about" translatable="false">About</string>
-    <string name="tools_text_account_information_username" translatable="false">Sotti</string>
-    <string name="tools_text_account_information_email" translatable="false">sotti@sottocorp.com</string>
     <string name="video_demo_title" translatable="false">Video demo title</string>
     <string name="notification_channel" translatable="false">easy_guard_player_channel</string>
     <string name="notification_channel_description" translatable="false">easy_guard_player_channel_description</string>
+    <string name="type_all_video" translatable="false">video/*</string>
+    <string name="email_developer" translatable="false">awydeveloper@gmail.com</string>
+    <string name="_0" translatable="false">0</string>
 
-    <string name="settings">Settings</string>
-    <string name="personal">Personal</string>
+
+    <string name="remove_all">Delete all</string>
+    <string name="playlist">Playlist</string>
+    <string name="no_data">No data</string>
+    <string name="loading_data">Loading data...</string>
+    <string name="speed">Speed</string>
+    <string name="created_at">Created date</string>
+    <string name="duration">Duration</string>
+    <string name="name">Name</string>
+    <string name="sort_by">Sort by</string>
+    <string name="add_video">Add video</string>
+    <string name="remove">Remove</string>
+    <string name="feedback_hint">Enter your question or feedback...</string>
+    <string name="trash">Trash</string>
+    <string name="rating">Rating</string>
+    <string name="view">View</string>
+    <string name="play_sound">Play audio</string>
+    <string name="remove_from_play_list">Remove from playlist</string>
+    <string name="enter_the_content_what_you_find">Enter search content...</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="do_you_want_to_continue_playing_this_video">Do you want to continue playing this video?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="enter_playlist_name">Enter playlist name...</string>
+    <string name="add_playlist">Add playlist</string>
+    <string name="app_version">Version: 1.0.0</string>
+    <string name="author_donly_conan">Author: Donly Conan</string>
+    <string name="next">Next</string>
+    <string name="repeat">Repeat</string>
+    <string name="previous">Back</string>
+    <string name="lock">Lock</string>
+    <string name="speed_xx">Speed</string>
+    <string name="rotate_screen">Rotate screen</string>
+    <string name="copy_right">Copyright</string>
+    <string name="about">Version</string>
+    <string name="info">Information</string>
+    <string name="restore_state_des">Restore the playback status of the video to the previous play.</string>
+    <string name="restore_state">Restore status</string>
+    <string name="auto_rotate_des">Allow adjusting the screen horizontally or vertically to fit the video format.</string>
+    <string name="auto_rotate">Auto rotate</string>
+    <string name="auto_play_des">Allow the app to play videos immediately after opening them.</string>
+    <string name="auto_play">Auto play</string>
+    <string name="erasure_cycle_des">Set deletion time</string>
+    <string name="erasure_cycle">Deletion cycle</string>
+    <string name="remove_video_from_devices_des">Allow the app to delete videos on the device when performing delete operations in the app.</string>
+    <string name="language_des">Language settings will be displayed in the app.</string>
+    <string name="language">Language</string>
     <string name="recent">Recent</string>
     <string name="shared">Shared</string>
-    <string name="favorite">Favorite</string>
+    <string name="favorite">Favorites</string>
     <string name="share">Share</string>
     <string name="upload">Upload</string>
     <string name="copy">Copy</string>
     <string name="print">Print</string>
     <string name="restore">Restore</string>
     <string name="delete">Delete</string>
-    <string name="done">Done</string>
-    <string name="language">Language</string>
-    <string name="language_des">The language setting will show up on the app.</string>
-    <string name="remove_video_from_devices">Delete video from device</string>
-    <string name="remove_video_from_devices_des">Allows the application to delete the video on the device when performing a delete operation on the application.</string>
-    <string name="erasure_cycle">Erase cycle</string>
-    <string name="erasure_cycle_des">Set erasure time</string>
-    <string name="auto_play">Autoplay</string>
-    <string name="auto_play_des">Allows the application to play the video as soon as the video is opened.</string>
-    <string name="auto_rotate">Auto rotation</string>
-    <string name="auto_rotate_des">Allows to align the screen horizontally or vertically to match the format of the video.</string>
-    <string name="restore_state">Restore Video\'s state</string>
-    <string name="restore_state_des">Restore the playing state of the video according to the previous play.</string>
-    <string name="info">Infomation</string>
-    <string name="about">Version</string>
-    <string name="copy_right">Copyright</string>
-    <string name="rotate_screen">Rotate the screen</string>
-    <string name="speed_xx">Speed</string>
-    <string name="lock">Lock</string>
-    <string name="repeat">Repeat</string>
-    <string name="previous">Previous</string>
-    <string name="next">Next</string>
-    <string name="app_version">Version: 1.0.0</string>
-    <string name="author_donly_conan">Author: Donly Conan</string>
-    <string name="add_playlist">Add playlist</string>
-    <string name="enter_playlist_name">Enter playlist name...</string>
-    <string name="ok">Ok</string>
-    <string name="cancel">Cancel</string>
-    <string name="do_you_want_to_continue_playing_this_video">Do you want to continue playing this video?</string>
-    <string name="no">No</string>
-    <string name="yes">Yes</string>
-    <string name="view">Watch</string>
-    <string name="play_sound">Play music</string>
-    <string name="remove_from_play_list">Remove from playlist</string>
-    <string name="enter_the_content_what_you_find">Enter search text...</string>
-    <string name="rating">Rating</string>
-    <string name="help_amp_feedback"><![CDATA[Help & Feedback]]></string>
-    <string name="feedback_hint">Enter your question or feedback...</string>
-    <string name="submit">Submit</string>
-    <string name="remove">Remove</string>
-    <string name="add_video">Add Video</string>
-    <string name="sort_by">Sort by</string>
-    <string name="name">Name</string>
-    <string name="created_at">Creatiton</string>
-    <string name="trash">Recycle Bin</string>
-    <string name="speed">Speed</string>
-    <string name="loading_data">Loading...</string>
-    <string name="no_data">No data found</string>
-    <string name="playlist">Playlist</string>
-    <string name="remove_all">Remove all</string>
-    <string name="you_have_not_rated">You have not rated</string>
-    <string name="send_email">Send email</string>
+    <string name="done">Complete</string>
+    <string name="settings">Settings</string>
+    <string name="you_have_not_rated">You haven\'t rated yet.</string>
+    <string name="send_email">Keep email</string>
     <string name="please_enter_something">Please enter something</string>
-    <string name="empty_list_des">The list files is empty!</string>
-    <string name="delete_file">Deleting file</string>
-    <string name="confirm_to_delete">Do you want to remove all files?</string>
-    <string name="duration">Duration</string>
-    <string name="auto_download">Auto loading</string>
-    <string name="auto_download_des">Allows the app to access and download videos from the device.</string>
-    <string name="erase_cycle_summary">Set cycle delete video.</string>
-    <string name="video_exist_des">" Video already exists."</string>
-    <string name="email_developer" translatable="false">awydeveloper@gmail.com</string>
+    <string name="delete_file">Delete file</string>
+    <string name="confirm_to_delete">Do you want to delete all existing videos?</string>
+    <string name="empty_list_des">File list is empty!</string>
+    <string name="submit">Send</string>
+    <string name="help_amp_feedback"><![CDATA[Help & Feedback]]></string>
+    <string name="auto_download">Auto download</string>
+    <string name="auto_download_des">Allow the app to access and download videos from the device.</string>
+    <string name="erase_cycle_summary">Set video deletion cycle.</string>
+    <string name="video_exist_des">Video already exists.</string>
     <string name="email">Email</string>
-    <string name="locked_des">The screen is locked</string>
-    <string name="locked_intro">Tap to unlock</string>
+    <string name="locked_des">Screen locked</string>
+    <string name="locked_intro">Press to unlock</string>
     <string name="play_music">Play music</string>
     <string name="rename">Rename</string>
     <string name="save">Save</string>
-    <string name="data_synchronization">Sync data</string>
-    <string name="understood">OK</string>
-    <string name="trash_clean_des">Trash bin will be emptied after %s %s</string>
-    <string name="days">days</string>
-    <string name="hours">hours</string>
+    <string name="data_synchronization">Synchronize data</string>
+    <string name="understood">Understood</string>
+    <string name="trash_clean_des">The trash will be cleared after %s %s</string>
+    <string name="days">day</string>
+    <string name="hours">hour</string>
     <string name="general_settings">General settings</string>
     <string name="select_language">Select language</string>
-    <string name="author">Donly Conan</string>
-    <string name="_0_mb">0 MB</string>
+    <string name="des_of_hidden_entrance">Hide the entrance to the private folder. Tap 3 times on the title on the Videos page to access it.</string>
+    <string name="hide_the_entrance">Hide private folder</string>
+    <string name="quick_share">Quick share</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="local_interaction">Internal interaction</string>
+    <string name="connect">Connection</string>
+    <string name="create_group">Create group</string>
+    <string name="group_is_working">Active groups</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="remove_group">Delete group</string>
+    <string name="unknown">Undefined</string>
+    <string name="network_is_not_available">Network unavailable</string>
+    <string name="the_video_is_being_protected_you_cannot_share_it">Video is protected, you cannot share it</string>
+    <string name="disconnect_before_pair_with_another_devices">Disconnect before pairing with another device</string>
+    <string name="pair_is_interrupted">Connection interrupted</string>
+    <string name="no_item_selected">You need to select at least one category</string>
     <string name="subtitles">Subtitles</string>
     <string name="private_folder">Private folder</string>
     <string name="unlock">Unlock</string>
     <string name="require_password_content">Please use your password or fingerprint to authenticate</string>
-    <string name="password">password</string>
-    <string name="authentication_failed">The authenticated process is failed!</string>
-    <string name="toast_when_failed_user_action">There are some of occurred problems, please try again!</string>
+    <string name="password">Password</string>
+    <string name="authentication_failed">Authentication process encountered an issue</string>
+    <string name="toast_when_failed_user_action">An error occurred, please try again</string>
     <string name="add">Add</string>
-    <string name="shared_file">Shared File</string>
-    <string name="share_file">Share File</string>
-    <string name="type_all_video">video/*</string>
-    <string name="request_action_again">The action is failed. Please try again!</string>
+    <string name="shared_file">Shared file</string>
+    <string name="share_file">Share file</string>
+    <string name="request_action_again">Action failed</string>
     <string name="untitled">Untitled</string>
-    <string name="file_service_is_not_available">File service is not available.</string>
-    <string name="can_t_delete_the_file">Can\'t delete the file.</string>
-    <string name="have_had_some_problems_when_moving_files">Have had some problems when moving files.</string>
-    <string name="have_had_some_problems_when_restoring_files">Have had some problems when restoring files.</string>
-    <string name="the_files_is_restored">The files is restored.</string>
+    <string name="file_service_is_not_available">File service unavailable</string>
+    <string name="can_t_delete_the_file">Unable to delete file</string>
+    <string name="have_had_some_problems_when_moving_files">An error occurred while moving the file</string>
+    <string name="have_had_some_problems_when_restoring_files">An error occurred while restoring the file</string>
+    <string name="the_files_is_restored">File has been restored</string>
     <string name="OK">OK</string>
-    <string name="the_files_have_not_been_deleted">The files have not been deleted from the devices</string>
-    <string name="the_files_have_been_moved_to_recycle_bin">The files have been moved to Recycle Bin</string>
-    <string name="move_to_trash">Move to Trash</string>
-    <string name="playlist_name_is_invalid">Playlist name is invalid!</string>
-    <string name="the_music_is_playing_by_easy_guard_player">The music is playing by Easy Guard Player</string>
-    <string name="show_info_file_move_into_bin">The file is moved into Recycle Bin</string>
-    <string name="_0">0</string>
-    <string name="des_of_hidden_entrance">The private folder entrance will be hidden, You can access it by clicking three times on the app\'s title</string>
-    <string name="hide_the_entrance">Hide the Entrance</string>
-    <string name="quick_share">Quick share</string>
-    <string name="disconnect">Disconnect</string>
-    <string name="local_interaction">Local Interaction</string>
-    <string name="connect">Connect</string>
-    <string name="create_group">Create group</string>
-    <string name="group_is_working">Group is working.</string>
-    <string name="scan_qr_code">Scan QR code</string>
-    <string name="remove_group">Remove group</string>
-    <string name="unknown">Unknown</string>
-    <string name="network_is_not_available">Network is not available.</string>
-    <string name="the_video_is_being_protected_you_cannot_share_it">The video is being protected, You cannot share it!</string>
+    <string name="the_files_have_not_been_deleted">Files still not deleted in internal storage</string>
+    <string name="the_files_have_been_moved_to_recycle_bin">Files moved to Recycle Bin</string>
+    <string name="move_to_trash">Move to trash</string>
+    <string name="playlist_name_is_invalid">Invalid playlist name</string>
+    <string name="the_music_is_playing_by_easy_guard_player">Music is being played by Easy Guard Player</string>
+    <string name="show_info_file_move_into_bin">Files moved to Recycle Bin</string>
+    <string name="wi_fi_pair">Wi-Fi Pair</string>
 
     <string-array name="language_entries">
         <item>English</item>
         <item>Việt Nam</item>
+        <item>Español</item>
     </string-array>
 
     <string-array name="language_values">
         <item>en</item>
         <item>vi</item>
+        <item>es</item>
     </string-array>
 
-    <string-array name="remove_entries">
-        <item>Daily</item>
-        <item>Weekly</item>
-        <item>Monthly</item>
-        <item>Annually</item>
-        <item>Disable</item>
-    </string-array>
-
-    <string-array name="remove_values">
-        <item>1</item>
-        <item>7</item>
-        <item>30</item>
-        <item>365</item>
-        <item>0</item>
-    </string-array>
 </resources>
