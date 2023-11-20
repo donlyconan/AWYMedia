@@ -130,7 +130,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
     }
 
     lateinit var gestureDetector: GestureDetector
-    private var expireBackTime: Long = now()
+    private var expireBackTime: Long = 0
     private var flinging: Boolean = false
     private var moveJob: Job? = null
     lateinit var scaleGestureDetector: ScaleGestureDetector
@@ -257,7 +257,6 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
     private fun showPlaylist(playlistId: Int) {
         Logs.d(TAG, "showPlaylist() called with: playlistId = $playlistId")
         val currentState = player.playWhenReady
-        player.pause()
         val dialog = ListedVideosDialog.newInstance(playlistId, viewModel.playingIndexMld.value!!, object : OnSelectedChangeListener {
             override fun onSelectionChanged(videoId: Int) {
                 Logs.d(TAG, "onSelectionChanged() called with: videoId = $videoId")
@@ -552,6 +551,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
         val requestDistance = if(land) 120 else 50
         if(e.x < requestDistance && viewModel.isListMode()) {
             showPlaylist(viewModel.playlistId)
+            expireBackTime = 0L
             return true
         }
         return false
@@ -601,7 +601,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
             }
             return true
         }
-        if(!viewModel.isListMode()) {
+        if(!viewModel.isListMode() || e1.x < 30) {
             Log.d(TAG, "Fling is not available in the single mode")
             return true
         }
@@ -653,7 +653,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
         if (expireBackTime >= now()) {
             onBackPressedDispatcher.onBackPressed()
         } else {
-            showMessage("Back again to exit")
+            showMessage(getString(R.string.back_again_to_exit))
             expireBackTime = now() + 2000
         }
     }

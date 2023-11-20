@@ -9,6 +9,7 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.utc.donlyconan.media.app.manager.TrashRemovalWorker
@@ -17,6 +18,9 @@ import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.dagger.components.ApplicationComponent
 import com.utc.donlyconan.media.dagger.components.DaggerApplicationComponent
 import com.utc.donlyconan.media.dagger.modules.ApplicationModule
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 /**
@@ -41,10 +45,11 @@ class EGMApplication: Application() {
         val intent = Intent(this, AudioService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
         // Register work manager
-        var periodicWorkRequest =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(1, TimeUnit.HOURS)
+        var periodicWorkRequest =  PeriodicWorkRequestBuilder<TrashRemovalWorker>(1, TimeUnit.DAYS)
             .build()
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
+
 
         connectToFileService()
     }

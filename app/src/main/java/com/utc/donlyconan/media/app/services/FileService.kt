@@ -118,8 +118,8 @@ class FileService : Service() {
             super.onChange(selfChange, uri, flags)
             syncJob?.cancel()
             syncJob = runIO {
-                delay(DELAY_1000S)
                 yield()
+                delay(DELAY_1000S)
                 deletingJob?.join()
                 videoRepository.sync()
             }
@@ -127,8 +127,8 @@ class FileService : Service() {
             if (flags and ContentResolver.NOTIFY_DELETE == 0) {
                 updateRecycleBinJob?.cancel()
                 updateRecycleBinJob = runIO {
-                    delay(DELAY_1000S)
                     yield()
+                    delay(DELAY_1000S)
                     deletingJob?.join()
                     trashRepository.sync()
                 }
@@ -216,7 +216,15 @@ class FileService : Service() {
     @Synchronized
     suspend fun deleteFileFromLocalData(vararg names: String): Int {
         Log.d(TAG, "deleteFileFromLocalData() called with: filenames = $names")
-        return names.count { name -> context.deleteFile(name) }
+        return names.count { name ->
+            var result = false
+            try {
+                result = context.deleteFile(name)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            result
+        }
     }
 
     /**

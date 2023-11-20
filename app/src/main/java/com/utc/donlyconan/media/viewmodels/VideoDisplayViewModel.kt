@@ -118,7 +118,7 @@ class VideoDisplayViewModel(
         Log.d(TAG, "saveTempState() called with: index = $index")
         if(isListMode() && index >= 0 && index < playlist!!.size) {
             playlist!!.get(index).let { video ->
-                video.playedTime = position
+                video.playedTime = if(isFinished) 0L else position
             }
         }
     }

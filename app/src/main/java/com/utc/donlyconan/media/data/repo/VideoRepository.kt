@@ -48,7 +48,7 @@ class VideoRepository @Inject constructor(
             }
         }
         videoDao.insert(*filteredVideos.toTypedArray())
-        update(*localVideos.toTypedArray())
+        videoDao.update(*localVideos.toTypedArray())
         Log.d(TAG, "sync: inserted size = ${filteredVideos.size}, updated size = ${localVideos.size}")
 
         // remove all videos that don't exist in the devices

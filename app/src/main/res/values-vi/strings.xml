@@ -124,5 +124,8 @@
     <string name="the_music_is_playing_by_easy_guard_player">Âm  nhạc đang được phát bở Easy Guard Player</string>
     <string name="show_info_file_move_into_bin">Tệp tin đã được di chuyển vào Recycle Bin</string>
     <string name="wi_fi_pair">Wi-Fi Ghép đôi</string>
+    <string name="the_video_was_shared">Video đã được chia sẻ</string>
+    <string name="the_connection_haven_t_established_yet">Kết nối chưa được thiết lập</string>
+    <string name="back_again_to_exit">Nhấn lần nữa để thoát</string>
 
 </resources>
