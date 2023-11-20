@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
@@ -30,6 +31,8 @@ class PrivateFolderFragment : ListVideosFragment() {
         }
     }
     private val binding by lazy { FragmentPrivateFolderBinding.inflate(layoutInflater) }
+    override val listView: RecyclerView
+        get() = binding.recyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

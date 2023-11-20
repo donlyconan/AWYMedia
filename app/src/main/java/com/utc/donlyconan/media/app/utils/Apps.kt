@@ -60,3 +60,8 @@ fun View.gone() {
 fun View.show() {
     visibility = View.VISIBLE
 }
+
+fun View.setEnabledState(isEnabled: Boolean) {
+    this.isEnabled = isEnabled
+    alpha = if(isEnabled) 1.0f else 0.3f
+}

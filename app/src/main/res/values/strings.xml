@@ -137,6 +137,8 @@
     <string name="the_music_is_playing_by_easy_guard_player">Music is being played by Easy Guard Player</string>
     <string name="show_info_file_move_into_bin">Files moved to Recycle Bin</string>
     <string name="wi_fi_pair">Wi-Fi Pair</string>
+    <string name="the_video_was_shared">The video was shared</string>
+    <string name="the_connection_haven_t_established_yet">The connection haven\'t established yet</string>
 
     <string-array name="language_entries">
         <item>English</item>

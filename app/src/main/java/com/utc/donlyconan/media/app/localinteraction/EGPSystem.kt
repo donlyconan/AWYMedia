@@ -19,7 +19,7 @@ abstract class EGPSystem {
     companion object {
         const val IP_PORT = 8888
         const val HOSTNAME = "localhost"
-        const val DEFAULT_BUFFER_SIZE = 2048
+        const val DEFAULT_BUFFER_SIZE = 4048
 
         @JvmStatic
         fun <T: EGPSystem> create(kClass: KClass<T>, inetAddress: InetAddress?): EGPSystem {

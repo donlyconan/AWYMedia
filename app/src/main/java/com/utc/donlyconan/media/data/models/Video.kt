@@ -81,8 +81,10 @@ data class Video(
         this.size = video.size
         this.type = video.type
         this.createdAt = video.createdAt
-        updatedAt = now()
+        this.externalUri = video.externalUri
     }
+
+    fun getUriId() = videoUri.substringAfterLast('/')
 
     companion object {
         fun fromFile(file: File): Video {

@@ -182,7 +182,9 @@ fun String.getMediaUri(context: Context, onFinish: (uri: Uri) -> Unit) {
 fun File.getMediaUri(context: Context, onFinish: (uri: Uri) -> Unit) {
     try {
         MediaScannerConnection.scanFile(context, arrayOf(absolutePath), arrayOf("*/*")) { path, uri ->
-            onFinish.invoke(uri)
+            if(uri != null) {
+                onFinish.invoke(uri)
+            }
         }
     } catch (e: Exception) {
         e.printStackTrace()

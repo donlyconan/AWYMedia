@@ -84,7 +84,7 @@ abstract class BaseAdapter<T>(differ: ItemCallback<T>, private var data: List<T>
         var onItemClickListener: OnItemClickListener? = null
         var onItemLongClickListener: OnItemLongClickListener? = null
         var onDragListener: OnDragListener? = null
-        private var isBlocked: Boolean = false
+        protected var isBlocked: Boolean = false
 
 
         init {
@@ -93,13 +93,13 @@ abstract class BaseAdapter<T>(differ: ItemCallback<T>, private var data: List<T>
         }
 
         override fun onClick(v: View) {
-            if(!isBlocked) {
+            if(!isBlocked && absoluteAdapterPosition != -1) {
                 onItemClickListener?.onItemClick(v, absoluteAdapterPosition)
             }
         }
 
         override fun onLongClick(v: View): Boolean {
-            if(!isBlocked) {
+            if(!isBlocked && absoluteAdapterPosition != -1) {
                 onItemLongClickListener?.onItemLongClick(v, absoluteAdapterPosition)
             }
             return true

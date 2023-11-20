@@ -7,6 +7,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.AudioService
+import com.utc.donlyconan.media.app.services.FileService
+import com.utc.donlyconan.media.app.utils.compareUri
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
 import com.utc.donlyconan.media.views.BaseFragment
@@ -15,14 +17,16 @@ import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.recyclerview.widget.RecyclerView
 import javax.inject.Inject
 
-abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
+abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileService.OnFileServiceListener  {
     
     protected lateinit var videoAdapter: VideoAdapter
     protected var audioService: AudioService? = null
     @Inject lateinit var videoRepo: VideoRepository
     protected val hideViews by lazy { mutableSetOf<Int>() }
+    abstract val listView: RecyclerView?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +93,35 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener {
         return false
     }
 
+    override fun onStart() {
+        super.onStart()
+        application.getFileService()?.registerOnFileServiceListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        application.getFileService()?.unregisterOnFileServiceListener(this)
+    }
+
+    override fun onDownloadingProgress(uri: String, progress: Long, total: Long) {
+        val index = videoAdapter.getData().indexOfFirst { item ->  item is Video && item.videoUri.compareUri(uri) }
+        if(index != -1) {
+            runOnUIThread {
+                val holder = listView?.findViewHolderForAdapterPosition(index) as? VideoAdapter.VideoHolder
+                holder?.setProgress(progress, total)
+                holder?.setBlockMode(progress != total)
+            }
+        }
+    }
+
+    override fun onEgpConnectionChanged(isConnected: Boolean, isGroupOwner: Boolean) {
+        Log.d(PersonalVideoFragment.TAG, "onEgpConnectionChanged() called with: isConnected = $isConnected, isGroupOwner = $isGroupOwner")
+        if(isConnected) {
+            hideViews.remove(R.id.btn_quick_share)
+        } else {
+            hideViews.add(R.id.btn_quick_share)
+        }
+    }
 
     companion object {
         val TAG = ListVideosFragment::class.simpleName

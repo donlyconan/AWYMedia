@@ -3,6 +3,7 @@ package com.utc.donlyconan.media.data.repo
 import android.content.ContentResolver
 import android.provider.MediaStore
 import android.util.Log
+import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
 import com.utc.donlyconan.media.data.dao.TrashDao
 import com.utc.donlyconan.media.data.dao.VideoDao
@@ -38,24 +39,24 @@ class VideoRepository @Inject constructor(
         val localVideos = videoDao.getAllPublicVideos()
         val allVideos = loadAllVideos()
         // filter videos that is already in the storage and not contains in the db
-        val filteredVideos = allVideos.dropWhile { video ->
+        val filteredVideos = allVideos.filterNot { video ->
             localVideos.any { vd ->
                 if(vd.videoUri == video.videoUri) {
                     vd.copyFrom(video)
-                    videoDao.update(vd)
                 }
                 vd.videoUri == video.videoUri
             }
-        }.toList()
+        }
         videoDao.insert(*filteredVideos.toTypedArray())
-        Log.d(TAG, "sync: inserted size = ${filteredVideos.size}")
+        update(*localVideos.toTypedArray())
+        Log.d(TAG, "sync: inserted size = ${filteredVideos.size}, updated size = ${localVideos.size}")
 
         // remove all videos that don't exist in the devices
         withContext(Dispatchers.IO) {
             val videoIds = localVideos.filterNot { video ->
                 allVideos.any { it.videoUri == video.videoUri }
             }.map { it.videoId }.toIntArray()
-            Log.d(TAG, "sync: remove the list no longer exist:  $videoIds")
+            Log.d(TAG, "sync: remove the list no longer exist:  ${videoIds.size}")
             videoDao.delete(*videoIds)
             playlistWithVideosDao.deleteByVideoId(* videoIds)
         }
@@ -71,13 +72,13 @@ class VideoRepository @Inject constructor(
         videoDao.delete(video.videoId)
     }
 
-    fun insertOrUpdate(video: Video) {
-        val existedVideo = get(video.videoUri)
-        if(existedVideo == null) {
-            insert(video)
-        } else {
-            update(video)
-        }
+    override fun update(vararg video: Video): Int {
+        video.forEach { it.updatedAt = now() }
+        return videoDao.update(*video)
+    }
+
+    override fun getLikely(partUri: String): Video? {
+        return videoDao.getLikely("%$partUri")
     }
 
 }

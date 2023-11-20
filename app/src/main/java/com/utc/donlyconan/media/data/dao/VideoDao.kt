@@ -8,12 +8,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VideoDao {
 
-    /**
-     * Returns number of records available
-     */
-    @Query("Select count(video_id) from videos")
-    fun count(): Int
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(vararg videos: Video)
 
@@ -50,13 +44,13 @@ interface VideoDao {
     @Query("Select * from videos where secured = 0")
     suspend fun getAllPublicVideos(): List<Video>
 
-    @Query("Delete from videos where secured = :isSecured")
-    fun clearVideosWith(isSecured: Boolean = false): Int
-
     @Query("Select video_name from videos where secured = 1")
     fun getAllTitlesInPrivateFolder(): List<String>
 
     @Query("Select * from videos where secured = 1")
     fun getAllSecuredVideos(): List<Video>
+
+    @Query("Select * from videos where video_uri like :partUri")
+    fun getLikely(partUri: String): Video?
 
 }

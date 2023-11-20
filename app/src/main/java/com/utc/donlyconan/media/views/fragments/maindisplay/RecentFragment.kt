@@ -1,25 +1,18 @@
 package com.utc.donlyconan.media.views.fragments.maindisplay
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.sortedByUpdatedDate
-import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentRecentBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.RecentVideoViewModel
-import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
-import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  *  This is Recent screen which will show all video is playing
@@ -27,6 +20,8 @@ import kotlinx.coroutines.launch
 class RecentFragment : ListVideosFragment() {
     val binding by lazy { FragmentRecentBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<RecentVideoViewModel>()
+    override val listView: RecyclerView
+        get() = binding.recyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

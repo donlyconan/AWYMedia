@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
-import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.app.utils.sortedByUpdatedDate
 import com.utc.donlyconan.media.databinding.FragmentFavoriteBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
@@ -31,6 +31,8 @@ class FavoriteFragment : ListVideosFragment(), OnItemClickListener {
             }
         }
     }
+    override val listView: RecyclerView
+        get() = binding.recyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

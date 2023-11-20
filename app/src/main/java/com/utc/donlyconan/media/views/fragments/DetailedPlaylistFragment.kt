@@ -1,7 +1,5 @@
 package com.utc.donlyconan.media.views.fragments
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,23 +7,18 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.exoplayer2.MediaItem
+import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.data.dao.PlaylistWithVideosDao
-import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.PlaylistRepository
 import com.utc.donlyconan.media.databinding.FragmentDetailedPlaylistBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
-import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
-import com.utc.donlyconan.media.views.fragments.maindisplay.PersonalVideoFragment
-import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import javax.inject.Inject
 
 
@@ -38,6 +31,8 @@ class DetailedPlaylistFragment : ListVideosFragment(), OnItemClickListener {
     val args by navArgs<DetailedPlaylistFragmentArgs>()
     @Inject lateinit var playlistWithVideosDao: PlaylistWithVideosDao
     @Inject lateinit var playlistRepo: PlaylistRepository
+    override val listView: RecyclerView
+        get() = binding.recyclerView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

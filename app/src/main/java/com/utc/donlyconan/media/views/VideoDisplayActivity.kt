@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.media.MediaMetadataRetriever
 import android.os.Bundle
 import android.os.Environment
@@ -35,7 +36,9 @@ import com.utc.donlyconan.media.app.EGMApplication
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.app.utils.androidFile
+import com.utc.donlyconan.media.app.utils.gone
 import com.utc.donlyconan.media.app.utils.now
+import com.utc.donlyconan.media.app.utils.setEnabledState
 import com.utc.donlyconan.media.databinding.ActivityVideoDisplayBinding
 import com.utc.donlyconan.media.databinding.CustomOptionPlayerControlViewBinding
 import com.utc.donlyconan.media.databinding.PlayerControlViewBinding
@@ -288,14 +291,14 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
     override fun onStop() {
         super.onStop()
         Logs.d(TAG, "onStop: ")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
         val position = player.currentPosition
         GlobalScope.launch(Dispatchers.IO) {
             viewModel.save(position)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         releasePlayer()
     }
 
@@ -584,11 +587,25 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
         velocityY: Float
     ): Boolean {
         Log.d(TAG, "GestureDetector#onFling() called with: e1 = $e1, e2 = $e2, velocityX = $velocityX, velocityY = $velocityY")
+        binding.player.hideController()
+        // share video if y = 0 and velocityX > 4000
+        if(abs(velocityX) > 4000 && e2.x.toInt() >= Resources.getSystem().displayMetrics.widthPixels - 40) {
+            if(application.getFileService()?.isReadyService() == true) {
+                viewModel.video?.let { video ->
+                    video.playedTime = player.currentPosition
+                    application.getFileService()?.send(video)
+                }
+                showMessage(R.string.the_video_was_shared)
+            } else {
+                showMessage(R.string.the_connection_haven_t_established_yet)
+            }
+            return true
+        }
         if(!viewModel.isListMode()) {
+            Log.d(TAG, "Fling is not available in the single mode")
             return true
         }
         // velocity is above -4000
-        binding.player.hideController()
         if(abs(velocityX) > 4000 && viewModel.isListMode()) {
             if (e2.x - e1.x > 200) {
                 Log.d(TAG, "onFling: Move next")
@@ -656,9 +673,4 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
 
     override fun onScaleEnd(detector: ScaleGestureDetector) { }
 
-}
-
-fun View.setEnabledState(isEnabled: Boolean) {
-    this.isEnabled = isEnabled
-    alpha = if(isEnabled) 1.0f else 0.3f
 }

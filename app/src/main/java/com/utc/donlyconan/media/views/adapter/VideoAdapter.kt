@@ -92,10 +92,11 @@ class VideoAdapter(
             binding.rootLayout.setOnClickListener(this)
             binding.imgMenuMore.setOnClickListener(this)
             binding.rootLayout.setOnLongClickListener(this)
+            setBlockMode(true)
         }
 
         fun bind(video: Video, showProgress: Boolean, showOptionMenu: Boolean, dragMode: Boolean = false) {
-            setBlockMode(!video.available)
+            setBlockMode(!video.available || video.size == 0L)
             binding.tvTitle.text = video.title
             binding.tvDate.text = video.createdAt.formatToTime()
             binding.tvSize.text = video.size.convertToStorageData()
@@ -148,9 +149,11 @@ class VideoAdapter(
         }
 
         override fun setBlockMode(isBlocked: Boolean) {
-            super.setBlockMode(isBlocked)
-            binding.root.isEnabled = !isBlocked
-            binding.rootLayout.isEnabled = !isBlocked
+            if(this.isBlocked != isBlocked) {
+                super.setBlockMode(isBlocked)
+                binding.root.isEnabled = !isBlocked
+                binding.rootLayout.isEnabled = !isBlocked
+            }
         }
     }
 

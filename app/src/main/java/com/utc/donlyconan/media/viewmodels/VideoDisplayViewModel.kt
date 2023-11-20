@@ -60,7 +60,7 @@ class VideoDisplayViewModel(
             val video = videoRepo.get(videoId)
             if(video != null) {
                 _videoMld.postValue(video!!)
-                if(continued || settings.autoPlay) {
+                if(continued || settings.restoreVideoState) {
                     playingTimeMld.postValue(video.playedTime)
                 }
                 playWhenReadyMld.postValue(settings.autoPlay)

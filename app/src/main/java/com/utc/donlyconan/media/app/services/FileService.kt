@@ -41,12 +41,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import java.io.File
 import java.io.IOException
@@ -203,7 +199,7 @@ class FileService : Service() {
         while (newFile.exists()) {
             var newName = "$filename($index)"
             index++
-            newFile = File("$newName.$ext")
+            newFile = File(file.parentFile,"$newName.$ext")
         }
         return newFile.name
     }
@@ -239,10 +235,8 @@ class FileService : Service() {
 
 
     private fun createRequestDelete() = runIO {
-        delay(DELAY_BEFORE_DELETING)
         Log.d(TAG, "createRequestDelete: deleting files = $listUris")
         try {
-            yield()
             deleteFileFromExternalStorage(*listUris.toTypedArray())
             Log.d(TAG, "createRequestDelete() cleared ${listUris.size} files")
         } catch (e: SecurityException) {
@@ -321,7 +315,7 @@ class FileService : Service() {
                     val name = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
                     setName(name)
                     registerClientServiceListener(clientServiceListener)
-                    runIO { start() }.invokeOnCompletion {
+                    coroutineScope.launch(Dispatchers.IO + egmHandler) { start() }.invokeOnCompletion {
                         listeners.browse {
                             onEgpConnectionChanged(false, egmSystem?.isGroupOwner() == true)
                         }
@@ -472,16 +466,15 @@ class FileService : Service() {
         }
 
         private fun createVideoFile(packet: Packet) {
-            video = packet.get()
+            video = packet.get<Video>()?.copy(videoId = 0, createdAt = now(), updatedAt = now(), isFavorite = false, isSecured = false)
             Log.d(TAG, "createVideoFile() called with: packet = $packet, video=$video")
-            video?.copy(videoId = 0, createdAt = now(), updatedAt = now(), isFavorite = false, isSecured = false)
-                ?.let { video ->
-                file = createNewFile(video.title!!)
-                Log.d(TAG, "createVideoFile file = $file")
+            if(video != null) {
+                file = createNewFile(video!!.title!!)
+                Log.d(TAG, "createVideoFile newFile = $file")
                 outputStream = file?.outputStream()
-                file?.getMediaUri(this@FileService) { uri ->
-                    video.videoUri = uri.toString()
-                    videoRepository.insertOrUpdate(video)
+                file?.getMediaUri(this@FileService.applicationContext) { uri ->
+                    video?.videoUri = uri.toString()
+                    Log.d(TAG, "createVideoFile: newUri = $uri")
                 }
             }
             downloadingProgress = 0
@@ -508,7 +501,7 @@ class FileService : Service() {
                         onDownloadingProgress(uri, size, size)
                     }
                 }
-                if(flag == Packet.CODE_VIDEO_ENCODE) {
+                if(flag == Packet.CODE_VIDEO_ENCODE || flag == Packet.CODE_SUBTITLE_ENCODE) {
                     handleWhenFinish()
                 }
                 outputStream = null
@@ -522,13 +515,16 @@ class FileService : Service() {
         private fun handleWhenFinish() {
             Log.d(TAG, "handleWhenFinish() called with: file = $file, video = $video, flag=$flag")
             if (video != null) {
-                file?.getMediaUri(this@FileService) { uri ->
-                    Log.d(TAG, "handleWhenFinish: uri = $uri")
-                    video!!.videoUri = uri.toString()
-                    if (flag == Packet.CODE_VIDEO_ENCODE) {
-                        videoRepository.update(video!!)
+                if (flag == Packet.CODE_VIDEO_ENCODE) {
+                    videoRepository.getLikely(video!!.getUriId())?.let { sv ->
+                        val newVideo = sv.copy(duration = video!!.duration, playedTime = video!!.playedTime, size = file?.length() ?: 0L)
+                        Log.d(TAG, "handleWhenFinish: newVideo = $newVideo")
+                        videoRepository.update(newVideo)
                     }
-                    if (flag == Packet.CODE_SUBTITLE_ENCODE) {
+                }
+                if (flag == Packet.CODE_SUBTITLE_ENCODE) {
+                    file?.getMediaUri(this@FileService) { uri ->
+                        Log.d(TAG, "handleWhenFinish: subtitleUri=$uri")
                         video?.subtitleUri = uri.toString()
                         videoRepository.update(video!!)
                         video = null

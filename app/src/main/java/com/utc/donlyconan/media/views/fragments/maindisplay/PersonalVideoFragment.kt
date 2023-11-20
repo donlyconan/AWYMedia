@@ -17,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
@@ -38,6 +39,7 @@ import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
+import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
@@ -49,7 +51,7 @@ import java.net.InetAddress
  * Represent for Main Screen of app where app will shows all video list has on it
  */
 class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItemClickListener,
-    OnItemLongClickListener, FileService.OnFileServiceListener {
+    OnItemLongClickListener {
 
     private val binding by lazy { FragmentPersonalVideoBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<PersonalVideoViewModel>{
@@ -62,6 +64,8 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             }
         }
     }
+    override val listView: RecyclerView
+        get() = binding.recyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -252,7 +256,6 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart() called")
-        application.getFileService()?.registerOnFileServiceListener(this)
         application.getAudioService()?.let { audioService ->
             audioService.registerPlayerListener(listener)
             binding.fab.isSelected = audioService.getPlayer()?.isPlaying == true
@@ -262,7 +265,6 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop() called")
-        application.getFileService()?.unregisterOnFileServiceListener(this)
         application.getAudioService()?.removePlayerListener(listener)
     }
 
@@ -279,22 +281,9 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         }
     }
 
-    override fun onDownloadingProgress(uri: String, progress: Long, total: Long) {
-        val index = videoAdapter.getData().indexOfFirst { item ->  item is Video && item.videoUri.compareUri(uri) }
-        runOnUIThread {
-            val holder = binding.recyclerView.findViewHolderForAdapterPosition(index) as? VideoAdapter.VideoHolder
-            holder?.setProgress(progress, total)
-            holder?.setBlockMode(progress != total)
-        }
-    }
-
     override fun onEgpConnectionChanged(isConnected: Boolean, isGroupOwner: Boolean) {
         Log.d(TAG, "onEgpConnectionChanged() called with: isConnected = $isConnected, isGroupOwner = $isGroupOwner")
-        if(isConnected) {
-            hideViews.remove(R.id.btn_quick_share)
-        } else {
-            hideViews.add(R.id.btn_quick_share)
-        }
+        super.onEgpConnectionChanged(isConnected, isGroupOwner)
         runOnUIThread {
             binding.llPairGroup.visibility = if(isConnected) View.VISIBLE else View.GONE
         }
