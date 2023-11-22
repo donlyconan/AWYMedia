@@ -140,6 +140,7 @@
     <string name="the_video_was_shared">The video was shared</string>
     <string name="the_connection_haven_t_established_yet">The connection haven\'t established yet</string>
     <string name="back_again_to_exit">Back again to exit</string>
+    <string name="an_error_has_occurred">An error has occurred. %1$s</string>
 
     <string-array name="language_entries">
         <item>English</item>

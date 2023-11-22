@@ -147,16 +147,22 @@ class RecycleBinFragment : BaseFragment(), OnItemLongClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(TAG, "onOptionsItemSelected() called with: item = $item")
-        val items = adapter.getSelectedItems()
-        if(items.isEmpty()) {
-            Log.d(TAG, "onOptionsItemSelected: video list is empty!")
-            showToast(R.string.no_item_selected)
-            return true
-        }
+        var items = adapter.getSelectedItems()
         if(item.itemId == R.id.it_trash) {
+            if(items.isEmpty()) {
+                items = adapter.getData().filterIsInstance<Trash>().apply {
+                    forEach { it.setSelected(true) }
+                }
+                adapter.notifyDataSetChanged()
+            }
             showDeletingDialog(*items.filterIsInstance<Trash>().toTypedArray())
         }
         if (item.itemId == R.id.it_restore) {
+            if(items.isEmpty()) {
+                Log.d(TAG, "onOptionsItemSelected: video list is empty!")
+                showToast(R.string.no_item_selected)
+                return true
+            }
             runOnWorkerThread {
                 showRestoreDialog(*items.filterIsInstance<Trash>().toTypedArray())
             }

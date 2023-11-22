@@ -127,5 +127,6 @@
     <string name="the_video_was_shared">Video đã được chia sẻ</string>
     <string name="the_connection_haven_t_established_yet">Kết nối chưa được thiết lập</string>
     <string name="back_again_to_exit">Nhấn lần nữa để thoát</string>
+    <string name="an_error_has_occurred">Đã có lỗi xảy ra. %1$s</string>
 
 </resources>

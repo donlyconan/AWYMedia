@@ -46,12 +46,10 @@ data class Video(
     @ColumnInfo(name = "external_uri")
     var externalUri: String? = null,
 ) : Selectable, Parcelable, Serializable {
-    @Ignore
-    var isChecked: Boolean = false
-    @Ignore
-    var progress: Int = 0
-    @Ignore
-    var available: Boolean = true
+    @Ignore var isChecked: Boolean = false
+    @Ignore var progress: Int = 0
+    @Ignore var available: Boolean = true
+    @Ignore var isSending: Boolean = false
 
     fun compareTo(v: Video, sortBy: Int) = when (sortBy) {
         Settings.SORT_BY_CREATION -> {

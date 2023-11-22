@@ -63,6 +63,8 @@ class FileService : Service() {
         const val TAG = "FileService"
         const val DELAY_BEFORE_DELETING = 5000L
         const val DELAY_1000S = 1000L
+        const val FILE_SENDING = 1
+        const val FILE_SENT = 2
     }
 
     private val binder by lazy { LocalBinder() }
@@ -77,6 +79,7 @@ class FileService : Service() {
     private var deletingJob: Job? = null
     private var updateRecycleBinJob: Job? = null
     private var socketJob: Job? = null
+    private val sendingFiles by lazy { ArrayList<Video>() }
 
     var egmSystem: EGPSystem? = null
         private set
@@ -275,6 +278,7 @@ class FileService : Service() {
             egmSystem?.listClients?.lastOrNull()?.let {  client ->
                 onDeviceNameUpdated(client.name)
             }
+            onSendingFileStatus(sendingFiles, FILE_SENDING)
         }
     }
 
@@ -305,7 +309,7 @@ class FileService : Service() {
         listeners.browse { onError(e) }
         e.printStackTrace()
         coroutineScope.launch(Dispatchers.Main) {
-            showMessage("An error has occurred. ${e.message}")
+            showMessage(getString(R.string.an_error_has_occurred, e.message))
         }
         if(e is SocketException) {
             closeEgpSystem()
@@ -347,12 +351,13 @@ class FileService : Service() {
 
     fun closeEgpSystem() {
         Log.d(TAG, "close() called")
+        clientHandlers.clear()
+        sendingFiles.clear()
         listeners.browse {
             onEgpConnectionChanged(false, egmSystem?.isGroupOwner() == true)
         }
         egmSystem?.shutdown()
         socketJob?.cancel()
-        clientHandlers.clear()
         egmSystem = null
         socketJob = null
     }
@@ -400,8 +405,16 @@ class FileService : Service() {
 
     fun send(video: Video) {
         Log.d(TAG, "send() called with: videos = $video")
+        if(sendingFiles.contains(video)) {
+            Log.d(TAG, "send: file is sending: $video")
+            return
+        }
+        sendingFiles.add(video)
         coroutineScope.launch(Dispatchers.IO + egmHandler) {
+            listeners.browse { onSendingFileStatus(sendingFiles, FILE_SENDING) }
             handleSendRequest(video)
+            sendingFiles.remove(video)
+            listeners.browse { onSendingFileStatus(listOf(video), FILE_SENT) }
         }
     }
 
@@ -554,5 +567,6 @@ class FileService : Service() {
         fun onError(e: Throwable?): Boolean { return false }
         fun onEgpConnectionChanged(isConnected: Boolean, isGroupOwner: Boolean) {}
         fun onDownloadingProgress(uri: String, progress: Long, total: Long) {}
+        fun onSendingFileStatus(videos: List<Video>, status: Int) {}
     }
 }

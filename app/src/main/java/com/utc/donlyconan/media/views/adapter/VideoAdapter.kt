@@ -10,7 +10,10 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
 import com.utc.donlyconan.media.app.utils.formatShortTime
 import com.utc.donlyconan.media.app.utils.formatToTime
+import com.utc.donlyconan.media.app.utils.gone
 import com.utc.donlyconan.media.app.utils.setVideoImage
+import com.utc.donlyconan.media.app.utils.show
+import com.utc.donlyconan.media.app.utils.startAnimation
 import com.utc.donlyconan.media.data.models.Playlist
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemGroupNameBinding
@@ -118,6 +121,7 @@ class VideoAdapter(
             } else {
                 binding.progress.visibility = View.GONE
             }
+            markSendingFile(video.isSending)
         }
 
         fun setLastItem(isLastItem: Boolean) {
@@ -142,17 +146,35 @@ class VideoAdapter(
                 }
                 max = total.toInt()
                 setProgress(progress.toInt(), true)
+                if(!binding.imgStatus.isShown) {
+                    markSendingFile(true)
+                }
                 if(progress == total) {
                     visibility = View.GONE
+                    markSendingFile(false)
                 }
             }
         }
 
         override fun setBlockMode(isBlocked: Boolean) {
             if(this.isBlocked != isBlocked) {
+                Log.d(TAG, "setBlockMode() called with: isBlocked = $isBlocked")
                 super.setBlockMode(isBlocked)
                 binding.root.isEnabled = !isBlocked
                 binding.rootLayout.isEnabled = !isBlocked
+            }
+        }
+
+        fun markSendingFile(isSending: Boolean) {
+            with(binding.imgStatus) {
+                if(isSending && !isShown) {
+                    show()
+                    startAnimation(R.anim.sending_file_anim)
+                }
+                if(!isSending) {
+                    clearAnimation()
+                    gone()
+                }
             }
         }
     }

@@ -2,7 +2,11 @@ package com.utc.donlyconan.media.app.utils
 
 import android.os.Environment
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import androidx.annotation.AnimRes
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -64,4 +68,28 @@ fun View.show() {
 fun View.setEnabledState(isEnabled: Boolean) {
     this.isEnabled = isEnabled
     alpha = if(isEnabled) 1.0f else 0.3f
+}
+
+fun View.startAnimation(
+    @AnimRes resId: Int,
+    onStart: (ani: Animation?) -> Unit = {},
+    onEnd: (ani: Animation?) -> Unit = {},
+    onRepeat: (ani: Animation?) -> Unit = {},
+) {
+    val loadedAnim = AnimationUtils.loadAnimation(context, resId)
+    loadedAnim.setAnimationListener(object : AnimationListener {
+        override fun onAnimationStart(animation: Animation?) {
+            onStart.invoke(animation)
+        }
+
+        override fun onAnimationEnd(animation: Animation?) {
+            onEnd(animation)
+        }
+
+        override fun onAnimationRepeat(animation: Animation?) {
+            onRepeat(animation)
+        }
+
+    })
+    startAnimation(loadedAnim)
 }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.AudioService
@@ -17,7 +18,6 @@ import com.utc.donlyconan.media.views.adapter.VideoAdapter
 import com.utc.donlyconan.media.views.fragments.options.MenuMoreOptionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.recyclerview.widget.RecyclerView
 import javax.inject.Inject
 
 abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileService.OnFileServiceListener  {
@@ -106,10 +106,24 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileSe
     override fun onDownloadingProgress(uri: String, progress: Long, total: Long) {
         val index = videoAdapter.getData().indexOfFirst { item ->  item is Video && item.videoUri.compareUri(uri) }
         if(index != -1) {
+            videoAdapter.getVideo(index).available = progress == total
             runOnUIThread {
                 val holder = listView?.findViewHolderForAdapterPosition(index) as? VideoAdapter.VideoHolder
                 holder?.setProgress(progress, total)
                 holder?.setBlockMode(progress != total)
+            }
+        }
+    }
+
+    override fun onSendingFileStatus(videos: List<Video>, status: Int) {
+        Log.d(TAG, "onSendingFileStatus() called with: video.size = ${videos.size}, status = $status")
+        videos.forEach { video ->
+            val index = videoAdapter.getData().indexOfFirst { item ->  item is Video && item.videoId == video.videoId }
+            if(index != -1) {
+                runOnUIThread {
+                    videoAdapter.getVideo(index).isSending = status == FileService.FILE_SENDING
+                    videoAdapter.notifyItemChanged(index)
+                }
             }
         }
     }

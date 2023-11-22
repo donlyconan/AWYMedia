@@ -55,6 +55,13 @@
                 android:progressDrawable="@drawable/video_play_progress"
                 android:visibility="gone" />
 
+            <ImageView
+                android:id="@+id/img_status"
+                android:layout_width="@dimen/space_30"
+                android:layout_height="@dimen/space_30"
+                android:src="@drawable/img_lightning_bolt"
+                android:layout_gravity="center"/>
+
         </androidx.cardview.widget.CardView>
 
         <TextView
