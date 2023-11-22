@@ -65,6 +65,7 @@ class FileService : Service() {
         const val DELAY_1000S = 1000L
         const val FILE_SENDING = 1
         const val FILE_SENT = 2
+        const val FILE_ERROR = 3
     }
 
     private val binder by lazy { LocalBinder() }
@@ -351,11 +352,12 @@ class FileService : Service() {
 
     fun closeEgpSystem() {
         Log.d(TAG, "close() called")
-        clientHandlers.clear()
-        sendingFiles.clear()
         listeners.browse {
             onEgpConnectionChanged(false, egmSystem?.isGroupOwner() == true)
+            onSendingFileStatus(sendingFiles, FILE_ERROR)
         }
+        clientHandlers.clear()
+        sendingFiles.clear()
         egmSystem?.shutdown()
         socketJob?.cancel()
         egmSystem = null

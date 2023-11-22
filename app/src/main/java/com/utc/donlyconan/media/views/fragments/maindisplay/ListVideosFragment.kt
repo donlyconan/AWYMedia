@@ -3,12 +3,14 @@ package com.utc.donlyconan.media.views.fragments.maindisplay
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.MediaItem
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.services.AudioService
 import com.utc.donlyconan.media.app.services.FileService
+import com.utc.donlyconan.media.app.utils.AlertDialogManager
 import com.utc.donlyconan.media.app.utils.compareUri
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.data.repo.VideoRepository
@@ -27,6 +29,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileSe
     @Inject lateinit var videoRepo: VideoRepository
     protected val hideViews by lazy { mutableSetOf<Int>() }
     abstract val listView: RecyclerView?
+    protected var downloadingAlert: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,11 +109,27 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileSe
     override fun onDownloadingProgress(uri: String, progress: Long, total: Long) {
         val index = videoAdapter.getData().indexOfFirst { item ->  item is Video && item.videoUri.compareUri(uri) }
         if(index != -1) {
-            videoAdapter.getVideo(index).available = progress == total
+            val video = videoAdapter.getVideo(index)
+            video.available = progress == total
             runOnUIThread {
                 val holder = listView?.findViewHolderForAdapterPosition(index) as? VideoAdapter.VideoHolder
                 holder?.setProgress(progress, total)
                 holder?.setBlockMode(progress != total)
+            }
+            if(progress == total) {
+                runOnUIThread {
+                    if(downloadingAlert != null) {
+                        downloadingAlert?.cancel()
+                    }
+                    downloadingAlert = AlertDialogManager.createDeleteAlertDialog(
+                        context = requireContext(),
+                        title = getString(R.string.app_name),
+                        msg = getString(R.string.the_file_is_downloaded_do_you_want_to_open, video.title),
+                        onAccept = {
+                            startVideoDisplayActivity(video.videoId, video.videoUri, continued=true)
+                        })
+                    downloadingAlert?.show()
+                }
             }
         }
     }
