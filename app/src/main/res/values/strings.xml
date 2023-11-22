@@ -142,6 +142,7 @@
     <string name="back_again_to_exit">Back again to exit</string>
     <string name="an_error_has_occurred">An error has occurred. %1$s</string>
     <string name="the_file_is_downloaded_do_you_want_to_open">The file has been downloaded completely. Do you want to open \'%1$s\'?</string>
+    <string name="the_authenticated_process_is_failed">The authenticated process is failed!</string>
 
     <string-array name="language_entries">
         <item>English</item>

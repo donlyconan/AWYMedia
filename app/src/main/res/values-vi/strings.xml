@@ -129,5 +129,6 @@
     <string name="back_again_to_exit">Nhấn lần nữa để thoát</string>
     <string name="an_error_has_occurred">Đã có lỗi xảy ra. %1$s</string>
     <string name="the_file_is_downloaded_do_you_want_to_open">Tải tệp tin hoàn tất. Bạn có muốn mở tệp tin \'%1$s\' không?</string>
+    <string name="the_authenticated_process_is_failed">Quá trình xác thực đã thất bại</string>
 
 </resources>
