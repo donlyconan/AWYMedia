@@ -146,6 +146,8 @@
     <string name="scan_qr_code_to_pair">Scan QR code to pair</string>
     <string name="connecting_devices">Connecting devices</string>
     <string name="connection_history">Connection history</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="no_old_connected_device">There is no devices connected recently</string>
 
     <string-array name="language_entries">
         <item>English</item>

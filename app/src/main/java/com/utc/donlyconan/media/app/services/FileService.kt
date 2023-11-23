@@ -81,6 +81,8 @@ class FileService : Service() {
     private var updateRecycleBinJob: Job? = null
     private var socketJob: Job? = null
     private val sendingFiles by lazy { ArrayList<Video>() }
+    var oldConnectedDeviceAddress: String? = null
+        private set
 
     var egmSystem: EGPSystem? = null
         private set
@@ -318,6 +320,7 @@ class FileService : Service() {
     }
     fun <T: EGPSystem>openEgmService(kClass: KClass<T>, inetAddress: InetAddress?, onFinish: (connected: Boolean) -> Unit = {}): Job? {
         Log.d(TAG, "openEgmService() called with: kClass = $kClass, inetAddress = $inetAddress")
+        oldConnectedDeviceAddress = inetAddress?.hostAddress
         socketJob = coroutineScope.launch(Dispatchers.IO + egmHandler) {
             if(isReadyService()) {
                 Log.d(TAG, "openEgmService: System is running.")

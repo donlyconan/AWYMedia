@@ -152,7 +152,7 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         if (isConnected && !isGroupOwner) {
             menuItem.setTitle(R.string.disconnect)
         } else {
-            menuItem.setTitle(R.string.connect)
+            menuItem.setTitle(R.string.scan_qr_code)
         }
         val groupItem = optionMenu.findItem(R.id.it_create_group)
         if (isConnected && isGroupOwner) {
@@ -185,6 +185,13 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
                     } else {
                         scanQRCode()
                     }
+                }
+            }
+            R.id.it_reconnect -> {
+                if(fileService?.oldConnectedDeviceAddress == null) {
+                    showToast(R.string.no_old_connected_device)
+                } else {
+                    viewModel.ipAddress.value = fileService?.oldConnectedDeviceAddress
                 }
             }
         }

@@ -7,6 +7,10 @@
 
 
     <item android:id="@+id/it_connect"
+        android:icon="@drawable/baseline_qr_code_scanner_24"
+        android:title="@string/scan_qr_code"/>
+
+    <item android:id="@+id/it_reconnect"
         android:icon="@drawable/outline_playlist_add_20"
-        android:title="@string/connect"/>
+        android:title="@string/reconnect"/>
 </menu>
