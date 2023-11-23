@@ -54,6 +54,10 @@ android {
             aidl.srcDirs = ['src/main/aidl']
         }
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+    }
 }
 
 

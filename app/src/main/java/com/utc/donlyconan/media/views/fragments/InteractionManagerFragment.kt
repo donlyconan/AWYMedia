@@ -23,6 +23,8 @@ import com.utc.donlyconan.media.app.localinteraction.Client
 import com.utc.donlyconan.media.app.localinteraction.EGPMediaClient
 import com.utc.donlyconan.media.app.localinteraction.EGPMediaServer
 import com.utc.donlyconan.media.app.services.FileService
+import com.utc.donlyconan.media.app.utils.gone
+import com.utc.donlyconan.media.app.utils.show
 import com.utc.donlyconan.media.databinding.FragmentInteractionManagerBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.DeviceViewModel
@@ -78,8 +80,10 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
         showLoadingScreen()
         viewModel.devicesMdl.observe(this) { data ->
             if(data == null || data.isEmpty()) {
+                binding.tvConnectingDevices.gone()
                 showNoDataScreen()
             } else {
+                binding.tvConnectingDevices.show()
                 hideLoading()
             }
             deviceAdapter.submit(data)
@@ -161,9 +165,6 @@ class InteractionManagerFragment : BaseFragment(), OnItemClickListener,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(RecycleBinFragment.TAG, "onOptionsItemSelected() called with: item = $item")
         when (item.itemId) {
-            R.id.it_refresh ->{
-                viewModel.devicesMdl.value = fileService?.egmSystem?.listClients ?: listOf()
-            }
             R.id.it_create_group -> {
                 fileService?.let { service ->
                     if (service.isReadyService()) {

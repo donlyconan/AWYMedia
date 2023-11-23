@@ -101,7 +101,7 @@
     <string name="quick_share">Quick share</string>
     <string name="disconnect">Disconnect</string>
     <string name="local_interaction">Internal interaction</string>
-    <string name="connect">Connection</string>
+    <string name="connect">Connect</string>
     <string name="create_group">Create group</string>
     <string name="group_is_working">Active groups</string>
     <string name="scan_qr_code">Scan QR Code</string>
@@ -143,6 +143,9 @@
     <string name="an_error_has_occurred">An error has occurred. %1$s</string>
     <string name="the_file_is_downloaded_do_you_want_to_open">The file has been downloaded completely. Do you want to open \'%1$s\'?</string>
     <string name="the_authenticated_process_is_failed">The authenticated process is failed!</string>
+    <string name="scan_qr_code_to_pair">Scan QR code to pair</string>
+    <string name="connecting_devices">Connecting devices</string>
+    <string name="connection_history">Connection history</string>
 
     <string-array name="language_entries">
         <item>English</item>
