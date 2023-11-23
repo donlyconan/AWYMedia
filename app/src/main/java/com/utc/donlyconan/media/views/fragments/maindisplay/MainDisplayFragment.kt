@@ -67,9 +67,9 @@ class MainDisplayFragment : BaseFragment() {
                 override fun onGlobalLayout() {
                     val navBar = binding.navBar
                     val layoutParams = navBar.layoutParams as ConstraintLayout.LayoutParams
-                    val width = binding.viewPager2.layoutParams.width
+                    val width = binding.root.height - binding.appbar.toolbar.height
                     layoutParams.width = width
-                    navBar.translationX = - navBar.width.toFloat()/2 + navBar.height.toFloat()/2
+                    navBar.translationX = (-width + layoutParams.height).toFloat()/2
                     navBar.requestLayout()
 
                     val menuView = navBar.getChildAt(0) as? BottomNavigationMenuView
