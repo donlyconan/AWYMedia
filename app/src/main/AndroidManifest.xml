@@ -74,6 +74,11 @@
         android:exported="true"
         android:launchMode="singleTop" />
 
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation" />
+
     <service
         android:name=".app.services.AudioService"
         android:exported="false"

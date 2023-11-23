@@ -116,7 +116,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileSe
                 holder?.setProgress(progress, total)
                 holder?.setBlockMode(progress != total)
             }
-            if(progress == total) {
+            if(progress == total && allowShowDialog) {
                 runOnUIThread {
                     if(downloadingAlert != null) {
                         downloadingAlert?.cancel()
@@ -127,6 +127,8 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileSe
                         msg = getString(R.string.the_file_is_downloaded_do_you_want_to_open, video.title),
                         onAccept = {
                             startVideoDisplayActivity(video.videoId, video.videoUri, continued=true)
+                        }, onDeny = {
+                            allowShowDialog = false
                         })
                     downloadingAlert?.show()
                 }
@@ -158,7 +160,7 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileSe
 
     companion object {
         val TAG = ListVideosFragment::class.simpleName
-
+        private var allowShowDialog: Boolean = true
     }
 
 }
