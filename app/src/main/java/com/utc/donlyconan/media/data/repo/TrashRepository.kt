@@ -33,7 +33,7 @@ class TrashRepository @Inject constructor(val context: Application,
 
     suspend fun removeWhenFileIsUnavailable() {
         Logs.d( "removeWhenFileIsUnavailable() called")
-        val fileList = context.fileList()
+        val fileList = context.fileList().filter { it.contains('.') }
         val trashes = trashDao.getAllTrashes()
             .filter {
                 !fileList.any() { fileName -> fileName == it.title }
