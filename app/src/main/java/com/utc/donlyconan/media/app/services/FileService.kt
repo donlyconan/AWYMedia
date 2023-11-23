@@ -546,6 +546,7 @@ class FileService : Service() {
                         val newVideo = sv.copy(duration = video!!.duration, playedTime = video!!.playedTime, size = file?.length() ?: 0L)
                         Log.d(TAG, "handleWhenFinish: newVideo = $newVideo")
                         videoRepository.update(newVideo)
+                        video = newVideo
                     }
                 }
                 if (flag == Packet.CODE_SUBTITLE_ENCODE) {
