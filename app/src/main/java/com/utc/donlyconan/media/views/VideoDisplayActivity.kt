@@ -218,11 +218,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
             events.observe(this@VideoDisplayActivity) { event ->
                 when(event) {
                     VideoDisplayViewModel.Result.CanNotMoveNext -> {
-                        showMessage("Đã di chuyển hết danh sách")
+                        showMessage(R.string.di_chuy_n_h_t_danh_s_ch)
                         flinging = false
                     }
                     VideoDisplayViewModel.Result.CanNotMovePrevious -> {
-                        showMessage("Đã di chuyển hết danh sách")
+                        showMessage(R.string.di_chuy_n_h_t_danh_s_ch)
                         flinging = false
                     }
                     else -> null

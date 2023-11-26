@@ -148,6 +148,7 @@
     <string name="connection_history">Connection history</string>
     <string name="reconnect">Reconnect</string>
     <string name="no_old_connected_device">There is no devices connected recently</string>
+    <string name="di_chuy_n_h_t_danh_s_ch">Moved the end of list</string>
 
     <string-array name="language_entries">
         <item>English</item>

@@ -133,5 +133,6 @@
     <string name="reconnect">Kết nối lại</string>
     <string name="scan_qr_code_to_pair">Quét mã QR để ghép đôi</string>
     <string name="no_old_connected_device">Không có thiết bị nào kết nối gần đây</string>
+    <string name="di_chuy_n_h_t_danh_s_ch">Đã di chuyển hết danh sách</string>
 
 </resources>
