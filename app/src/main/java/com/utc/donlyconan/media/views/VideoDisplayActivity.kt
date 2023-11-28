@@ -125,6 +125,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
             moveJob?.cancel()
             result.data?.data?.let { uri ->
                 viewModel.save(uri.toString())
+                viewModel.playingTimeMld.value = player.currentPosition
             }
         }
     }
