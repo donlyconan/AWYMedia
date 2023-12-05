@@ -105,7 +105,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
             }
         }
 
-        requestPermissions()
+        requestPermissionsIfNeed()
         binding.fab.setOnTouchListener(onTouchEvent)
         viewModel.numberOfTrash.observe(this) { quantity ->
             binding.fabTrash.isSelected = quantity > 0
@@ -125,12 +125,12 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         } else if(!isDetached) {
             Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.OK) {
-                    requestPermissions()
+                    requestPermissionsIfNeed()
                 }.show()
         }
     }
 
-    private fun requestPermissions() {
+    private fun requestPermissionsIfNeed() {
         Log.d(TAG, "requestPermissions() called")
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if(!Environment.isExternalStorageManager()) {
@@ -146,10 +146,11 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                         requireActivity().finish()
                     }
                 ).show()
+            } else {
+                application.getFileService()?.syncAllVideos()
             }
         } else {
             if(checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                Log.d(TAG, "onViewCreated: loading...")
                 application.getFileService()?.syncAllVideos()
             } else {
                 requestPermissionIfNeed(
@@ -169,7 +170,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         } else {
             Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.OK) {
-                    requestPermissions()
+                    requestPermissionsIfNeed()
                 }.show()
         }
     }
