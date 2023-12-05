@@ -128,7 +128,6 @@ class FileService : Service() {
             syncJob?.cancel()
             syncJob = runIO {
                 yield()
-                delay(DELAY_1000S)
                 deletingJob?.join()
                 videoRepository.sync()
             }
@@ -137,7 +136,6 @@ class FileService : Service() {
                 updateRecycleBinJob?.cancel()
                 updateRecycleBinJob = runIO {
                     yield()
-                    delay(DELAY_1000S)
                     deletingJob?.join()
                     trashRepository.sync()
                 }
