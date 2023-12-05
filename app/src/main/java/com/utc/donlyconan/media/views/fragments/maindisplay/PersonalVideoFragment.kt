@@ -13,6 +13,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -27,11 +28,9 @@ import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.localinteraction.Client
 import com.utc.donlyconan.media.app.localinteraction.EGPMediaClient
 import com.utc.donlyconan.media.app.services.AudioService
-import com.utc.donlyconan.media.app.services.FileService
 import com.utc.donlyconan.media.app.services.MediaPlayerListener
 import com.utc.donlyconan.media.app.settings.Settings
 import com.utc.donlyconan.media.app.utils.AlertDialogManager
-import com.utc.donlyconan.media.app.utils.compareUri
 import com.utc.donlyconan.media.app.utils.now
 import com.utc.donlyconan.media.app.utils.sortedByCreatedDate
 import com.utc.donlyconan.media.app.utils.toBannerNumber
@@ -39,7 +38,6 @@ import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.FragmentPersonalVideoBinding
 import com.utc.donlyconan.media.databinding.LoadingDataScreenBinding
 import com.utc.donlyconan.media.viewmodels.PersonalVideoViewModel
-import com.utc.donlyconan.media.views.VideoDisplayActivity
 import com.utc.donlyconan.media.views.adapter.OnItemClickListener
 import com.utc.donlyconan.media.views.adapter.OnItemLongClickListener
 import com.utc.donlyconan.media.views.adapter.VideoAdapter
@@ -119,20 +117,22 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
+    private val intentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        Log.d(TAG, "requestPermissions() called with: result = $result")
+        if(Environment.isExternalStorageManager()) {
+            application.getFileService()?.syncAllVideos()
+        } else if(!isDetached) {
+            Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.OK) {
+                    requestPermissions()
+                }.show()
+        }
+    }
+
     private fun requestPermissions() {
         Log.d(TAG, "requestPermissions() called")
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val intentLanucher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                Log.d(TAG, "requestPermissions() called with: result = $result")
-               if(Environment.isExternalStorageManager()) {
-                   application.getFileService()?.syncAllVideos()
-               } else if(!isDetached) {
-                   Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
-                       .setAction(R.string.OK) {
-                           requestPermissions()
-                       }.show()
-               }
-            }
             if(!Environment.isExternalStorageManager()) {
                 AlertDialogManager.createDeleteAlertDialog(
                     context = requireContext(),
@@ -140,7 +140,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                     msg = "We are need you to provide file access permission for the app. Let's tab ${getString(R.string.app_name)}'s  checkbox.",
                     onAccept = {
                         val permissionIntent = Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                        intentLanucher.launch(permissionIntent)
+                        intentLauncher.launch(permissionIntent)
                     },
                     onDeny = {
                         requireActivity().finish()
