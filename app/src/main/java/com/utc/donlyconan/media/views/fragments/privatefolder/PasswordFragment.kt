@@ -5,13 +5,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.utc.donlyconan.media.R
+import com.utc.donlyconan.media.app.utils.Logs
 import com.utc.donlyconan.media.databinding.FragmentPasswordBinding
 import com.utc.donlyconan.media.views.BaseFragment
 import com.utc.donlyconan.media.views.fragments.maindisplay.ListVideosFragment
@@ -35,7 +35,11 @@ class PasswordFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showAuthentication()
+    }
 
+    private fun showAuthentication() {
+        Logs.d("showAuthentication() called")
         val executor = ContextCompat.getMainExecutor(requireActivity())
         val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -64,15 +68,19 @@ class PasswordFragment : BaseFragment() {
                 showToast(getString(R.string.authentication_failed))
             }
         })
+        try {
+            val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.app_name))
+                .setSubtitle(getString(R.string.require_password_content))
+                .setNegativeButtonText(getString(R.string.cancel))
+                .setAllowedAuthenticators(Authenticators.BIOMETRIC_STRONG)
+                .build()
 
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(getString(R.string.app_name))
-            .setSubtitle(getString(R.string.require_password_content))
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-            .build()
-
-        biometricPrompt.authenticate(promptInfo)
+            biometricPrompt.authenticate(promptInfo)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            findNavController().navigateUp()
+            showToast(getString(R.string.authentication_failed))
+        }
     }
-
-
 }

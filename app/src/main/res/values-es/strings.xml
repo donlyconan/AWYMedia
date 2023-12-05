@@ -124,4 +124,18 @@
     <string name="the_music_is_playing_by_easy_guard_player">La música está siendo reproducida por Easy Guard Player</string>
     <string name="show_info_file_move_into_bin">El archivo se movió a la papelera</string>
     <string name="wi_fi_pair">Emparejamiento de Wi-Fi</string>
+    <string name="the_video_was_shared">El video fue compartido</string>
+    <string name="the_connection_haven_t_established_yet">La conexión aún no se ha establecido</string>
+    <string name="back_again_to_exit">Volver a salir</string>
+    <string name="an_error_has_occurred">Se ha producido un error. %1$s</string>
+    <string name="the_file_is_downloaded_do_you_want_to_open">El archivo se ha descargado completamente. ¿Quieres abrir \'%1$s\'?</string>
+    <string name="the_authenticated_process_is_failed">¡El proceso de autenticación ha fallado!</string>
+    <string name="scan_qr_code_to_pair">Escanear el código QR para vincular</string>
+    <string name="connecting_devices">Conectando dispositivos</string>
+    <string name="connection_history">Historial de conexiones</string>
+    <string name="reconnect">Volver a conectar</string>
+    <string name="no_old_connected_device">No hay dispositivos conectados recientemente</string>
+    <string name="di_chuy_n_h_t_danh_s_ch">Movido al final de la lista</string>
+    <string name="forgot_password">Olvidó la contraseña</string>
+    <string name="use_fingerprint">Usar huella dactilar en su lugar</string>
 </resources>
