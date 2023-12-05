@@ -9,6 +9,7 @@ import android.content.Intent
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Binder
+import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
@@ -121,6 +122,9 @@ class FileService : Service() {
     private val mediaObserver =  object : ContentObserver(Handler(Looper.myLooper()!!)){
 
         override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
+            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+                super.onChange(selfChange, uri, flags)
+            }
             syncJob?.cancel()
             syncJob = runIO {
                 yield()
@@ -141,6 +145,7 @@ class FileService : Service() {
         }
 
         override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
+            super.onChange(selfChange, uris, flags)
             Log.d(TAG, "onChange() called with: selfChange = $selfChange, uris = $uris, flags = $flags")
             // sync data from external into local data
         }
