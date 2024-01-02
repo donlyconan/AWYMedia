@@ -30,12 +30,14 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
         application.getFileService()?.registerOnFileServiceListener(onFileServiceListener)
         application.setOnInitializedService(onInitializedService)
+        isWorking = true
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
         application.getFileService()?.unregisterOnFileServiceListener(onFileServiceListener)
+        isWorking = false
     }
 
     private val onInitializedService = object: EGMApplication.OnInitializedService {
@@ -96,6 +98,8 @@ class MainActivity : BaseActivity() {
 
     companion object {
         val TAG: String = MainActivity.javaClass.simpleName
+        var isWorking: Boolean = false
+            private set
     }
 
     interface OnActivityResponse {

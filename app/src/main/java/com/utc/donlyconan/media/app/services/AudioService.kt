@@ -182,6 +182,7 @@ class AudioService : Service() {
     }
 
     fun openVideoDisplay(context: Context?) {
+        Log.d(TAG, "openVideoDisplay called")
         player?.currentMediaItem?.localConfiguration?.uri?.let { uri ->
             val position = player!!.currentPosition
             val videoRepo = (context!!.applicationContext as EGMApplication).applicationComponent()
@@ -189,15 +190,15 @@ class AudioService : Service() {
             videoRepo.get(uri.toString())?.let { video ->
                 video.playedTime = position
                 videoRepo.update(video)
-                startActivity(
-                    VideoDisplayActivity.newIntent(
-                        context,
-                        video.videoId,
-                        video.videoUri,
-                        continued = true
-                    ).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    })
+                val intent = VideoDisplayActivity.newIntent(
+                    context = context,
+                    videoId = video.videoId,
+                    uri = video.videoUri,
+                    continued = true
+                ).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+                startActivity(intent)
             }
         }
     }

@@ -159,6 +159,7 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                 )
             }
         }
+        requestPermissionIfNeed(Manifest.permission.SYSTEM_ALERT_WINDOW)
     }
 
 

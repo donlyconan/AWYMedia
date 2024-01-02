@@ -674,4 +674,14 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
 
     override fun onScaleEnd(detector: ScaleGestureDetector) { }
 
+    override fun finish() {
+        Log.d(TAG, "finish() called main activity is working = ${MainActivity.isWorking}")
+        if(!MainActivity.isWorking) {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        } else {
+            super.finish()
+        }
+    }
 }

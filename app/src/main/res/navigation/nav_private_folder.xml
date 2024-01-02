@@ -26,10 +26,4 @@
         android:label="fragment_private_folder"
         tools:layout="@layout/fragment_private_folder" />
 
-    <fragment
-        android:id="@+id/changePasswordFragment2"
-        android:name="com.utc.donlyconan.media.views.fragments.privatefolder.ChangePasswordFragment"
-        android:label="fragment_change_password"
-        tools:layout="@layout/fragment_change_password" />
-
 </navigation>
