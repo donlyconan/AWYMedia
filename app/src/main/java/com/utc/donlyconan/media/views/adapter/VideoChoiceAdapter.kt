@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.utc.donlyconan.media.R
 import com.utc.donlyconan.media.app.utils.convertToStorageData
+import com.utc.donlyconan.media.app.utils.formatShortTime
 import com.utc.donlyconan.media.app.utils.setVideoImage
 import com.utc.donlyconan.media.data.models.Video
 import com.utc.donlyconan.media.databinding.ItemVideoChoiceBinding
@@ -76,6 +77,7 @@ class VideoChoiceAdapter(var context: Context, var videos: ArrayList<Video>) :
             Log.d(TAG, "bind() called with: video = $video, isLastItem = $isLastItem")
             binding.tvTitle.text = video.title
             binding.tvSize.text = video.size.convertToStorageData()
+            binding.tvDuration.text = (video.duration / 1000).formatShortTime()
 
             binding.imgThumbnail.setVideoImage(video.videoUri)
             if (isLastItem) {

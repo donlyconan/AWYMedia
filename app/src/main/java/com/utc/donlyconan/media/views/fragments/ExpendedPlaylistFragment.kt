@@ -99,6 +99,7 @@ class ExpendedPlaylistFragment : BaseFragment(), View.OnClickListener, OnItemCli
                 }
             } else {
                 adapter.submit(playlist)
+                hideLoading()
             }
             return true
         }
