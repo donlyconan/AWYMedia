@@ -159,7 +159,6 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
                 )
             }
         }
-        requestPermissionIfNeed(Manifest.permission.SYSTEM_ALERT_WINDOW)
     }
 
 
@@ -169,7 +168,8 @@ class PersonalVideoFragment : ListVideosFragment(), View.OnClickListener, OnItem
         if (granted != 0) {
             application.getFileService()?.syncAllVideos()
         } else {
-            Snackbar.make(view!!, "You need to allow permissions before using.", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(view!!,
+                getString(R.string.you_need_to_allow_permissions_before_using), Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.OK) {
                     requestPermissionsIfNeed()
                 }.show()

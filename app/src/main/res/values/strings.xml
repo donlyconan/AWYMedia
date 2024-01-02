@@ -163,5 +163,6 @@
         <item>es</item>
     </string-array>
     <string name="use_fingerprint">Use fingerprint instead.</string>
+    <string name="you_need_to_allow_permissions_before_using">You need to allow permissions before using.</string>
 
 </resources>
