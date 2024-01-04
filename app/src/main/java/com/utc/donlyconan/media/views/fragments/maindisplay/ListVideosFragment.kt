@@ -127,8 +127,10 @@ abstract class ListVideosFragment : BaseFragment(), OnItemClickListener,  FileSe
                         msg = getString(R.string.the_file_is_downloaded_do_you_want_to_open, video.title),
                         onAccept = {
                             startVideoDisplayActivity(video.videoId, video.videoUri, continued=true)
+                            downloadingAlert?.dismiss()
                         }, onDeny = {
                             allowShowDialog = false
+                            downloadingAlert?.dismiss()
                         })
                     downloadingAlert?.show()
                 }
