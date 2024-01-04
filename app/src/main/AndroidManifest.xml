@@ -52,7 +52,6 @@
         android:name=".views.VideoDisplayActivity"
         android:screenOrientation="nosensor"
         android:turnScreenOn="true"
-        android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
         android:exported="true"
         android:launchMode="singleTask"
         android:theme="@style/Activity.Fullscreen"
