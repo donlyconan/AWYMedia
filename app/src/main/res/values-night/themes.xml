@@ -1,17 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.AWYMedia" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/gray</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/white_gray</item>
-        <item name="colorControlNormal">@color/white</item>
-        <!-- Status bar color. -->
-        <!-- Customize your theme here. -->
-        <item name="android:statusBarColor">?colorPrimary</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:itemBackground">@color/gray_20</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
+<!--    <style name="Theme.AWYMedia" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--        &lt;!&ndash; Primary brand color. &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/gray</item>-->
+<!--        &lt;!&ndash; Secondary brand color. &ndash;&gt;-->
+<!--        <item name="colorSecondary">@color/white_gray</item>-->
+<!--        <item name="colorControlNormal">@color/white</item>-->
+<!--        &lt;!&ndash; Status bar color. &ndash;&gt;-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+<!--        <item name="android:statusBarColor">?colorPrimary</item>-->
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+<!--        <item name="android:windowActionModeOverlay">true</item>-->
+<!--        <item name="android:itemBackground">@color/gray_20</item>-->
+<!--        <item name="android:textColor">@color/white</item>-->
+<!--    </style>-->
 </resources>

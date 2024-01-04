@@ -550,7 +550,7 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
         // location in x must be under 50 and time
         val land = requestedOrientation == Configuration.ORIENTATION_LANDSCAPE
         val requestDistance = if(land) 120 else 50
-        if(e.x < requestDistance && viewModel.isListMode()) {
+        if(e.x < requestDistance && e.y > 100 && viewModel.isListMode()) {
             showPlaylist(viewModel.playlistId)
             expireBackTime = 0L
             return true
