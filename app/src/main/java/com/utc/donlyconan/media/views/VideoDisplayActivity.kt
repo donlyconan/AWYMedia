@@ -412,10 +412,11 @@ class VideoDisplayActivity : BaseActivity(), View.OnClickListener,
                 val position = player.currentPosition
                 val repeatMode = player.repeatMode
                 val speed = viewModel.speedMld.value!!
-                val index = viewModel.playingIndexMld.value!!
+                var index = viewModel.playingIndexMld.value!!
                 lifecycleScope.launch {
                     var playlist = viewModel.playlist?.map { it.videoUri }?.toTypedArray()
-                    if (playlist.isNullOrEmpty() || repeatMode == Player.REPEAT_MODE_OFF) {
+                    if (playlist.isNullOrEmpty()) {
+                        index = 0
                         playlist = arrayOf(viewModel.videoMld.value!!.videoUri)
                     }
                     val mediaItems = playlist.map { uri -> MediaItem.fromUri(uri) }
